@@ -127,9 +127,6 @@ public class EnumerableFactoryRegistry
     public static IEnumerableFactory? TryGetEnumerableFactory(Type genericType)
         => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : null;
 
-    public static IEnumerableFactory<TEnumerable, T>? TryGetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
-        => throw new NotImplementedException();
-
     public static IEnumerableFactory GetEnumerableFactory(Type genericType)
         => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException("EnumerableFactory not registered", nameof(genericType));
 

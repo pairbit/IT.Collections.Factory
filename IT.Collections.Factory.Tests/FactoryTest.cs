@@ -16,10 +16,9 @@ public class Tests
 
         var enumerableFactory = EnumerableFactoryRegistry.GetEnumerableFactory(typeof(IList<>));
 
-        var factory2 = EnumerableFactoryRegistry.TryGetEnumerableFactory<IList<int>, int>();
+        var list = (IList<int>)enumerableFactory.Empty<int>();
 
-        //factory2.
-        //var list = (IList<int>)enumerableFactory.New<int>(10);
+
 
         Assert.Pass();
     }

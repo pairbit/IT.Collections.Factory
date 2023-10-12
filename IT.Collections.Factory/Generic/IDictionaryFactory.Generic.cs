@@ -1,4 +1,4 @@
-﻿namespace IT.Collections.Factory;
+﻿namespace IT.Collections.Factory.Generic;
 
 public delegate TDictionary DictionaryFactory<TDictionary, TKey, TValue>(int capacity) where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>;
 

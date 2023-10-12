@@ -1,4 +1,4 @@
-﻿namespace IT.Collections.Factory;
+﻿namespace IT.Collections.Factory.Generic;
 
 public delegate TEnumerable EnumerableFactory<TEnumerable, T>(int capacity) where TEnumerable : IEnumerable<T>;
 
