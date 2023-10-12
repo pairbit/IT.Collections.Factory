@@ -6,5 +6,5 @@ public class ConcurrentBagFactory : EnumerableFactory
 {
     public static readonly ConcurrentBagFactory Default = new();
 
-    protected override IEnumerable<T> New<T>(int capacity) => new ConcurrentBag<T>();
+    public override IEnumerable<T> New<T>(int capacity) => new ConcurrentBag<T>();
 }

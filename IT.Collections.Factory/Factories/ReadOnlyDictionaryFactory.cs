@@ -11,6 +11,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
     public IDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, in TState state, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder) where TKey : notnull
     {
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var dictionary = new Dictionary<TKey, TValue>(capacity);
 

@@ -6,5 +6,5 @@ public class ConcurrentQueueFactory : EnumerableFactory
 {
     public static readonly ConcurrentQueueFactory Default = new();
 
-    protected override IEnumerable<T> New<T>(int capacity) => new ConcurrentQueue<T>();
+    public override IEnumerable<T> New<T>(int capacity) => new ConcurrentQueue<T>();
 }

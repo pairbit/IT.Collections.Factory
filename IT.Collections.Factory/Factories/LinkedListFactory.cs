@@ -6,5 +6,5 @@ public class LinkedListFactory : EnumerableFactory
 
     public override IEnumerable<T> Empty<T>() => new LinkedList<T>();
 
-    protected override IEnumerable<T> New<T>(int capacity) => new LinkedList<T>();
+    public override IEnumerable<T> New<T>(int capacity) => new LinkedList<T>();
 }

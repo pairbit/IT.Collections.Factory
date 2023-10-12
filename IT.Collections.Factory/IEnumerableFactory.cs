@@ -2,9 +2,13 @@
 
 public interface IEnumerableFactory
 {
+    bool IsReadOnly { get; }
+
     IEnumerable<T> Empty<T>();
 
-    IEnumerable<T> New<T, TState>(int capacity, in TState state, EnumerableBuilder<T, TState> builder);
+    IEnumerable<T> New<T>(int capacity);
 
-    //IEnumerable<T> New<T>(int capacity);
+    IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder);
+
+    IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state);
 }

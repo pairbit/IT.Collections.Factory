@@ -6,7 +6,7 @@ public class HashSetFactory : EnumerableFactory
 
     public override IEnumerable<T> Empty<T>() => new HashSet<T>((IEqualityComparer<T>?)null);
 
-    protected override IEnumerable<T> New<T>(int capacity)
+    public override IEnumerable<T> New<T>(int capacity)
 #if NETSTANDARD2_0 || NET461
         => new HashSet<T>();
 #else

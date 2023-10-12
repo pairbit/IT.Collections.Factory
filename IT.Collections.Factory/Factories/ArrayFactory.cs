@@ -6,5 +6,5 @@ public class ArrayFactory : EnumerableFactory
 
     public override IEnumerable<T> Empty<T>() => Array.Empty<T>();
 
-    protected override IEnumerable<T> New<T>(int capacity) => new T[capacity];
+    public override IEnumerable<T> New<T>(int capacity) => new T[capacity];
 }

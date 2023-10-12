@@ -6,5 +6,5 @@ public class StackFactory : EnumerableFactory
 
     public override IEnumerable<T> Empty<T>() => new Stack<T>();
 
-    protected override IEnumerable<T> New<T>(int capacity) => new Stack<T>(capacity);
+    public override IEnumerable<T> New<T>(int capacity) => new Stack<T>(capacity);
 }
