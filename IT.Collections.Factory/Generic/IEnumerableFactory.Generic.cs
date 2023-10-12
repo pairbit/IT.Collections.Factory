@@ -4,7 +4,13 @@ public delegate TEnumerable EnumerableFactory<TEnumerable, T>(int capacity) wher
 
 public interface IEnumerableFactory<TEnumerable, T> where TEnumerable : IEnumerable<T>
 {
+    bool IsReadOnly { get; }
+
     TEnumerable Empty();
 
-    TEnumerable New<TState>(int capacity, in TState state, EnumerableBuilder<T, TState> builder);
+    TEnumerable New(int capacity);
+
+    TEnumerable New(int capacity, EnumerableBuilder<T> builder);
+
+    TEnumerable New<TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state);
 }
