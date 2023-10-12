@@ -12,44 +12,44 @@ public class EnumerableFactoryRegistry
     static EnumerableFactoryRegistry()
     {
         //RegisterEnumerableFactory(ArrayFactory.Default, typeof(IEnumerable<>));
-        RegisterEnumerable(ListFactory.Default, typeof(IList<>));
-        RegisterEnumerable(LinkedListFactory.Default, typeof(ICollection<>), typeof(IEnumerable<>));
-        RegisterEnumerable(HashSetFactory.Default, typeof(ISet<>));
-        RegisterEnumerable(SortedSetFactory.Default);
-        RegisterEnumerable(StackFactory.Default);
-        RegisterEnumerable(QueueFactory.Default);
-        RegisterEnumerable(CollectionFactory.Default);
-        RegisterEnumerable(ObservableCollectionFactory.Default);
-        RegisterEnumerable(ReadOnlyObservableCollectionFactory.Default);
+        RegisterEnumerableFactory(ListFactory.Default, typeof(IList<>));
+        RegisterEnumerableFactory(LinkedListFactory.Default, typeof(ICollection<>), typeof(IEnumerable<>));
+        RegisterEnumerableFactory(HashSetFactory.Default, typeof(ISet<>));
+        RegisterEnumerableFactory(SortedSetFactory.Default);
+        RegisterEnumerableFactory(StackFactory.Default);
+        RegisterEnumerableFactory(QueueFactory.Default);
+        RegisterEnumerableFactory(CollectionFactory.Default);
+        RegisterEnumerableFactory(ObservableCollectionFactory.Default);
+        RegisterEnumerableFactory(ReadOnlyObservableCollectionFactory.Default);
 
-        RegisterEnumerable(ReadOnlyListFactory.Default, typeof(IReadOnlyList<>));
-        RegisterEnumerable(ReadOnlyLinkedListFactory.Default, typeof(IReadOnlyCollection<>));
+        RegisterEnumerableFactory(ReadOnlyListFactory.Default, typeof(IReadOnlyList<>));
+        RegisterEnumerableFactory(ReadOnlyLinkedListFactory.Default, typeof(IReadOnlyCollection<>));
 #if NET6_0_OR_GREATER
-        RegisterEnumerable(ReadOnlyHashSetFactory.Default, typeof(IReadOnlySet<>));
+        RegisterEnumerableFactory(ReadOnlyHashSetFactory.Default, typeof(IReadOnlySet<>));
 #endif
 #if NETCOREAPP3_1_OR_GREATER
-        RegisterEnumerable(ImmutableArrayFactory.Default);
-        RegisterEnumerable(ImmutableListFactory.Default, typeof(System.Collections.Immutable.IImmutableList<>));
-        RegisterEnumerable(ImmutableHashSetFactory.Default, typeof(System.Collections.Immutable.IImmutableSet<>));
-        RegisterEnumerable(ImmutableSortedSetFactory.Default);
-        RegisterEnumerable(ImmutableStackFactory.Default, typeof(System.Collections.Immutable.IImmutableStack<>));
-        RegisterEnumerable(ImmutableQueueFactory.Default, typeof(System.Collections.Immutable.IImmutableQueue<>));
-        RegisterDictionary(ImmutableDictionaryFactory.Default, typeof(System.Collections.Immutable.IImmutableDictionary<,>));
-        RegisterDictionary(ImmutableSortedDictionaryFactory.Default);
+        RegisterEnumerableFactory(ImmutableArrayFactory.Default);
+        RegisterEnumerableFactory(ImmutableListFactory.Default, typeof(System.Collections.Immutable.IImmutableList<>));
+        RegisterEnumerableFactory(ImmutableHashSetFactory.Default, typeof(System.Collections.Immutable.IImmutableSet<>));
+        RegisterEnumerableFactory(ImmutableSortedSetFactory.Default);
+        RegisterEnumerableFactory(ImmutableStackFactory.Default, typeof(System.Collections.Immutable.IImmutableStack<>));
+        RegisterEnumerableFactory(ImmutableQueueFactory.Default, typeof(System.Collections.Immutable.IImmutableQueue<>));
+        RegisterDictionaryFactory(ImmutableDictionaryFactory.Default, typeof(System.Collections.Immutable.IImmutableDictionary<,>));
+        RegisterDictionaryFactory(ImmutableSortedDictionaryFactory.Default);
 #endif
-        RegisterDictionary(DictionaryFactory.Default, typeof(IDictionary<,>));
-        RegisterDictionary(ReadOnlyDictionaryFactory.Default, typeof(IReadOnlyDictionary<,>));
-        RegisterDictionary(SortedDictionaryFactory.Default);
-        RegisterDictionary(SortedListFactory.Default);
+        RegisterDictionaryFactory(DictionaryFactory.Default, typeof(IDictionary<,>));
+        RegisterDictionaryFactory(ReadOnlyDictionaryFactory.Default, typeof(IReadOnlyDictionary<,>));
+        RegisterDictionaryFactory(SortedDictionaryFactory.Default);
+        RegisterDictionaryFactory(SortedListFactory.Default);
 
-        RegisterDictionary(ConcurrentDictionaryFactory.Default);
-        RegisterEnumerable(ConcurrentBagFactory.Default, typeof(IProducerConsumerCollection<>));
-        RegisterEnumerable(ConcurrentQueueFactory.Default);
-        RegisterEnumerable(ConcurrentStackFactory.Default);
-        RegisterEnumerable(BlockingCollectionFactory.Default);
+        RegisterDictionaryFactory(ConcurrentDictionaryFactory.Default);
+        RegisterEnumerableFactory(ConcurrentBagFactory.Default, typeof(IProducerConsumerCollection<>));
+        RegisterEnumerableFactory(ConcurrentQueueFactory.Default);
+        RegisterEnumerableFactory(ConcurrentStackFactory.Default);
+        RegisterEnumerableFactory(BlockingCollectionFactory.Default);
     }
 
-    public static void RegisterEnumerable(IEnumerableFactory factory, params Type[] genericTypes)
+    public static void RegisterEnumerableFactory(IEnumerableFactory factory, params Type[] genericTypes)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
@@ -91,7 +91,7 @@ public class EnumerableFactoryRegistry
         }
     }
 
-    public static void RegisterDictionary(IDictionaryFactory factory, params Type[] genericTypes)
+    public static void RegisterDictionaryFactory(IDictionaryFactory factory, params Type[] genericTypes)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
@@ -123,4 +123,19 @@ public class EnumerableFactoryRegistry
             }
         }
     }
+
+    public static IEnumerableFactory? TryGetEnumerableFactory(Type genericType)
+        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : null;
+
+    public static IEnumerableFactory<TEnumerable, T>? TryGetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
+        => throw new NotImplementedException();
+
+    public static IEnumerableFactory GetEnumerableFactory(Type genericType)
+        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException("EnumerableFactory not registered", nameof(genericType));
+
+    public static IDictionaryFactory? TryGetDictionaryFactory(Type genericType)
+        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : null;
+
+    public static IDictionaryFactory GetDictionaryFactory(Type genericType)
+        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException("DictionaryFactory not registered", nameof(genericType));
 }

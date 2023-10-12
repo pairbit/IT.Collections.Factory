@@ -12,11 +12,14 @@ public class Tests
     {
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(LinkedListFactory.Default, typeof(IReadOnlyCollection<>));
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(StackFactory.Default, typeof(IEnumerable<>), typeof(IReadOnlyCollection<>));
-        EnumerableFactoryRegistry.RegisterEnumerable(EquatableListFactory.Default);
+        EnumerableFactoryRegistry.RegisterEnumerableFactory(EquatableListFactory.Default);
 
-        //var enumerableFactory = EnumerableFactoryRegistry.GetFactory(typeof(IList<>));
+        var enumerableFactory = EnumerableFactoryRegistry.GetEnumerableFactory(typeof(IList<>));
 
+        var factory2 = EnumerableFactoryRegistry.TryGetEnumerableFactory<IList<int>, int>();
 
+        //factory2.
+        //var list = (IList<int>)enumerableFactory.New<int>(10);
 
         Assert.Pass();
     }
