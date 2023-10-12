@@ -12,23 +12,18 @@ public class ImmutableListFactory : IEnumerableFactory
 
     public IEnumerable<T> Empty<T>() => ImmutableList<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
-    {
-        if (capacity == 0) return ImmutableList<T>.Empty;
-
-        return ImmutableList<T>.Empty.AddRange(new T[capacity]);
-    }
+    public IEnumerable<T> New<T>(int capacity) => ImmutableList<T>.Empty;
 
     public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableList<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var listBuilder = ImmutableList<T>.Empty.ToBuilder();
 
-        builder(array);
+        builder(listBuilder.Add, false);
 
-        return ImmutableList<T>.Empty.AddRange(array);
+        return listBuilder.ToImmutable();
     }
 
     public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
@@ -36,11 +31,11 @@ public class ImmutableListFactory : IEnumerableFactory
         if (capacity == 0) return ImmutableList<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var listBuilder = ImmutableList<T>.Empty.ToBuilder();
 
-        builder(array, in state);
+        builder(listBuilder.Add, false, in state);
 
-        return ImmutableList<T>.Empty.AddRange(array);
+        return listBuilder.ToImmutable();
     }
 }
 

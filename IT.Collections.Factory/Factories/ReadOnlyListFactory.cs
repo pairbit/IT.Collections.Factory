@@ -22,7 +22,7 @@ public class ReadOnlyListFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list);
+        builder(list.Add, false);
 
         return new ReadOnlyCollection<T>(list);
     }
@@ -34,7 +34,7 @@ public class ReadOnlyListFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list, in state);
+        builder(list.Add, false, in state);
 
         return new ReadOnlyCollection<T>(list);
     }

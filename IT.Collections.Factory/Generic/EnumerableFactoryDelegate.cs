@@ -4,12 +4,16 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
     where TEnumerable : IEnumerable<T>
 {
     private readonly EnumerableFactory<TEnumerable, T> _factory;
+    private readonly Action<TEnumerable, T> _add;
+    private readonly bool _reverse;
 
     public bool IsReadOnly => false;
 
-    public EnumerableFactoryDelegate(EnumerableFactory<TEnumerable, T> factory)
+    public EnumerableFactoryDelegate(EnumerableFactory<TEnumerable, T> factory, Action<TEnumerable, T> add, bool reverse)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        _add = add ?? throw new ArgumentNullException(nameof(add));
+        _reverse = reverse;
     }
 
     public TEnumerable Empty() => _factory(0);
@@ -27,8 +31,9 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var enumerable = _factory(capacity);
+        var add = _add;
 
-        builder(enumerable);
+        builder(item => add(enumerable, item), _reverse);
 
         return enumerable;
     }
@@ -39,8 +44,9 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var enumerable = _factory(capacity);
+        var add = _add;
 
-        builder(enumerable, in state);
+        builder(item => add(enumerable, item), _reverse, in state);
 
         return enumerable;
     }

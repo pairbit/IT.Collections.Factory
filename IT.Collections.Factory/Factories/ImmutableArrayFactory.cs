@@ -25,8 +25,9 @@ public class ImmutableArrayFactory : IEnumerableFactory
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var array = new T[capacity];
+        var index = 0;
 
-        builder(array);
+        builder(item => array[index++] = item, false);
 
         return ImmutableArray.Create(array);
     }
@@ -37,8 +38,9 @@ public class ImmutableArrayFactory : IEnumerableFactory
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var array = new T[capacity];
+        var index = 0;
 
-        builder(array, in state);
+        builder(item => array[index++] = item, false, in state);
 
         return ImmutableArray.Create(array);
     }

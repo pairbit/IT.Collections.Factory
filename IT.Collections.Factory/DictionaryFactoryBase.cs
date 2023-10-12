@@ -15,7 +15,7 @@ public abstract class DictionaryFactoryBase : IDictionaryFactory
 
         var dictionary = New<TKey, TValue>(capacity);
 
-        builder(dictionary);
+        builder(dictionary.Add, false);
 
         return dictionary;
     }
@@ -27,7 +27,7 @@ public abstract class DictionaryFactoryBase : IDictionaryFactory
 
         var dictionary = New<TKey, TValue>(capacity);
 
-        builder(dictionary, in state);
+        builder(dictionary.Add, false, in state);
 
         return dictionary;
     }

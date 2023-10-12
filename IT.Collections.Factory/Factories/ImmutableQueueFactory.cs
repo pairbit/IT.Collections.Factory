@@ -12,23 +12,18 @@ public class ImmutableQueueFactory : IEnumerableFactory
 
     public IEnumerable<T> Empty<T>() => ImmutableQueue<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
-    {
-        if (capacity == 0) return ImmutableQueue<T>.Empty;
-
-        return ImmutableQueue.Create(new T[capacity]);
-    }
+    public IEnumerable<T> New<T>(int capacity) => ImmutableQueue<T>.Empty;
 
     public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableQueue<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var queue = ImmutableQueue<T>.Empty;
 
-        builder(array);
+        builder(item => queue = queue.Enqueue(item), false);
 
-        return ImmutableQueue.Create(array);
+        return queue;
     }
 
     public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
@@ -36,11 +31,11 @@ public class ImmutableQueueFactory : IEnumerableFactory
         if (capacity == 0) return ImmutableQueue<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var queue = ImmutableQueue<T>.Empty;
 
-        builder(array, in state);
+        builder(item => queue = queue.Enqueue(item), false, in state);
 
-        return ImmutableQueue.Create(array);
+        return queue;
     }
 }
 

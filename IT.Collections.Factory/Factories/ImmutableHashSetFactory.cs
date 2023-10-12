@@ -12,23 +12,18 @@ public class ImmutableHashSetFactory : IEnumerableFactory
 
     public IEnumerable<T> Empty<T>() => ImmutableHashSet<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
-    {
-        if (capacity == 0) return ImmutableHashSet<T>.Empty;
-
-        return ImmutableHashSet<T>.Empty.Union(new T[capacity]);
-    }
+    public IEnumerable<T> New<T>(int capacity) => ImmutableHashSet<T>.Empty;
 
     public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableHashSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
 
-        builder(array);
+        builder(item => hashSetBuilder.Add(item), false);
 
-        return ImmutableHashSet<T>.Empty.Union(array);
+        return hashSetBuilder.ToImmutable();
     }
 
     public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
@@ -36,11 +31,11 @@ public class ImmutableHashSetFactory : IEnumerableFactory
         if (capacity == 0) return ImmutableHashSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
 
-        builder(array, in state);
+        builder(item => hashSetBuilder.Add(item), false, in state);
 
-        return ImmutableHashSet<T>.Empty.Union(array);
+        return hashSetBuilder.ToImmutable();
     }
 }
 

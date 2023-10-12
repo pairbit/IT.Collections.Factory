@@ -20,9 +20,9 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity);
+        IDictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(dictionary);
+        builder(dictionary.Add, false);
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }
@@ -32,9 +32,9 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity);
+        IDictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(dictionary, in state);
+        builder(dictionary.Add, false, in state);
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }

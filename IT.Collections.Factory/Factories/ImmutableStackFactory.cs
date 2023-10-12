@@ -12,31 +12,16 @@ public class ImmutableStackFactory : IEnumerableFactory
 
     public IEnumerable<T> Empty<T>() => ImmutableStack<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
-    {
-        if (capacity == 0) return ImmutableStack<T>.Empty;
-
-        var array = new T[capacity];
-
-        var stack = ImmutableStack<T>.Empty;
-
-        for (int i = array.Length - 1; i >= 0; i--) stack = stack.Push(array[i]);
-
-        return stack;
-    }
+    public IEnumerable<T> New<T>(int capacity) => ImmutableStack<T>.Empty;
 
     public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableStack<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
-
-        builder(array);
-
         var stack = ImmutableStack<T>.Empty;
 
-        for (int i = array.Length - 1; i >= 0; i--) stack = stack.Push(array[i]);
+        builder(item => stack = stack.Push(item), true);
 
         return stack;
     }
@@ -46,13 +31,9 @@ public class ImmutableStackFactory : IEnumerableFactory
         if (capacity == 0) return ImmutableStack<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
-
-        builder(array, in state);
-
         var stack = ImmutableStack<T>.Empty;
 
-        for (int i = array.Length - 1; i >= 0; i--) stack = stack.Push(array[i]);
+        builder(item => stack = stack.Push(item), true, in state);
 
         return stack;
     }

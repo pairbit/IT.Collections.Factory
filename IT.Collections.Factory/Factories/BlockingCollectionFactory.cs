@@ -24,7 +24,7 @@ public class BlockingCollectionFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(queue);
+        builder(queue.Enqueue, false);
 
         return new BlockingCollection<T>(queue, capacity);
     }
@@ -36,7 +36,7 @@ public class BlockingCollectionFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(queue, in state);
+        builder(queue.Enqueue, false, in state);
 
         return new BlockingCollection<T>(queue, capacity);
     }

@@ -12,23 +12,18 @@ public class ImmutableSortedSetFactory : IEnumerableFactory
 
     public IEnumerable<T> Empty<T>() => ImmutableSortedSet<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
-    {
-        if (capacity == 0) return ImmutableSortedSet<T>.Empty;
-
-        return ImmutableSortedSet<T>.Empty.Union(new T[capacity]);
-    }
+    public IEnumerable<T> New<T>(int capacity) => ImmutableSortedSet<T>.Empty;
 
     public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableSortedSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
 
-        builder(array);
+        builder(item => sortedSetBuilder.Add(item), false);
 
-        return ImmutableSortedSet<T>.Empty.Union(array);
+        return sortedSetBuilder.ToImmutable();
     }
 
     public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
@@ -36,11 +31,11 @@ public class ImmutableSortedSetFactory : IEnumerableFactory
         if (capacity == 0) return ImmutableSortedSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var array = new T[capacity];
+        var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
 
-        builder(array, in state);
+        builder(item => sortedSetBuilder.Add(item), false, in state);
 
-        return ImmutableSortedSet<T>.Empty.Union(array);
+        return sortedSetBuilder.ToImmutable();
     }
 }
 

@@ -24,7 +24,7 @@ public class ReadOnlyHashSetFactory : IEnumerableFactory
 
         var hashSet = new HashSet<T>(capacity, null);
 
-        builder(hashSet);
+        builder(((ICollection<T>)hashSet).Add, false);
 
         return new ReadOnlySet<T>(hashSet);
     }
@@ -36,7 +36,7 @@ public class ReadOnlyHashSetFactory : IEnumerableFactory
 
         var hashSet = new HashSet<T>(capacity, null);
 
-        builder(hashSet, in state);
+        builder(((ICollection<T>)hashSet).Add, false, in state);
 
         return new ReadOnlySet<T>(hashSet);
     }
