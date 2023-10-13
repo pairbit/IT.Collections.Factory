@@ -1,6 +1,6 @@
 namespace IT.Collections.Factory.Tests;
 
-public class Tests
+public class EnumerableFactoryTest
 {
     private readonly static Random _random = new();
     private int _capacity;
@@ -35,7 +35,7 @@ public class Tests
     }
 
     [Test]
-    public void EnumerableFactoryAllTest()
+    public void FactoryTest()
     {
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(LinkedListFactory.Default, typeof(IReadOnlyCollection<>));
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(StackFactory.Default, typeof(IEnumerable<>), typeof(IReadOnlyCollection<>));
@@ -57,7 +57,7 @@ public class Tests
         {
             try
             {
-                EnumerableFactoryTest(factory);
+                FactoryTest(factory);
             }
             catch (Exception)
             {
@@ -67,7 +67,7 @@ public class Tests
         }
     }
 
-    private void EnumerableFactoryTest(IEnumerableFactory factory)
+    private void FactoryTest(IEnumerableFactory factory)
     {
         var empty = factory.Empty<int>();
 

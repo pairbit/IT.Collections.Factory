@@ -42,7 +42,7 @@ public class DictionaryFactoryTest
     }
 
     [Test]
-    public void FactoryAllTest()
+    public void FactoryTest()
     {
         foreach (var pair in EnumerableFactoryRegistry.DictionaryTypes)
         {
