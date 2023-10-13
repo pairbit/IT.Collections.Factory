@@ -22,7 +22,7 @@ public class ReadOnlyObservableCollectionFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list.Add, false);
+        builder(item => { list.Add(item); return true; }, false);
 
         return new ReadOnlyObservableCollection<T>(new ObservableCollection<T>(list));
     }
@@ -34,7 +34,7 @@ public class ReadOnlyObservableCollectionFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list.Add, false, in state);
+        builder(item => { list.Add(item); return true; }, false, in state);
 
         return new ReadOnlyObservableCollection<T>(new ObservableCollection<T>(list));
     }

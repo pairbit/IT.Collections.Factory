@@ -21,7 +21,7 @@ public class ImmutableListFactory : IEnumerableFactory
 
         var listBuilder = ImmutableList<T>.Empty.ToBuilder();
 
-        builder(listBuilder.Add, false);
+        builder(item => { listBuilder.Add(item); return true; }, false);
 
         return listBuilder.ToImmutable();
     }
@@ -33,7 +33,7 @@ public class ImmutableListFactory : IEnumerableFactory
 
         var listBuilder = ImmutableList<T>.Empty.ToBuilder();
 
-        builder(listBuilder.Add, false, in state);
+        builder(item => { listBuilder.Add(item); return true; }, false, in state);
 
         return listBuilder.ToImmutable();
     }

@@ -21,7 +21,7 @@ public class ImmutableSortedSetFactory : IEnumerableFactory
 
         var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
 
-        builder(item => sortedSetBuilder.Add(item), false);
+        builder(sortedSetBuilder.Add, false);
 
         return sortedSetBuilder.ToImmutable();
     }
@@ -33,7 +33,7 @@ public class ImmutableSortedSetFactory : IEnumerableFactory
 
         var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
 
-        builder(item => sortedSetBuilder.Add(item), false, in state);
+        builder(sortedSetBuilder.Add, false, in state);
 
         return sortedSetBuilder.ToImmutable();
     }

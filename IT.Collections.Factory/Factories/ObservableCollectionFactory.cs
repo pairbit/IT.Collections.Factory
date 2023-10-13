@@ -24,7 +24,7 @@ public class ObservableCollectionFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list.Add, false);
+        builder(item => { list.Add(item); return true; }, false);
 
         return new ObservableCollection<T>(list);
     }
@@ -36,7 +36,7 @@ public class ObservableCollectionFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(list.Add, false, in state);
+        builder(item => { list.Add(item); return true; }, false, in state);
 
         return new ObservableCollection<T>(list);
     }

@@ -4,16 +4,17 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
     where TEnumerable : IEnumerable<T>
 {
     private readonly EnumerableFactory<TEnumerable, T> _factory;
-    private readonly Action<TEnumerable, T> _add;
+    private readonly Func<TEnumerable, T, bool> _tryAdd;
     private readonly EnumerableType _type;
 
     public EnumerableType Type => _type;
 
-    public EnumerableFactoryDelegate(EnumerableFactory<TEnumerable, T> factory, Action<TEnumerable, T> add,
+    public EnumerableFactoryDelegate(EnumerableFactory<TEnumerable, T> factory,
+        Func<TEnumerable, T, bool> tryAdd,
         EnumerableType type = EnumerableType.None)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-        _add = add ?? throw new ArgumentNullException(nameof(add));
+        _tryAdd = tryAdd ?? throw new ArgumentNullException(nameof(tryAdd));
         _type = type;
     }
 
@@ -32,9 +33,9 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var enumerable = _factory(capacity);
-        var add = _add;
+        var tryAdd = _tryAdd;
 
-        builder(item => add(enumerable, item), _type == EnumerableType.Reverse);
+        builder(item => tryAdd(enumerable, item), _type == EnumerableType.Reverse);
 
         return enumerable;
     }
@@ -45,9 +46,9 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var enumerable = _factory(capacity);
-        var add = _add;
+        var tryAdd = _tryAdd;
 
-        builder(item => add(enumerable, item), _type == EnumerableType.Reverse, in state);
+        builder(item => tryAdd(enumerable, item), _type == EnumerableType.Reverse, in state);
 
         return enumerable;
     }

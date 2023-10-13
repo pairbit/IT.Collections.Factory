@@ -22,7 +22,7 @@ public class ReadOnlyLinkedListFactory : IEnumerableFactory
 
         var list = new LinkedList<T>();
 
-        builder(((ICollection<T>)list).Add, false);
+        builder(item => { list.AddLast(item); return true; }, false);
 
         return new ReadOnlyCollection<T>(list);
     }
@@ -34,7 +34,7 @@ public class ReadOnlyLinkedListFactory : IEnumerableFactory
 
         var list = new LinkedList<T>();
 
-        builder(((ICollection<T>)list).Add, false, in state);
+        builder(item => { list.AddLast(item); return true; }, false, in state);
 
         return new ReadOnlyCollection<T>(list);
     }

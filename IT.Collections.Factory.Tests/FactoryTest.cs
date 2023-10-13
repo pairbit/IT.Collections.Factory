@@ -8,6 +8,7 @@ public class Tests
     private int[] _arrayUnique;
     private int[] _arraySorted;
     private int[] _arraySortedUnique;
+    private int[] _arrayDuplicates;
 
     [SetUp]
     public void Setup()
@@ -30,6 +31,7 @@ public class Tests
         _arrayUnique = array.Distinct().ToArray();
         _arraySorted = array.OrderBy(x => x).ToArray();
         _arraySortedUnique = _arraySorted.Distinct().ToArray();
+        _arrayDuplicates = array.GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
     }
 
     [Test]
@@ -105,13 +107,23 @@ public class Tests
         Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
         var memory = new ReadOnlyMemory<int>(_array);
-        var state = (memory, factory.Type);
-        var withBuilderState = factory.New<int, (ReadOnlyMemory<int>, EnumerableType)>(_capacity, BuilderState, in state);
+        var duplicates = new List<int>();
+        var state = (memory, factory.Type, duplicates);
+        var withBuilderState = factory.New<int, (ReadOnlyMemory<int>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
         Assert.That(withBuilderState.SequenceEqual(array), Is.True);
+
+        if (factory.Type.IsUnique())
+        {
+            Assert.That(duplicates.SequenceEqual(_arrayDuplicates), Is.True);
+        }
+        else
+        {
+            Assert.That(duplicates.Count == 0, Is.True);
+        }
     }
 
-    private void Builder(Action<int> add, bool reverse, EnumerableType type)
+    private void Builder(TryAdd<int> tryAdd, bool reverse, EnumerableType type)
     {
         Assert.That(reverse, Is.EqualTo(type.IsReverse()));
 
@@ -120,21 +132,29 @@ public class Tests
         {
             for (int i = array.Length - 1; i >= 0; i--)
             {
-                add(array[i]);
+                var item = array[i];
+                if (!tryAdd(item))
+                {
+                    Assert.That(_arrayDuplicates.Contains(item), Is.True);
+                }
             }
         }
         else
         {
             for (int i = 0; i < array.Length; i++)
             {
-                add(array[i]);
+                var item = array[i];
+                if (!tryAdd(item))
+                {
+                    Assert.That(_arrayDuplicates.Contains(item), Is.True);
+                }
             }
         }
     }
 
-    private static void BuilderState(Action<int> add, bool reverse, in (ReadOnlyMemory<int>, EnumerableType) state)
+    private static void BuilderState(TryAdd<int> tryAdd, bool reverse, in (ReadOnlyMemory<int>, EnumerableType, List<int>) state)
     {
-        (var memory, var type) = state;
+        (var memory, var type, var duplicates) = state;
 
         Assert.That(reverse, Is.EqualTo(type.IsReverse()));
 
@@ -143,14 +163,16 @@ public class Tests
         {
             for (int i = span.Length - 1; i >= 0; i--)
             {
-                add(span[i]);
+                var item = span[i];
+                if (!tryAdd(item)) duplicates.Add(item);
             }
         }
         else
         {
             for (int i = 0; i < span.Length; i++)
             {
-                add(span[i]);
+                var item = span[i];
+                if (!tryAdd(item)) duplicates.Add(item);
             }
         }
     }

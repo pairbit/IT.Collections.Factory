@@ -17,7 +17,7 @@ public class StackFactory : IEnumerableFactory
 
         var stack = new Stack<T>(capacity);
 
-        builder(stack.Push, true);
+        builder(item => { stack.Push(item); return true; }, true);
 
         return stack;
     }
@@ -29,7 +29,7 @@ public class StackFactory : IEnumerableFactory
 
         var stack = new Stack<T>(capacity);
 
-        builder(stack.Push, true, in state);
+        builder(item => { stack.Push(item); return true; }, true, in state);
 
         return stack;
     }

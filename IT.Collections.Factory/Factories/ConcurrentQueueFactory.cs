@@ -19,7 +19,7 @@ public class ConcurrentQueueFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(queue.Enqueue, false);
+        builder(item => { queue.Enqueue(item); return true; }, false);
 
         return queue;
     }
@@ -31,7 +31,7 @@ public class ConcurrentQueueFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(queue.Enqueue, false, in state);
+        builder(item => { queue.Enqueue(item); return true; }, false, in state);
 
         return queue;
     }

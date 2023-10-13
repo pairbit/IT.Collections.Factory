@@ -17,7 +17,7 @@ public class LinkedListFactory : IEnumerableFactory
 
         var list = new LinkedList<T>();
 
-        builder(((ICollection<T>)list).Add, false);
+        builder(item => { list.AddLast(item); return true; }, false);
 
         return list;
     }
@@ -29,7 +29,7 @@ public class LinkedListFactory : IEnumerableFactory
 
         var list = new LinkedList<T>();
 
-        builder(((ICollection<T>)list).Add, false, in state);
+        builder(item => { list.AddLast(item); return true; }, false, in state);
 
         return list;
     }

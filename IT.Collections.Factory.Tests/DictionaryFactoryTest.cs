@@ -8,6 +8,7 @@ public class DictionaryFactoryTest
     private KeyValuePair<int, int>[] _arrayUnique;
     private KeyValuePair<int, int>[] _arraySorted;
     private KeyValuePair<int, int>[] _arraySortedUnique;
+    private int[] _arrayKeyDuplicates;
 
     [SetUp]
     public void Setup()
@@ -37,6 +38,7 @@ public class DictionaryFactoryTest
         _arrayUnique = dic.ToArray();
         _arraySorted = array.OrderBy(x => x.Key).ToArray();
         _arraySortedUnique = dic.OrderBy(x => x.Key).ToArray();
+        _arrayKeyDuplicates = array.GroupBy(x => x.Key).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
     }
 
     [Test]
@@ -114,8 +116,10 @@ public class DictionaryFactoryTest
         Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
-        var state = (memory, factory.Type);
-        IEnumerable<KeyValuePair<int, int>> withBuilderState = factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType)>(_capacity, BuilderState, in state);
+        var duplicates = new List<int>();
+        var state = (memory, factory.Type, duplicates);
+        IEnumerable<KeyValuePair<int, int>> withBuilderState = 
+            factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
         if (factory.Type.IsUnordered())
@@ -123,9 +127,18 @@ public class DictionaryFactoryTest
             withBuilderState = withBuilderState.OrderBy(x => x.Key).ToArray();
         }
         Assert.That(withBuilderState.SequenceEqual(array), Is.True);
+
+        if (factory.Type.IsUnique())
+        {
+            Assert.That(duplicates.SequenceEqual(_arrayKeyDuplicates), Is.True);
+        }
+        else
+        {
+            Assert.That(duplicates.Count == 0, Is.True);
+        }
     }
 
-    private void Builder(Action<KeyValuePair<int, int>> add, bool reverse, EnumerableType type)
+    private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, bool reverse, EnumerableType type)
     {
         Assert.That(reverse, Is.EqualTo(type.IsReverse()));
 
@@ -134,21 +147,29 @@ public class DictionaryFactoryTest
         {
             for (int i = array.Length - 1; i >= 0; i--)
             {
-                add(array[i]);
+                var item = array[i];
+                if (!tryAdd(item))
+                {
+                    Assert.That(_arrayKeyDuplicates.Contains(item.Key), Is.True);
+                }
             }
         }
         else
         {
             for (int i = 0; i < array.Length; i++)
             {
-                add(array[i]);
+                var item = array[i];
+                if (!tryAdd(item))
+                {
+                    Assert.That(_arrayKeyDuplicates.Contains(item.Key), Is.True);
+                }
             }
         }
     }
 
-    private static void BuilderState(Action<KeyValuePair<int, int>> add, bool reverse, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType) state)
+    private static void BuilderState(TryAdd<KeyValuePair<int, int>> tryAdd, bool reverse, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>) state)
     {
-        (var memory, var type) = state;
+        (var memory, var type, var duplicates) = state;
 
         Assert.That(reverse, Is.EqualTo(type.IsReverse()));
 
@@ -157,14 +178,16 @@ public class DictionaryFactoryTest
         {
             for (int i = span.Length - 1; i >= 0; i--)
             {
-                add(span[i]);
+                var item = span[i];
+                if (!tryAdd(item)) duplicates.Add(item.Key);
             }
         }
         else
         {
             for (int i = 0; i < span.Length; i++)
             {
-                add(span[i]);
+                var item = span[i];
+                if (!tryAdd(item)) duplicates.Add(item.Key);
             }
         }
     }

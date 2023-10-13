@@ -27,7 +27,7 @@ public class ImmutableArrayFactory : IEnumerableFactory
         var array = new T[capacity];
         var index = 0;
 
-        builder(item => array[index++] = item, false);
+        builder(item => { array[index++] = item; return true; }, false);
 
         return ImmutableArray.Create(array);
     }
@@ -40,7 +40,7 @@ public class ImmutableArrayFactory : IEnumerableFactory
         var array = new T[capacity];
         var index = 0;
 
-        builder(item => array[index++] = item, false, in state);
+        builder(item => { array[index++] = item; return true; }, false, in state);
 
         return ImmutableArray.Create(array);
     }

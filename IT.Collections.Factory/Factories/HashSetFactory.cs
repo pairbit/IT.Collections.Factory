@@ -26,7 +26,7 @@ public class HashSetFactory : IEnumerableFactory
         var hashSet = new HashSet<T>(capacity, null);
 #endif
 
-        builder(((ICollection<T>)hashSet).Add, false);
+        builder(hashSet.Add, false);
 
         return hashSet;
     }
@@ -42,7 +42,7 @@ public class HashSetFactory : IEnumerableFactory
         var hashSet = new HashSet<T>(capacity, null);
 #endif
 
-        builder(((ICollection<T>)hashSet).Add, false, in state);
+        builder(hashSet.Add, false, in state);
 
         return hashSet;
     }

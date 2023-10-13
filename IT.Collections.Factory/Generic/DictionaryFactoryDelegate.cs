@@ -4,18 +4,18 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
     where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
 {
     private readonly DictionaryFactory<TDictionary, TKey, TValue> _factory;
-    private readonly Action<TDictionary, KeyValuePair<TKey, TValue>> _add;
+    private readonly Func<TDictionary, KeyValuePair<TKey, TValue>, bool> _tryAdd;
     private readonly EnumerableType _type;
 
     public EnumerableType Type => _type;
 
     public DictionaryFactoryDelegate(
         DictionaryFactory<TDictionary, TKey, TValue> factory,
-        Action<TDictionary, KeyValuePair<TKey, TValue>> add,
+        Func<TDictionary, KeyValuePair<TKey, TValue>, bool> tryAdd,
         EnumerableType type = EnumerableType.None)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-        _add = add ?? throw new ArgumentNullException(nameof(add));
+        _tryAdd = tryAdd ?? throw new ArgumentNullException(nameof(tryAdd));
         _type = type;
     }
 
@@ -34,9 +34,9 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var dictionary = _factory(capacity);
-        var add = _add;
+        var tryAdd = _tryAdd;
 
-        builder(item => add(dictionary, item), _type == EnumerableType.Reverse);
+        builder(item => tryAdd(dictionary, item), _type == EnumerableType.Reverse);
 
         return dictionary;
     }
@@ -47,9 +47,9 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var dictionary = _factory(capacity);
-        var add = _add;
+        var tryAdd = _tryAdd;
 
-        builder(item => add(dictionary, item), _type == EnumerableType.Reverse, in state);
+        builder(item => tryAdd(dictionary, item), _type == EnumerableType.Reverse, in state);
 
         return dictionary;
     }

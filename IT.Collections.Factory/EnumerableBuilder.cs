@@ -1,4 +1,5 @@
 ﻿namespace IT.Collections.Factory;
 
-public delegate void EnumerableBuilder<T>(Action<T> add, bool reverse);
-public delegate void EnumerableBuilder<T, TState>(Action<T> add, bool reverse, in TState state);
+public delegate bool TryAdd<T>(T item);
+public delegate void EnumerableBuilder<T>(TryAdd<T> tryAdd, bool reverse);
+public delegate void EnumerableBuilder<T, TState>(TryAdd<T> tryAdd, bool reverse, in TState state);
