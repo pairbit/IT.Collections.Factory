@@ -5,8 +5,9 @@ public enum EnumerableType
 {
     None = 0,
     ReadOnly = 1,
-    Sorted = 2,
-    Unique = 4,
-    Reverse = 8,
+    Ordered = 2,
+    Unordered = 4,
+    Unique = 8,
+    Reverse = 16,
     //NoCapacity
 }

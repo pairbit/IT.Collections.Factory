@@ -4,7 +4,7 @@ public class SortedSetFactory : IEnumerableFactory
 {
     public static readonly SortedSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Sorted | EnumerableType.Unique;
+    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => new SortedSet<T>();
 

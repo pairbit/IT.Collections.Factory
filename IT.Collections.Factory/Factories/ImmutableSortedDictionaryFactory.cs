@@ -8,7 +8,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 {
     public static readonly ImmutableSortedDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
 
     public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => ImmutableSortedDictionary<TKey, TValue>.Empty;
 
@@ -22,7 +22,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
 
-        builder(dictionaryBuilder.Add, false);
+        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), false);
 
         return dictionaryBuilder.ToImmutable();
     }
@@ -34,7 +34,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
 
-        builder(dictionaryBuilder.Add, false, in state);
+        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), false, in state);
 
         return dictionaryBuilder.ToImmutable();
     }

@@ -59,7 +59,7 @@ public class Tests
             }
             catch (Exception)
             {
-                Console.WriteLine($"Type '{factory.GetType().FullName}' is exception");
+                Console.WriteLine($"Type '{factory.Empty<int>().GetType().GetGenericTypeDefinition().FullName}' is exception");
                 throw;
             }
         }
@@ -87,11 +87,11 @@ public class Tests
 
         var array = _array;
 
-        if (factory.Type.IsSorted() && factory.Type.IsUnique())
+        if (factory.Type.IsOrdered() && factory.Type.IsUnique())
         {
             array = _arraySortedUnique;
         }
-        else if (factory.Type.IsSorted())
+        else if (factory.Type.IsOrdered())
         {
             array = _arraySorted;
         }

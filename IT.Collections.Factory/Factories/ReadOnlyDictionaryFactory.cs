@@ -6,7 +6,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly;
+    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
 
     public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => Cache<TKey, TValue>.Empty;
 
@@ -20,9 +20,9 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        IDictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(capacity);
+        var dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(dictionary.Add, false);
+        builder(item => dictionary.TryAdd(item.Key, item.Value), false);
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }
@@ -32,9 +32,9 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        IDictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(capacity);
+        var dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(dictionary.Add, false, in state);
+        builder(item => dictionary.TryAdd(item.Key, item.Value), false, in state);
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }

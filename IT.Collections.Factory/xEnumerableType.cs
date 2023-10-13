@@ -2,7 +2,9 @@
 
 public static class xEnumerableType
 {
-    public static bool IsSorted(this EnumerableType type) => (type & EnumerableType.Sorted) == EnumerableType.Sorted;
+    public static bool IsOrdered(this EnumerableType type) => (type & EnumerableType.Ordered) == EnumerableType.Ordered;
+
+    public static bool IsUnordered(this EnumerableType type) => (type & EnumerableType.Unordered) == EnumerableType.Unordered;
 
     public static bool IsReadOnly(this EnumerableType type) => (type & EnumerableType.ReadOnly) == EnumerableType.ReadOnly;
 

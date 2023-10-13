@@ -8,7 +8,7 @@ public class ImmutableSortedSetFactory : IEnumerableFactory
 {
     public static readonly ImmutableSortedSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Sorted | EnumerableType.Unique;
+    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => ImmutableSortedSet<T>.Empty;
 
