@@ -4,7 +4,7 @@ public class HashSetFactory : IEnumerableFactory
 {
     public static readonly HashSetFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => new HashSet<T>((IEqualityComparer<T>?)null);
 

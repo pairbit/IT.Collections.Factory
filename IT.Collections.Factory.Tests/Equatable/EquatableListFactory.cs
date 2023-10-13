@@ -6,7 +6,7 @@ public class EquatableListFactory : IEnumerableFactory
 {
     public static readonly EquatableListFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new EquatableList<T>();
 

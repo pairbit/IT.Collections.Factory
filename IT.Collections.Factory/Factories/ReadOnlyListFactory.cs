@@ -6,7 +6,7 @@ public class ReadOnlyListFactory : IEnumerableFactory
 {
     public static readonly ReadOnlyListFactory Default = new();
 
-    public bool IsReadOnly => true;
+    public EnumerableType Type => EnumerableType.ReadOnly;
 
     public IEnumerable<T> Empty<T>() => Cache<T>.Empty;
 

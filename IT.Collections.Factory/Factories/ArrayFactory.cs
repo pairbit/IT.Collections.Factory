@@ -4,7 +4,7 @@ public class ArrayFactory : IEnumerableFactory
 {
     public static readonly ArrayFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => Array.Empty<T>();
 

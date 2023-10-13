@@ -6,7 +6,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
 
-    public bool IsReadOnly => true;
+    public EnumerableType Type => EnumerableType.ReadOnly;
 
     public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => Cache<TKey, TValue>.Empty;
 

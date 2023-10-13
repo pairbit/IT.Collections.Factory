@@ -4,7 +4,7 @@ public class LinkedListFactory : IEnumerableFactory
 {
     public static readonly LinkedListFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new LinkedList<T>();
 

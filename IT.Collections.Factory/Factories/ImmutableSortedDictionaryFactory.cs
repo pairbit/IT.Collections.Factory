@@ -8,7 +8,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 {
     public static readonly ImmutableSortedDictionaryFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => ImmutableSortedDictionary<TKey, TValue>.Empty;
 

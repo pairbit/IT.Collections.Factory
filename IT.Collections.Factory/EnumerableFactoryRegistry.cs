@@ -1,13 +1,18 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 
 namespace IT.Collections.Factory;
 
 using Factories;
+using Generic;
 
 public class EnumerableFactoryRegistry
 {
     static readonly ConcurrentDictionary<Type, IEnumerableFactory> _enumerableTypes = new();
     static readonly ConcurrentDictionary<Type, IDictionaryFactory> _dictionaryTypes = new();
+
+    static readonly ReadOnlyDictionary<Type, IEnumerableFactory> _enumerableTypesReadOnly = new(_enumerableTypes);
+    static readonly ReadOnlyDictionary<Type, IDictionaryFactory> _dictionaryTypesReadOnly = new(_dictionaryTypes);
 
     static EnumerableFactoryRegistry()
     {
@@ -48,6 +53,10 @@ public class EnumerableFactoryRegistry
         RegisterEnumerableFactory(ConcurrentStackFactory.Default);
         RegisterEnumerableFactory(BlockingCollectionFactory.Default);
     }
+
+    public static IReadOnlyDictionary<Type, IEnumerableFactory> EnumerableTypes => _enumerableTypesReadOnly;
+
+    public static IReadOnlyDictionary<Type, IDictionaryFactory> DictionaryTypes => _dictionaryTypesReadOnly;
 
     public static void RegisterEnumerableFactory(IEnumerableFactory factory, params Type[] genericTypes)
     {
@@ -127,12 +136,30 @@ public class EnumerableFactoryRegistry
     public static IEnumerableFactory? TryGetEnumerableFactory(Type genericType)
         => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : null;
 
+    public static IEnumerableFactory<TEnumerable, T>? TryGetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
+        => _enumerableTypes.TryGetValue(typeof(TEnumerable).GetGenericTypeDefinition(), out var factory)
+                ? new EnumerableFactoryProxy<TEnumerable, T>(factory) : null;
+
     public static IEnumerableFactory GetEnumerableFactory(Type genericType)
-        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException("EnumerableFactory not registered", nameof(genericType));
+        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"EnumerableFactory '{genericType.FullName}' not registered", nameof(genericType));
+
+    public static IEnumerableFactory<TEnumerable, T> GetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
+        => new EnumerableFactoryProxy<TEnumerable, T>(GetEnumerableFactory(typeof(TEnumerable).GetGenericTypeDefinition()));
 
     public static IDictionaryFactory? TryGetDictionaryFactory(Type genericType)
         => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : null;
 
+    public static IDictionaryFactory<TDictionary, TKey, TValue>? TryGetDictionaryFactory<TDictionary, TKey, TValue>()
+        where TKey : notnull
+        where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
+        => _dictionaryTypes.TryGetValue(typeof(TDictionary).GetGenericTypeDefinition(), out var factory)
+            ? new DictionaryFactoryProxy<TDictionary, TKey, TValue>(factory) : null;
+
     public static IDictionaryFactory GetDictionaryFactory(Type genericType)
-        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException("DictionaryFactory not registered", nameof(genericType));
+        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"DictionaryFactory '{genericType.FullName}' not registered", nameof(genericType));
+
+    public static IDictionaryFactory<TDictionary, TKey, TValue> GetDictionaryFactory<TDictionary, TKey, TValue>()
+        where TKey : notnull
+        where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
+        => new DictionaryFactoryProxy<TDictionary, TKey, TValue>(GetDictionaryFactory(typeof(TDictionary).GetGenericTypeDefinition()));
 }

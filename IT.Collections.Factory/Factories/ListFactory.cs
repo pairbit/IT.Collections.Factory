@@ -4,7 +4,7 @@ public class ListFactory : IEnumerableFactory
 {
     public static readonly ListFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new List<T>();
 

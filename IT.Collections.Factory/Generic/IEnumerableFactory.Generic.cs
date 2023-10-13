@@ -4,7 +4,7 @@ public delegate TEnumerable EnumerableFactory<TEnumerable, T>(int capacity) wher
 
 public interface IEnumerableFactory<TEnumerable, T> where TEnumerable : IEnumerable<T>
 {
-    bool IsReadOnly { get; }
+    EnumerableType Type { get; }
 
     TEnumerable Empty();
 

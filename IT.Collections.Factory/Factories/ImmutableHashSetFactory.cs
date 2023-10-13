@@ -8,7 +8,7 @@ public class ImmutableHashSetFactory : IEnumerableFactory
 {
     public static readonly ImmutableHashSetFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.Sorted | EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => ImmutableHashSet<T>.Empty;
 

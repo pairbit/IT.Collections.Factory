@@ -8,7 +8,7 @@ public class ImmutableDictionaryFactory : IDictionaryFactory
 {
     public static readonly ImmutableDictionaryFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => ImmutableDictionary<TKey, TValue>.Empty;
 

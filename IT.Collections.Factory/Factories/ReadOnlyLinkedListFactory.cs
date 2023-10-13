@@ -6,7 +6,7 @@ public class ReadOnlyLinkedListFactory : IEnumerableFactory
 {
     public static readonly ReadOnlyLinkedListFactory Default = new();
 
-    public bool IsReadOnly => true;
+    public EnumerableType Type => EnumerableType.ReadOnly;
 
     public IEnumerable<T> Empty<T>() => ReadOnlyCollection<T>.Empty;
 

@@ -6,7 +6,7 @@ public class ReadOnlyObservableCollectionFactory : IEnumerableFactory
 {
     public static readonly ReadOnlyObservableCollectionFactory Default = new();
 
-    public bool IsReadOnly => true;
+    public EnumerableType Type => EnumerableType.ReadOnly;
 
     public IEnumerable<T> Empty<T>() => Cache<T>.Empty;
 

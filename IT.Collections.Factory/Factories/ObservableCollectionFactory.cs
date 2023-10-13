@@ -6,7 +6,7 @@ public class ObservableCollectionFactory : IEnumerableFactory
 {
     public static readonly ObservableCollectionFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new ObservableCollection<T>();
 

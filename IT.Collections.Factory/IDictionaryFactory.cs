@@ -2,7 +2,7 @@
 
 public interface IDictionaryFactory
 {
-    bool IsReadOnly { get; }
+    EnumerableType Type { get; }
 
     IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull;
 

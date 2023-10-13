@@ -4,7 +4,7 @@ public class QueueFactory : IEnumerableFactory
 {
     public static readonly QueueFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new Queue<T>();
 

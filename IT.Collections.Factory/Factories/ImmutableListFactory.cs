@@ -8,7 +8,7 @@ public class ImmutableListFactory : IEnumerableFactory
 {
     public static readonly ImmutableListFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => ImmutableList<T>.Empty;
 

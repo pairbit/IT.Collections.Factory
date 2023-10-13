@@ -6,7 +6,7 @@ public class ConcurrentStackFactory : IEnumerableFactory
 {
     public static readonly ConcurrentStackFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new ConcurrentStack<T>();
 

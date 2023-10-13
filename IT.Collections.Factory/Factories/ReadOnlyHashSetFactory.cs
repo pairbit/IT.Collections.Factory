@@ -8,7 +8,7 @@ public class ReadOnlyHashSetFactory : IEnumerableFactory
 {
     public static readonly ReadOnlyHashSetFactory Default = new();
 
-    public bool IsReadOnly => true;
+    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => ReadOnlySet<T>.Empty;
 

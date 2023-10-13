@@ -4,7 +4,7 @@ public class EnumerableFactoryProxy<TEnumerable, T> : IEnumerableFactory<TEnumer
 {
     private readonly IEnumerableFactory _factory;
 
-    public bool IsReadOnly => _factory.IsReadOnly;
+    public EnumerableType Type => _factory.Type;
 
     public EnumerableFactoryProxy(IEnumerableFactory factory)
     {

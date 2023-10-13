@@ -8,7 +8,7 @@ public class ImmutableQueueFactory : IEnumerableFactory
 {
     public static readonly ImmutableQueueFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => ImmutableQueue<T>.Empty;
 

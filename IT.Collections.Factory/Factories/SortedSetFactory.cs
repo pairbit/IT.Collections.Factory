@@ -4,7 +4,7 @@ public class SortedSetFactory : IEnumerableFactory
 {
     public static readonly SortedSetFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.Sorted | EnumerableType.Unique;
 
     public IEnumerable<T> Empty<T>() => new SortedSet<T>();
 
@@ -16,7 +16,7 @@ public class SortedSetFactory : IEnumerableFactory
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var sortedSet = new SortedSet<T>();
-
+        
         builder(((ICollection<T>)sortedSet).Add, false);
 
         return sortedSet;

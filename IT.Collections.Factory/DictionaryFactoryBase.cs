@@ -2,7 +2,7 @@
 
 public abstract class DictionaryFactoryBase : IDictionaryFactory
 {
-    public bool IsReadOnly => false;
+    public virtual EnumerableType Type => EnumerableType.None;
 
     public virtual IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => New<TKey, TValue>(0);
 

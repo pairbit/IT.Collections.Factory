@@ -2,7 +2,7 @@
 
 public interface IEnumerableFactory
 {
-    bool IsReadOnly { get; }
+    EnumerableType Type { get; }
 
     IEnumerable<T> Empty<T>();
 

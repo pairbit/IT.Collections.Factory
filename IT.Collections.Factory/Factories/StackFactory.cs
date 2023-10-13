@@ -4,7 +4,7 @@ public class StackFactory : IEnumerableFactory
 {
     public static readonly StackFactory Default = new();
 
-    public bool IsReadOnly => false;
+    public EnumerableType Type => EnumerableType.None;
 
     public IEnumerable<T> Empty<T>() => new Stack<T>();
 
