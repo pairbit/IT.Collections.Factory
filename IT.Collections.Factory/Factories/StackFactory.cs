@@ -4,7 +4,7 @@ public class StackFactory : IEnumerableFactory
 {
     public static readonly StackFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public EnumerableType Type => EnumerableType.Reverse;
 
     public IEnumerable<T> Empty<T>() => new Stack<T>();
 

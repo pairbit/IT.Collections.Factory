@@ -6,7 +6,7 @@ public class ConcurrentBagFactory : IEnumerableFactory
 {
     public static readonly ConcurrentBagFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public EnumerableType Type => EnumerableType.Reverse;
 
     public IEnumerable<T> Empty<T>() => new ConcurrentBag<T>();
 

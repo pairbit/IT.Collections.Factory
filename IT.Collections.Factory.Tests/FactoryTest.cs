@@ -39,7 +39,7 @@ public class Tests
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(StackFactory.Default, typeof(IEnumerable<>), typeof(IReadOnlyCollection<>));
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(EquatableListFactory.Default);
 
-        foreach (var pair in EnumerableFactoryRegistry.EnumerableTypes) 
+        foreach (var pair in EnumerableFactoryRegistry.EnumerableTypes)
         {
             var type = pair.Key;
             var enumerableFactory = EnumerableFactoryRegistry.TryGetEnumerableFactory(type);
@@ -100,19 +100,26 @@ public class Tests
             Console.WriteLine($"Type '{type.FullName}' is unique");
             array = _arrayUnique;
         }
+        if (factory.Type.IsReverse())
+        {
+            Console.WriteLine($"Type '{type.FullName}' is reverse");
+        }
 
-        var withBuilder = factory.New<int>(_capacity, Builder);
+        var withBuilder = factory.New<int>(_capacity, (add, reverse) => Builder(add, reverse, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
         Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
         var memory = new ReadOnlyMemory<int>(_array);
-        var withBuilderState = factory.New<int, ReadOnlyMemory<int>>(_capacity, BuilderState, in memory);
+        var state = (memory, factory.Type);
+        var withBuilderState = factory.New<int, (ReadOnlyMemory<int>, EnumerableType)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
         Assert.That(withBuilderState.SequenceEqual(array), Is.True);
     }
 
-    private void Builder(Action<int> add, bool reverse)
+    private void Builder(Action<int> add, bool reverse, EnumerableType type)
     {
+        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
+
         var array = _array;
         if (reverse)
         {
@@ -130,8 +137,12 @@ public class Tests
         }
     }
 
-    private static void BuilderState(Action<int> add, bool reverse, in ReadOnlyMemory<int> memory)
+    private static void BuilderState(Action<int> add, bool reverse, in (ReadOnlyMemory<int>, EnumerableType) state)
     {
+        (var memory, var type) = state;
+
+        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
+
         var span = memory.Span;
         if (reverse)
         {
