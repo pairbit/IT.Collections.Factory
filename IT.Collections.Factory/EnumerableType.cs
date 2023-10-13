@@ -7,5 +7,6 @@ public enum EnumerableType
     ReadOnly = 1,
     Sorted = 2,
     Unique = 4,
-    Reverse = 8
+    Reverse = 8,
+    //NoCapacity
 }

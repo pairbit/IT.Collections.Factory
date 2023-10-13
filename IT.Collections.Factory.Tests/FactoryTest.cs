@@ -49,7 +49,7 @@ public class Tests
             Assert.That(ReferenceEquals(enumerableFactory, EnumerableFactoryRegistry.GetEnumerableFactory(type)), Is.True);
         }
 
-        var factories = EnumerableFactoryRegistry.EnumerableTypes.Values.Distinct().OrderBy(x => x.GetType().FullName).ToArray();
+        var factories = EnumerableFactoryRegistry.EnumerableTypes.Values.Distinct().OrderBy(x => x.Empty<int>().GetType().FullName).ToArray();
 
         foreach (var factory in factories)
         {
@@ -71,9 +71,11 @@ public class Tests
 
         var type = empty.GetType();
 
+        if (factory.Type != EnumerableType.None)
+            Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' is {factory.Type}");
+
         if (factory.Type.IsReadOnly())
         {
-            Console.WriteLine($"Type '{type.FullName}' is readonly");
             Assert.Throws<NotSupportedException>(() => factory.New<int>(_capacity));
         }
         else
@@ -87,22 +89,15 @@ public class Tests
 
         if (factory.Type.IsSorted() && factory.Type.IsUnique())
         {
-            Console.WriteLine($"Type '{type.FullName}' is sorted and unique");
             array = _arraySortedUnique;
         }
         else if (factory.Type.IsSorted())
         {
-            Console.WriteLine($"Type '{type.FullName}' is sorted");
             array = _arraySorted;
         }
         else if (factory.Type.IsUnique())
         {
-            Console.WriteLine($"Type '{type.FullName}' is unique");
             array = _arrayUnique;
-        }
-        if (factory.Type.IsReverse())
-        {
-            Console.WriteLine($"Type '{type.FullName}' is reverse");
         }
 
         var withBuilder = factory.New<int>(_capacity, (add, reverse) => Builder(add, reverse, factory.Type));
