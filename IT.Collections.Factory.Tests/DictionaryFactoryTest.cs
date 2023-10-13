@@ -44,7 +44,7 @@ public class DictionaryFactoryTest
     [Test]
     public void FactoryTest()
     {
-        foreach (var pair in EnumerableFactoryRegistry.DictionaryTypes)
+        foreach (var pair in EnumerableFactoryRegistry.DictionaryFactories)
         {
             var type = pair.Key;
             var factory = EnumerableFactoryRegistry.TryGetDictionaryFactory(type);
@@ -54,7 +54,7 @@ public class DictionaryFactoryTest
             Assert.That(ReferenceEquals(factory, EnumerableFactoryRegistry.GetDictionaryFactory(type)), Is.True);
         }
 
-        var factories = EnumerableFactoryRegistry.DictionaryTypes.Values.Distinct().OrderBy(x => x.Empty<int, int>().GetType().FullName).ToArray();
+        var factories = EnumerableFactoryRegistry.DictionaryFactories.Values.Distinct().OrderBy(x => x.Empty<int, int>().GetType().FullName).ToArray();
 
         foreach (var factory in factories)
         {

@@ -8,11 +8,13 @@ using Generic;
 
 public class EnumerableFactoryRegistry
 {
-    static readonly ConcurrentDictionary<Type, IEnumerableFactory> _enumerableTypes = new();
-    static readonly ConcurrentDictionary<Type, IDictionaryFactory> _dictionaryTypes = new();
+    static readonly ConcurrentDictionary<Type, IEnumerableFactory> _enumerableFactories = new();
+    static readonly ConcurrentDictionary<Type, IDictionaryFactory> _dictionaryFactories = new();
 
-    static readonly ReadOnlyDictionary<Type, IEnumerableFactory> _enumerableTypesReadOnly = new(_enumerableTypes);
-    static readonly ReadOnlyDictionary<Type, IDictionaryFactory> _dictionaryTypesReadOnly = new(_dictionaryTypes);
+    static readonly ConcurrentDictionary<Type, object> _genericEnumerableFactories = new();
+
+    static readonly ReadOnlyDictionary<Type, IEnumerableFactory> _enumerableFactoriesReadOnly = new(_enumerableFactories);
+    static readonly ReadOnlyDictionary<Type, IDictionaryFactory> _dictionaryFactoriesReadOnly = new(_dictionaryFactories);
 
     static EnumerableFactoryRegistry()
     {
@@ -54,9 +56,9 @@ public class EnumerableFactoryRegistry
         RegisterEnumerableFactory(BlockingCollectionFactory.Default);
     }
 
-    public static IReadOnlyDictionary<Type, IEnumerableFactory> EnumerableTypes => _enumerableTypesReadOnly;
+    public static IReadOnlyDictionary<Type, IEnumerableFactory> EnumerableFactories => _enumerableFactoriesReadOnly;
 
-    public static IReadOnlyDictionary<Type, IDictionaryFactory> DictionaryTypes => _dictionaryTypesReadOnly;
+    public static IReadOnlyDictionary<Type, IDictionaryFactory> DictionaryFactories => _dictionaryFactoriesReadOnly;
 
     public static void RegisterEnumerableFactory(IEnumerableFactory factory, params Type[] genericTypes)
     {
@@ -80,13 +82,13 @@ public class EnumerableFactoryRegistry
 
             baseType = enumerableType.GetGenericTypeDefinition();
 
-            _enumerableTypes[baseType] = factory;
+            _enumerableFactories[baseType] = factory;
         }
 
         if (genericTypes != null && genericTypes.Length > 0)
         {
             for (int i = 0; i < genericTypes.Length; i++)
-            {    
+            {
                 var genericType = genericTypes[i];
 
                 if (!genericType.IsGenericType)
@@ -100,9 +102,22 @@ public class EnumerableFactoryRegistry
                 if (!type.IsAssignableFrom(enumerableType))
                     throw new ArgumentException($"Registered type '{genericType.FullName}' is not assignable from type '{baseType.FullName}'", nameof(genericTypes));
 
-                _enumerableTypes[genericType] = factory;
+                _enumerableFactories[genericType] = factory;
             }
         }
+    }
+
+    public static void RegisterEnumerableFactory<TEnumerable, T>(IEnumerableFactory<TEnumerable, T> factory) where TEnumerable : IEnumerable<T>
+    {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+        _genericEnumerableFactories[typeof(TEnumerable)] = factory;
+    }
+
+    public static void RegisterEnumerableFactory<TEnumerable, T>(EnumerableFactory<TEnumerable, T> factory,
+        Func<TEnumerable, T, bool> tryAdd, EnumerableType type = EnumerableType.None) where TEnumerable : IEnumerable<T>
+    {
+        _genericEnumerableFactories[typeof(TEnumerable)] = new EnumerableFactoryDelegate<TEnumerable, T>(factory, tryAdd, type);
     }
 
     public static void RegisterDictionaryFactory(IDictionaryFactory factory, params Type[] genericTypes)
@@ -119,7 +134,7 @@ public class EnumerableFactoryRegistry
 
         var baseType = enumerableType.GetGenericTypeDefinition();
 
-        _dictionaryTypes[baseType] = factory;
+        _dictionaryFactories[baseType] = factory;
 
         if (genericTypes != null && genericTypes.Length > 0)
         {
@@ -138,38 +153,52 @@ public class EnumerableFactoryRegistry
                 if (!type.IsAssignableFrom(enumerableType))
                     throw new ArgumentException($"Registered type '{genericType.FullName}' is not assignable from type '{baseType.FullName}'", nameof(genericTypes));
 
-                _dictionaryTypes[genericType] = factory;
+                _dictionaryFactories[genericType] = factory;
             }
         }
     }
 
     public static IEnumerableFactory? TryGetEnumerableFactory(Type genericType)
-        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : null;
+        => _enumerableFactories.TryGetValue(genericType, out var factory) ? factory : null;
 
     public static IEnumerableFactory<TEnumerable, T>? TryGetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
-        => _enumerableTypes.TryGetValue(typeof(TEnumerable).GetGenericTypeDefinition(), out var factory)
-                ? new EnumerableFactoryProxy<TEnumerable, T>(factory) : null;
+    {
+        var type = typeof(TEnumerable);
+
+        if (_genericEnumerableFactories.TryGetValue(type, out var genericFactory)) return (IEnumerableFactory<TEnumerable, T>)genericFactory;
+
+        if (_enumerableFactories.TryGetValue(type.GetGenericTypeDefinition(), out var factory)) return new EnumerableFactoryProxy<TEnumerable, T>(factory);
+
+        return null;
+    }
 
     public static IEnumerableFactory GetEnumerableFactory(Type genericType)
-        => _enumerableTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"EnumerableFactory '{genericType.FullName}' not registered", nameof(genericType));
+        => _enumerableFactories.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"EnumerableFactory '{genericType.FullName}' not registered", nameof(genericType));
 
     public static IEnumerableFactory<TEnumerable, T> GetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
-        => new EnumerableFactoryProxy<TEnumerable, T>(GetEnumerableFactory(typeof(TEnumerable).GetGenericTypeDefinition()));
+        => TryGetEnumerableFactory<TEnumerable, T>() ?? throw new ArgumentException($"EnumerableFactory '{typeof(TEnumerable).FullName}' not registered");
 
     public static IDictionaryFactory? TryGetDictionaryFactory(Type genericType)
-        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : null;
+        => _dictionaryFactories.TryGetValue(genericType, out var factory) ? factory : null;
 
     public static IDictionaryFactory<TDictionary, TKey, TValue>? TryGetDictionaryFactory<TDictionary, TKey, TValue>()
         where TKey : notnull
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
-        => _dictionaryTypes.TryGetValue(typeof(TDictionary).GetGenericTypeDefinition(), out var factory)
-            ? new DictionaryFactoryProxy<TDictionary, TKey, TValue>(factory) : null;
+    {
+        var type = typeof(TDictionary);
+
+        if (_genericEnumerableFactories.TryGetValue(type, out var genericFactory)) return (IDictionaryFactory<TDictionary, TKey, TValue>)genericFactory;
+
+        if (_dictionaryFactories.TryGetValue(type.GetGenericTypeDefinition(), out var factory)) return new DictionaryFactoryProxy<TDictionary, TKey, TValue>(factory);
+
+        return null;
+    }
 
     public static IDictionaryFactory GetDictionaryFactory(Type genericType)
-        => _dictionaryTypes.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"DictionaryFactory '{genericType.FullName}' not registered", nameof(genericType));
+        => _dictionaryFactories.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"DictionaryFactory '{genericType.FullName}' not registered", nameof(genericType));
 
     public static IDictionaryFactory<TDictionary, TKey, TValue> GetDictionaryFactory<TDictionary, TKey, TValue>()
         where TKey : notnull
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
-        => new DictionaryFactoryProxy<TDictionary, TKey, TValue>(GetDictionaryFactory(typeof(TDictionary).GetGenericTypeDefinition()));
+        => TryGetDictionaryFactory<TDictionary, TKey, TValue>() ?? throw new ArgumentException($"EnumerableFactory '{typeof(TDictionary).FullName}' not registered");
 }

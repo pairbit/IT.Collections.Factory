@@ -41,7 +41,7 @@ public class EnumerableFactoryTest
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(StackFactory.Default, typeof(IEnumerable<>), typeof(IReadOnlyCollection<>));
         //EnumerableFactoryRegistry.RegisterEnumerableFactory(EquatableListFactory.Default);
 
-        foreach (var pair in EnumerableFactoryRegistry.EnumerableTypes)
+        foreach (var pair in EnumerableFactoryRegistry.EnumerableFactories)
         {
             var type = pair.Key;
             var enumerableFactory = EnumerableFactoryRegistry.TryGetEnumerableFactory(type);
@@ -51,7 +51,7 @@ public class EnumerableFactoryTest
             Assert.That(ReferenceEquals(enumerableFactory, EnumerableFactoryRegistry.GetEnumerableFactory(type)), Is.True);
         }
 
-        var factories = EnumerableFactoryRegistry.EnumerableTypes.Values.Distinct().OrderBy(x => x.Empty<int>().GetType().FullName).ToArray();
+        var factories = EnumerableFactoryRegistry.EnumerableFactories.Values.Distinct().OrderBy(x => x.Empty<int>().GetType().FullName).ToArray();
 
         foreach (var factory in factories)
         {
