@@ -125,15 +125,20 @@ public class EnumerableFactoryRegistry
         {
             for (int i = 0; i < genericTypes.Length; i++)
             {
-                var genericTypeBase = genericTypes[i];
+                var genericType = genericTypes[i];
 
-                if (!genericTypeBase.IsGenericType)
-                    throw new ArgumentException($"Registered type '{genericTypeBase.FullName}' is not generic type", nameof(genericTypes));
+                if (!genericType.IsGenericType)
+                    throw new ArgumentException($"Registered type '{genericType.FullName}' is not generic type", nameof(genericTypes));
 
-                if (!genericTypeBase.MakeGenericType(typeof(int), typeof(int)).IsAssignableFrom(enumerableType))
-                    throw new ArgumentException($"Registered type '{genericTypeBase.FullName}' is not assignable from type '{baseType.FullName}'", nameof(genericTypes));
+                var type = genericType.MakeGenericType(typeof(int), typeof(int));
 
-                _dictionaryTypes[genericTypeBase] = factory;
+                if (!typeof(IEnumerable<KeyValuePair<int, int>>).IsAssignableFrom(type))
+                    throw new ArgumentException($"Registered type '{genericType.FullName}' does not inherit type '{typeof(IEnumerable<>).FullName}'", nameof(genericTypes));
+
+                if (!type.IsAssignableFrom(enumerableType))
+                    throw new ArgumentException($"Registered type '{genericType.FullName}' is not assignable from type '{baseType.FullName}'", nameof(genericTypes));
+
+                _dictionaryTypes[genericType] = factory;
             }
         }
     }
