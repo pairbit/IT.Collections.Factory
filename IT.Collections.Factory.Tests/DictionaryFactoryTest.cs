@@ -74,6 +74,8 @@ public class DictionaryFactoryTest
     {
         var empty = factory.Empty<int, int>();
 
+        Assert.That(empty.Any(), Is.False);
+
         var type = empty.GetType();
 
         if (factory.Type != EnumerableType.None)
@@ -81,14 +83,23 @@ public class DictionaryFactoryTest
 
         if (factory.Type.IsReadOnly())
         {
+            Assert.Throws<NotSupportedException>(() => factory.New<int, int>(0));
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(_capacity));
         }
         else
         {
-            var withCapacity = factory.New<int, int>(10);
+            Assert.That(factory.New<int, int>(0).Any(), Is.False);
 
+            var withCapacity = factory.New<int, int>(_capacity);
+
+            //Assert.That(withCapacity.Any(), Is.False);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
         }
+
+        Assert.That(factory.New<int, int>(0, null!).Any(), Is.False);
+        Assert.That(factory.New<int, int, int>(0, null!, 0).Any(), Is.False);
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!));
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0));
 
         var array = _array;
 
