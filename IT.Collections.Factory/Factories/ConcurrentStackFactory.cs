@@ -19,7 +19,7 @@ public class ConcurrentStackFactory : IEnumerableFactory
 
         var stack = new ConcurrentStack<T>();
 
-        builder(item => { stack.Push(item); return true; }, true);
+        builder(((IProducerConsumerCollection<T>)stack).TryAdd, true);
 
         return stack;
     }
@@ -31,7 +31,7 @@ public class ConcurrentStackFactory : IEnumerableFactory
 
         var stack = new ConcurrentStack<T>();
 
-        builder(item => { stack.Push(item); return true; }, true, in state);
+        builder(((IProducerConsumerCollection<T>)stack).TryAdd, true, in state);
 
         return stack;
     }
