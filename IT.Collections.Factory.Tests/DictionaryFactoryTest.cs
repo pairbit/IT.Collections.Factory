@@ -30,7 +30,7 @@ public class DictionaryFactoryTest
         for (int i = 0; i < array.Length; i++)
         {
             var item = array[i];
-            dic.TryAdd(item.Key, item.Value);
+            if (!dic.ContainsKey(item.Key)) dic.Add(item.Key, item.Value);
         }
 
         _array = array;
