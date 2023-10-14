@@ -10,10 +10,10 @@ public class GenericTests
     [Test]
     public void Test()
     {
-        EnumerableFactoryRegistry.RegisterEnumerableFactory<List<string>, string>(
+        StaticEnumerableFactoryRegistry.RegisterEnumerableFactory<List<string>, string>(
             x => new EquatableList<string>(x, StringComparer.OrdinalIgnoreCase), (list, item) => list.Add(item));
 
-        var factory = EnumerableFactoryRegistry.GetEnumerableFactory<List<string>, string>();
+        var factory = StaticEnumerableFactoryRegistry.GetEnumerableFactory<List<string>, string>();
 
         FactoryTest(factory);
     }

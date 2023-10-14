@@ -1,9 +1,11 @@
-﻿namespace IT.Collections.Factory;
+﻿using System.Collections.Concurrent;
 
-public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, object>>
+namespace IT.Collections.Factory;
+
+public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<ConcurrentDictionary<Type, object>>
 {
-    public EnumerableFactoryRegistry(int capacity)
-        : base(new Dictionary<Type, object>(capacity))
+    public ConcurrentEnumerableFactoryRegistry(int capacity) 
+        : base(new ConcurrentDictionary<Type, object>(Environment.ProcessorCount, capacity))
     {
 
     }

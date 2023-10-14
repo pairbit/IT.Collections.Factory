@@ -44,17 +44,17 @@ public class DictionaryFactoryTest
     [Test]
     public void FactoryTest()
     {
-        foreach (var pair in EnumerableFactoryRegistry.DictionaryFactories)
+        foreach (var pair in StaticEnumerableFactoryRegistry.DictionaryFactories)
         {
             var type = pair.Key;
-            var factory = EnumerableFactoryRegistry.TryGetDictionaryFactory(type);
+            var factory = StaticEnumerableFactoryRegistry.TryGetDictionaryFactory(type);
 
             Assert.That(factory, Is.Not.Null);
             Assert.That(ReferenceEquals(factory, pair.Value), Is.True);
-            Assert.That(ReferenceEquals(factory, EnumerableFactoryRegistry.GetDictionaryFactory(type)), Is.True);
+            Assert.That(ReferenceEquals(factory, StaticEnumerableFactoryRegistry.GetDictionaryFactory(type)), Is.True);
         }
 
-        var factories = EnumerableFactoryRegistry.DictionaryFactories.Values.Distinct().OrderBy(x => x.Empty<int, int>().GetType().FullName).ToArray();
+        var factories = StaticEnumerableFactoryRegistry.DictionaryFactories.Values.Distinct().OrderBy(x => x.Empty<int, int>().GetType().FullName).ToArray();
 
         Console.WriteLine($"{factories.Length} dictionary factories");
 
