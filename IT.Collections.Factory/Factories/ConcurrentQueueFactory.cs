@@ -19,7 +19,7 @@ public class ConcurrentQueueFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(((IProducerConsumerCollection<T>)queue).TryAdd, false);
+        builder(((IProducerConsumerCollection<T>)queue).TryAdd);
 
         return queue;
     }
@@ -31,7 +31,7 @@ public class ConcurrentQueueFactory : IEnumerableFactory
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(((IProducerConsumerCollection<T>)queue).TryAdd, false, in state);
+        builder(((IProducerConsumerCollection<T>)queue).TryAdd, in state);
 
         return queue;
     }

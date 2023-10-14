@@ -21,7 +21,7 @@ public class ConcurrentDictionaryFactory : IDictionaryFactory
 
         var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false);
+        builder(item => dictionary.TryAdd(item.Key, item.Value));
 
         return dictionary;
     }
@@ -33,7 +33,7 @@ public class ConcurrentDictionaryFactory : IDictionaryFactory
 
         var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false, in state);
+        builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 
         return dictionary;
     }

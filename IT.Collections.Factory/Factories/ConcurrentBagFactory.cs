@@ -19,7 +19,7 @@ public class ConcurrentBagFactory : IEnumerableFactory
 
         var bag = new ConcurrentBag<T>();
 
-        builder(((IProducerConsumerCollection<T>)bag).TryAdd, true);
+        builder(((IProducerConsumerCollection<T>)bag).TryAdd);
 
         return bag;
     }
@@ -31,7 +31,7 @@ public class ConcurrentBagFactory : IEnumerableFactory
 
         var bag = new ConcurrentBag<T>();
 
-        builder(((IProducerConsumerCollection<T>)bag).TryAdd, true, in state);
+        builder(((IProducerConsumerCollection<T>)bag).TryAdd, in state);
 
         return bag;
     }

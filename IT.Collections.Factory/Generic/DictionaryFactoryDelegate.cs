@@ -36,7 +36,7 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
         var dictionary = _factory(capacity);
         var tryAdd = _tryAdd;
 
-        builder(item => tryAdd(dictionary, item), _type == EnumerableType.Reverse);
+        builder(item => tryAdd(dictionary, item));
 
         return dictionary;
     }
@@ -49,7 +49,7 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
         var dictionary = _factory(capacity);
         var tryAdd = _tryAdd;
 
-        builder(item => tryAdd(dictionary, item), _type == EnumerableType.Reverse, in state);
+        builder(item => tryAdd(dictionary, item), in state);
 
         return dictionary;
     }

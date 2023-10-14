@@ -19,7 +19,7 @@ public class EquatableListFactory : IEnumerableFactory
 
         var list = new EquatableList<T>(capacity);
 
-        builder(item => { list.Add(item); return true; }, false);
+        builder(item => { list.Add(item); return true; });
 
         return list;
     }
@@ -31,7 +31,7 @@ public class EquatableListFactory : IEnumerableFactory
 
         var list = new EquatableList<T>(capacity);
 
-        builder(item => { list.Add(item); return true; }, false, in state);
+        builder(item => { list.Add(item); return true; }, in state);
 
         return list;
     }

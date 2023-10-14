@@ -19,7 +19,7 @@ public class SortedListFactory : IDictionaryFactory
 
         var dictionary = new SortedList<TKey, TValue>(capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false);
+        builder(item => dictionary.TryAdd(item.Key, item.Value));
 
         return dictionary;
     }
@@ -31,7 +31,7 @@ public class SortedListFactory : IDictionaryFactory
 
         var dictionary = new SortedList<TKey, TValue>(capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false, in state);
+        builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 
         return dictionary;
     }

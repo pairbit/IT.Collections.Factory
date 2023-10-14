@@ -22,7 +22,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
 
-        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), false);
+        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value));
 
         return dictionaryBuilder.ToImmutable();
     }
@@ -34,7 +34,7 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
 
-        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), false, in state);
+        builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), in state);
 
         return dictionaryBuilder.ToImmutable();
     }

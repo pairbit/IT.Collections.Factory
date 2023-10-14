@@ -21,7 +21,7 @@ public class ImmutableStackFactory : IEnumerableFactory
 
         var stack = ImmutableStack<T>.Empty;
 
-        builder(item => { stack = stack.Push(item); return true; }, true);
+        builder(item => { stack = stack.Push(item); return true; });
 
         return stack;
     }
@@ -33,7 +33,7 @@ public class ImmutableStackFactory : IEnumerableFactory
 
         var stack = ImmutableStack<T>.Empty;
 
-        builder(item => { stack = stack.Push(item); return true; }, true, in state);
+        builder(item => { stack = stack.Push(item); return true; }, in state);
 
         return stack;
     }

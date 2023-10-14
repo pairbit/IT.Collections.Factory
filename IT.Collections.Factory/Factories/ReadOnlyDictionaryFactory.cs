@@ -22,7 +22,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 
         var dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false);
+        builder(item => dictionary.TryAdd(item.Key, item.Value));
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }
@@ -34,7 +34,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 
         var dictionary = new Dictionary<TKey, TValue>(capacity);
 
-        builder(item => dictionary.TryAdd(item.Key, item.Value), false, in state);
+        builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 
         return new ReadOnlyDictionary<TKey, TValue>(dictionary);
     }

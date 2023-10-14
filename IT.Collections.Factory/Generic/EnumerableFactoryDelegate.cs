@@ -36,7 +36,7 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         var enumerable = _factory(capacity);
         var tryAdd = _tryAdd;
 
-        builder(item => tryAdd(enumerable, item), _type == EnumerableType.Reverse);
+        builder(item => tryAdd(enumerable, item));
 
         return enumerable;
     }
@@ -49,7 +49,7 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
         var enumerable = _factory(capacity);
         var tryAdd = _tryAdd;
 
-        builder(item => tryAdd(enumerable, item), _type == EnumerableType.Reverse, in state);
+        builder(item => tryAdd(enumerable, item), in state);
 
         return enumerable;
     }

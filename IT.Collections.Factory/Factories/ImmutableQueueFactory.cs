@@ -21,7 +21,7 @@ public class ImmutableQueueFactory : IEnumerableFactory
 
         var queue = ImmutableQueue<T>.Empty;
 
-        builder(item => { queue = queue.Enqueue(item); return true; }, false);
+        builder(item => { queue = queue.Enqueue(item); return true; });
 
         return queue;
     }
@@ -33,7 +33,7 @@ public class ImmutableQueueFactory : IEnumerableFactory
 
         var queue = ImmutableQueue<T>.Empty;
 
-        builder(item => { queue = queue.Enqueue(item); return true; }, false, in state);
+        builder(item => { queue = queue.Enqueue(item); return true; }, in state);
 
         return queue;
     }

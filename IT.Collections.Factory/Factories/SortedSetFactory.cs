@@ -17,7 +17,7 @@ public class SortedSetFactory : IEnumerableFactory
 
         var sortedSet = new SortedSet<T>();
         
-        builder(sortedSet.Add, false);
+        builder(sortedSet.Add);
 
         return sortedSet;
     }
@@ -29,7 +29,7 @@ public class SortedSetFactory : IEnumerableFactory
 
         var sortedSet = new SortedSet<T>();
 
-        builder(sortedSet.Add, false, in state);
+        builder(sortedSet.Add, in state);
 
         return sortedSet;
     }

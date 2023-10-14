@@ -17,7 +17,7 @@ public class QueueFactory : IEnumerableFactory
 
         var queue = new Queue<T>(capacity);
 
-        builder(item => { queue.Enqueue(item); return true; }, false);
+        builder(item => { queue.Enqueue(item); return true; });
 
         return queue;
     }
@@ -29,7 +29,7 @@ public class QueueFactory : IEnumerableFactory
 
         var queue = new Queue<T>(capacity);
 
-        builder(item => { queue.Enqueue(item); return true; }, false, in state);
+        builder(item => { queue.Enqueue(item); return true; }, in state);
 
         return queue;
     }

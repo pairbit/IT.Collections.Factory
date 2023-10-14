@@ -21,7 +21,7 @@ public class ImmutableHashSetFactory : IEnumerableFactory
 
         var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
 
-        builder(hashSetBuilder.Add, false);
+        builder(hashSetBuilder.Add);
 
         return hashSetBuilder.ToImmutable();
     }
@@ -33,7 +33,7 @@ public class ImmutableHashSetFactory : IEnumerableFactory
 
         var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
 
-        builder(hashSetBuilder.Add, false, in state);
+        builder(hashSetBuilder.Add, in state);
 
         return hashSetBuilder.ToImmutable();
     }

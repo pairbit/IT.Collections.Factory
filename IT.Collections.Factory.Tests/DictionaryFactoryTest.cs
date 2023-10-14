@@ -116,7 +116,7 @@ public class DictionaryFactoryTest
             array = _arrayUnique;
         }
 
-        IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, (add, reverse) => Builder(add, reverse, factory.Type));
+        IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
         if (factory.Type.IsUnordered())
@@ -149,12 +149,10 @@ public class DictionaryFactoryTest
         }
     }
 
-    private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, bool reverse, EnumerableType type)
+    private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, EnumerableType type)
     {
-        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
-
         var array = _array;
-        if (reverse)
+        if (type.IsReverse())
         {
             for (int i = array.Length - 1; i >= 0; i--)
             {
@@ -178,14 +176,12 @@ public class DictionaryFactoryTest
         }
     }
 
-    private static void BuilderState(TryAdd<KeyValuePair<int, int>> tryAdd, bool reverse, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>) state)
+    private static void BuilderState(TryAdd<KeyValuePair<int, int>> tryAdd, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>) state)
     {
         (var memory, var type, var duplicates) = state;
 
-        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
-
         var span = memory.Span;
-        if (reverse)
+        if (type.IsReverse())
         {
             for (int i = span.Length - 1; i >= 0; i--)
             {

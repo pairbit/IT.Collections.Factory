@@ -113,7 +113,7 @@ public class EnumerableFactoryTest
             array = _arrayUnique;
         }
 
-        var withBuilder = factory.New<int>(_capacity, (add, reverse) => Builder(add, reverse, factory.Type));
+        var withBuilder = factory.New<int>(_capacity, add => Builder(add, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
         Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
@@ -134,12 +134,10 @@ public class EnumerableFactoryTest
         }
     }
 
-    private void Builder(TryAdd<int> tryAdd, bool reverse, EnumerableType type)
+    private void Builder(TryAdd<int> tryAdd, EnumerableType type)
     {
-        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
-
         var array = _array;
-        if (reverse)
+        if (type.IsReverse())
         {
             for (int i = array.Length - 1; i >= 0; i--)
             {
@@ -163,14 +161,12 @@ public class EnumerableFactoryTest
         }
     }
 
-    private static void BuilderState(TryAdd<int> tryAdd, bool reverse, in (ReadOnlyMemory<int>, EnumerableType, List<int>) state)
+    private static void BuilderState(TryAdd<int> tryAdd, in (ReadOnlyMemory<int>, EnumerableType, List<int>) state)
     {
         (var memory, var type, var duplicates) = state;
 
-        Assert.That(reverse, Is.EqualTo(type.IsReverse()));
-
         var span = memory.Span;
-        if (reverse)
+        if (type.IsReverse())
         {
             for (int i = span.Length - 1; i >= 0; i--)
             {

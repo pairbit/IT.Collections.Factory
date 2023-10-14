@@ -17,7 +17,7 @@ public class ListFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(item => { list.Add(item); return true; }, false);
+        builder(item => { list.Add(item); return true; });
 
         return list;
     }
@@ -29,7 +29,7 @@ public class ListFactory : IEnumerableFactory
 
         var list = new List<T>(capacity);
 
-        builder(item => { list.Add(item); return true; }, false, in state);
+        builder(item => { list.Add(item); return true; }, in state);
 
         return list;
     }
