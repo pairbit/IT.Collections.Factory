@@ -9,8 +9,9 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
 
     public EnumerableType Type => _type;
 
-    public EnumerableFactoryDelegate(EnumerableFactory<TEnumerable, T> factory,
-        Func<TEnumerable, T, bool> tryAdd,
+    public EnumerableFactoryDelegate(
+        EnumerableFactory<TEnumerable, T> factory, 
+        Func<TEnumerable, T, bool> tryAdd, 
         EnumerableType type = EnumerableType.None)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));

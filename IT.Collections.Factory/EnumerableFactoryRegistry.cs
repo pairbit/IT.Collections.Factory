@@ -120,6 +120,15 @@ public class EnumerableFactoryRegistry
         _genericEnumerableFactories[typeof(TEnumerable)] = new EnumerableFactoryDelegate<TEnumerable, T>(factory, tryAdd, type);
     }
 
+    public static void RegisterEnumerableFactory<TEnumerable, T>(EnumerableFactory<TEnumerable, T> factory,
+        Action<TEnumerable, T> add, EnumerableType type = EnumerableType.None) where TEnumerable : IEnumerable<T>
+    {
+        if (add == null) throw new ArgumentNullException(nameof(add));
+
+        _genericEnumerableFactories[typeof(TEnumerable)] = 
+            new EnumerableFactoryDelegate<TEnumerable, T>(factory, (enumerable, item) => { add(enumerable, item); return true; }, type);
+    }
+
     public static void RegisterDictionaryFactory(IDictionaryFactory factory, params Type[] genericTypes)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
