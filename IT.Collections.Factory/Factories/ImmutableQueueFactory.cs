@@ -4,17 +4,38 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableQueueFactory : IEnumerableFactory
+public class ImmutableQueueFactory :
+#if NET5_0_OR_GREATER
+    EnumerableFactory
+#else
+    IEnumerableFactory
+#endif
 {
     public static readonly ImmutableQueueFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        EnumerableType Type => EnumerableType.None;
 
-    public IEnumerable<T> Empty<T>() => ImmutableQueue<T>.Empty;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableQueue<T> Empty<T>() => ImmutableQueue<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity) => ImmutableQueue<T>.Empty;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableQueue<T> New<T>(int capacity) => ImmutableQueue<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableQueue<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableQueue<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -26,7 +47,11 @@ public class ImmutableQueueFactory : IEnumerableFactory
         return queue;
     }
 
-    public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableQueue<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
     {
         if (capacity == 0) return ImmutableQueue<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -37,6 +62,12 @@ public class ImmutableQueueFactory : IEnumerableFactory
 
         return queue;
     }
+#if !NET5_0_OR_GREATER
+    IEnumerable<T> IEnumerableFactory.Empty<T>() => Empty<T>();
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity) => New<T>(capacity);
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder) => New(capacity, builder);
+    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state) => New(capacity, builder, in state);
+#endif
 }
 
 #endif

@@ -2,20 +2,51 @@
 
 namespace IT.Collections.Factory.Factories;
 
-public class ReadOnlyDictionaryFactory : IDictionaryFactory
+public class ReadOnlyDictionaryFactory :
+#if NET5_0_OR_GREATER
+    BaseDictionaryFactory
+#else
+    IDictionaryFactory
+#endif
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
 
-    public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => Cache<TKey, TValue>.Empty;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ReadOnlyDictionary<TKey, TValue> Empty<TKey, TValue>()
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
+        => Cache<TKey, TValue>.Empty;
 
-    public IDictionary<TKey, TValue> New<TKey, TValue>(int capacity) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
     {
         throw new NotSupportedException();
     }
 
-    public IDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
     {
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -24,10 +55,17 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
-        return new ReadOnlyDictionary<TKey, TValue>(dictionary);
+        return new(dictionary);
     }
 
-    public IDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ReadOnlyDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
     {
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -36,11 +74,17 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 
-        return new ReadOnlyDictionary<TKey, TValue>(dictionary);
+        return new(dictionary);
     }
 
     static class Cache<TKey, TValue> where TKey : notnull
     {
         public readonly static ReadOnlyDictionary<TKey, TValue> Empty = new(new Dictionary<TKey, TValue>());
     }
+#if !NET5_0_OR_GREATER
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.Empty<TKey, TValue>() => Empty<TKey, TValue>();
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity) => New<TKey, TValue>(capacity);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder) => New(capacity, builder);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state) => New(capacity, builder, in state);
+#endif
 }

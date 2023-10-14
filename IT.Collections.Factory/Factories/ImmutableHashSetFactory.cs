@@ -4,17 +4,38 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableHashSetFactory : IEnumerableFactory
+public class ImmutableHashSetFactory :
+#if NET5_0_OR_GREATER
+    EnumerableFactory
+#else
+    IEnumerableFactory
+#endif
 {
     public static readonly ImmutableHashSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
 
-    public IEnumerable<T> Empty<T>() => ImmutableHashSet<T>.Empty;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableHashSet<T> Empty<T>() => ImmutableHashSet<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity) => ImmutableHashSet<T>.Empty;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableHashSet<T> New<T>(int capacity) => ImmutableHashSet<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableHashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ImmutableHashSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -26,7 +47,11 @@ public class ImmutableHashSetFactory : IEnumerableFactory
         return hashSetBuilder.ToImmutable();
     }
 
-    public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableHashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
     {
         if (capacity == 0) return ImmutableHashSet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -37,6 +62,12 @@ public class ImmutableHashSetFactory : IEnumerableFactory
 
         return hashSetBuilder.ToImmutable();
     }
+#if !NET5_0_OR_GREATER
+    IEnumerable<T> IEnumerableFactory.Empty<T>() => Empty<T>();
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity) => New<T>(capacity);
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder) => New(capacity, builder);
+    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state) => New(capacity, builder, in state);
+#endif
 }
 
 #endif

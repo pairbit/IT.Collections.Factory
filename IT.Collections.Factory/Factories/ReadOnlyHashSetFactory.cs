@@ -4,20 +4,20 @@ namespace IT.Collections.Factory.Factories;
 
 using Internal;
 
-public class ReadOnlyHashSetFactory : IEnumerableFactory
+public class ReadOnlyHashSetFactory : EnumerableFactory
 {
     public static readonly ReadOnlyHashSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
+    public override EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
 
-    public IEnumerable<T> Empty<T>() => ReadOnlySet<T>.Empty;
+    public override IReadOnlySet<T> Empty<T>() => ReadOnlySet<T>.Empty;
 
-    public IEnumerable<T> New<T>(int capacity)
+    public override IReadOnlySet<T> New<T>(int capacity)
     {
         throw new NotSupportedException();
     }
 
-    public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+    public override IReadOnlySet<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -29,7 +29,7 @@ public class ReadOnlyHashSetFactory : IEnumerableFactory
         return new ReadOnlySet<T>(hashSet);
     }
 
-    public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+    public override IReadOnlySet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

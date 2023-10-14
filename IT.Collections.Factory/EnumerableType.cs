@@ -10,5 +10,5 @@ public enum EnumerableType
     Unique = 8,
     Reverse = 16,
     //NoCapacity
-    //Fixed
+    //Comparable
 }

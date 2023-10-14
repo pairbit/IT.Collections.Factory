@@ -2,19 +2,40 @@
 
 namespace IT.Collections.Factory.Factories;
 
-public class ConcurrentStackFactory : IEnumerableFactory
+public class ConcurrentStackFactory :
+#if NET5_0_OR_GREATER
+    EnumerableFactory
+#else
+    IEnumerableFactory
+#endif
 {
     public static readonly ConcurrentStackFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Reverse;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        EnumerableType Type => EnumerableType.Reverse;
 
-    public IEnumerable<T> Empty<T>() => new ConcurrentStack<T>();
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ConcurrentStack<T> Empty<T>() => new();
 
-    public IEnumerable<T> New<T>(int capacity) => new ConcurrentStack<T>();
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ConcurrentStack<T> New<T>(int capacity) => new();
 
-    public IEnumerable<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ConcurrentStack<T> New<T>(int capacity, EnumerableBuilder<T> builder)
     {
-        if (capacity == 0) return new ConcurrentStack<T>();
+        if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var stack = new ConcurrentStack<T>();
@@ -24,9 +45,13 @@ public class ConcurrentStackFactory : IEnumerableFactory
         return stack;
     }
 
-    public IEnumerable<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ConcurrentStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
     {
-        if (capacity == 0) return new ConcurrentStack<T>();
+        if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var stack = new ConcurrentStack<T>();
@@ -35,4 +60,10 @@ public class ConcurrentStackFactory : IEnumerableFactory
 
         return stack;
     }
+#if !NET5_0_OR_GREATER
+    IEnumerable<T> IEnumerableFactory.Empty<T>() => Empty<T>();
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity) => New<T>(capacity);
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder) => New(capacity, builder);
+    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state) => New(capacity, builder, in state);
+#endif
 }

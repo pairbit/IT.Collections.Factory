@@ -4,18 +4,49 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableSortedDictionaryFactory : IDictionaryFactory
+public class ImmutableSortedDictionaryFactory :
+#if NET5_0_OR_GREATER
+    BaseDictionaryFactory
+#else
+    IDictionaryFactory
+#endif
 {
     public static readonly ImmutableSortedDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
 
-    public IDictionary<TKey, TValue> Empty<TKey, TValue>() where TKey : notnull => ImmutableSortedDictionary<TKey, TValue>.Empty;
-
-    public IDictionary<TKey, TValue> New<TKey, TValue>(int capacity) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableSortedDictionary<TKey, TValue> Empty<TKey, TValue>()
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
         => ImmutableSortedDictionary<TKey, TValue>.Empty;
 
-    public IDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableSortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
+        => ImmutableSortedDictionary<TKey, TValue>.Empty;
+
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableSortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
     {
         if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -27,7 +58,14 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
         return dictionaryBuilder.ToImmutable();
     }
 
-    public IDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state) where TKey : notnull
+    public
+#if NET5_0_OR_GREATER
+        override
+#endif
+        ImmutableSortedDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state)
+#if !NET5_0_OR_GREATER
+        where TKey : notnull
+#endif
     {
         if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -38,6 +76,12 @@ public class ImmutableSortedDictionaryFactory : IDictionaryFactory
 
         return dictionaryBuilder.ToImmutable();
     }
+#if !NET5_0_OR_GREATER
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.Empty<TKey, TValue>() => Empty<TKey, TValue>();
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity) => New<TKey, TValue>(capacity);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder) => New(capacity, builder);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state) => New(capacity, builder, in state);
+#endif
 }
 
 #endif
