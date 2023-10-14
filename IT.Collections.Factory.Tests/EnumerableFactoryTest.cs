@@ -53,6 +53,8 @@ public class EnumerableFactoryTest
 
         var factories = EnumerableFactoryRegistry.EnumerableFactories.Values.Distinct().OrderBy(x => x.Empty<int>().GetType().FullName).ToArray();
 
+        Console.WriteLine($"{factories.Length} enumerable factories");
+
         foreach (var factory in factories)
         {
             try
@@ -61,7 +63,7 @@ public class EnumerableFactoryTest
             }
             catch (Exception)
             {
-                Console.WriteLine($"Type '{factory.Empty<int>().GetType().GetGenericTypeDefinition().FullName}' is exception");
+                Console.WriteLine($"Type '{factory.Empty<int>().GetType().GetGenericTypeDefinitionOrArray().FullName}' is exception");
                 throw;
             }
         }
@@ -70,13 +72,12 @@ public class EnumerableFactoryTest
     private void FactoryTest(IEnumerableFactory factory)
     {
         var empty = factory.Empty<int>();
-
         Assert.That(empty.Any(), Is.False);
-
+        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
         var type = empty.GetType();
 
         if (factory.Type != EnumerableType.None)
-            Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' is {factory.Type}");
+            Console.WriteLine($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {factory.Type}");
 
         if (factory.Type.IsReadOnly())
         {
@@ -85,12 +86,19 @@ public class EnumerableFactoryTest
         }
         else
         {
-            Assert.That(factory.New<int>(0).Any(), Is.False);
+            var withZero = factory.New<int>(0);
+            Assert.That(withZero.GetType(), Is.EqualTo(type));
+            Assert.That(withZero.Any(), Is.False);
+            if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
 
             var withCapacity = factory.New<int>(_capacity);
-            
             //Assert.That(withCapacity.Any(), Is.False);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
+            if (withCapacity.TryGetCapacity(out capacity))
+            {
+                Console.WriteLine($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' has {capacity} capacity");
+                Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
+            }
         }
 
         Assert.That(factory.New<int>(0, null!).Any(), Is.False);

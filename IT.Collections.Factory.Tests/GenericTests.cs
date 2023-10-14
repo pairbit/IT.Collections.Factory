@@ -27,7 +27,7 @@ public class GenericTests
         var type = empty.GetType();
 
         if (factory.Type != EnumerableType.None)
-            Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' is {factory.Type}");
+            Console.WriteLine($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {factory.Type}");
 
         if (factory.Type.IsReadOnly())
         {

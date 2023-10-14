@@ -19,6 +19,7 @@ public class EnumerableFactoryRegistry
     static EnumerableFactoryRegistry()
     {
         //RegisterEnumerableFactory(ArrayFactory.Default, typeof(IEnumerable<>));
+        RegisterEnumerableFactory(ArrayFactory.Default);
         RegisterEnumerableFactory(ListFactory.Default, typeof(IList<>));
         RegisterEnumerableFactory(LinkedListFactory.Default, typeof(ICollection<>), typeof(IEnumerable<>));
         RegisterEnumerableFactory(HashSetFactory.Default, typeof(ISet<>));
@@ -81,9 +82,9 @@ public class EnumerableFactoryRegistry
             if (!enumerableType.IsGenericType) throw new ArgumentException($"Registered type '{enumerableType.FullName}' is not generic type", nameof(factory));
 
             baseType = enumerableType.GetGenericTypeDefinition();
-
-            _enumerableFactories[baseType] = factory;
         }
+
+        _enumerableFactories[baseType] = factory;
 
         if (genericTypes != null && genericTypes.Length > 0)
         {

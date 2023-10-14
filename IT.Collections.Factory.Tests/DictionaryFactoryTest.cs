@@ -56,6 +56,8 @@ public class DictionaryFactoryTest
 
         var factories = EnumerableFactoryRegistry.DictionaryFactories.Values.Distinct().OrderBy(x => x.Empty<int, int>().GetType().FullName).ToArray();
 
+        Console.WriteLine($"{factories.Length} dictionary factories");
+
         foreach (var factory in factories)
         {
             try
@@ -73,9 +75,8 @@ public class DictionaryFactoryTest
     private void FactoryTest(IDictionaryFactory factory)
     {
         var empty = factory.Empty<int, int>();
-
         Assert.That(empty.Any(), Is.False);
-
+        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
         var type = empty.GetType();
 
         if (factory.Type != EnumerableType.None)
@@ -88,12 +89,19 @@ public class DictionaryFactoryTest
         }
         else
         {
-            Assert.That(factory.New<int, int>(0).Any(), Is.False);
+            var withZero = factory.New<int, int>(0);
+            Assert.That(withZero.GetType(), Is.EqualTo(type));
+            Assert.That(withZero.Any(), Is.False);
+            if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
 
             var withCapacity = factory.New<int, int>(_capacity);
-
             //Assert.That(withCapacity.Any(), Is.False);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
+            if (withCapacity.TryGetCapacity(out capacity))
+            {
+                Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' has {capacity} capacity");
+                Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
+            }
         }
 
         Assert.That(factory.New<int, int>(0, null!).Any(), Is.False);
