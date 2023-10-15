@@ -58,7 +58,7 @@ internal class EnumerableFactoryTester
         }
     }
 
-    private void Test(IEnumerableFactory factory)
+    public void Test(IEnumerableFactory factory)
     {
         var empty = factory.Empty<int>();
         Assert.That(empty.Any(), Is.False);

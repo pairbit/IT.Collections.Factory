@@ -54,7 +54,7 @@ internal class DictionaryFactoryTester
         {
             try
             {
-                FactoryTest(factory);
+                Test(factory);
             }
             catch (Exception)
             {
@@ -64,7 +64,7 @@ internal class DictionaryFactoryTester
         }
     }
 
-    private void FactoryTest(IDictionaryFactory factory)
+    public void Test(IDictionaryFactory factory)
     {
         var empty = factory.Empty<int, int>();
         Assert.That(empty.Any(), Is.False);

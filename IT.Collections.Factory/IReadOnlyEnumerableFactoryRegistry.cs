@@ -2,5 +2,5 @@
 
 public interface IReadOnlyEnumerableFactoryRegistry : IReadOnlyDictionary<Type, IEnumerableFactoryRegistrable>
 {
-    TFactory? TryGet<TFactory>() where TFactory : IEnumerableFactoryRegistrable;
+    TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable;
 }

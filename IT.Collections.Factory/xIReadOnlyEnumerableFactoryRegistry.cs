@@ -4,13 +4,17 @@ using Generic;
 
 public static class xIReadOnlyEnumerableFactoryRegistry
 {
+    public static TFactory GetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry)
+        where TFactory : IEnumerableFactoryRegistrable
+        => registry.TryGetFactory<TFactory>() ?? throw new ArgumentException($"Factory '{typeof(TFactory).FullName}' not registered");
+
     public static IEnumerableFactory<TEnumerable, T>? TryGet<TEnumerable, T>(this IReadOnlyEnumerableFactoryRegistry registry)
         where TEnumerable : IEnumerable<T>
-        => registry.TryGet<IEnumerableFactory<TEnumerable, T>>();
+        => registry.TryGetFactory<IEnumerableFactory<TEnumerable, T>>();
 
     public static IDictionaryFactory<TDictionary, TKey, TValue>? TryGet<TDictionary, TKey, TValue>(this IReadOnlyEnumerableFactoryRegistry registry)
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
-        => registry.TryGet<IDictionaryFactory<TDictionary, TKey, TValue>>();
+        => registry.TryGetFactory<IDictionaryFactory<TDictionary, TKey, TValue>>();
 
     //if (registry == null) throw new ArgumentNullException(nameof(registry));
 
