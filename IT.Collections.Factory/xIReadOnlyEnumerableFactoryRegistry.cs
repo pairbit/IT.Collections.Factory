@@ -1,16 +1,39 @@
 ﻿namespace IT.Collections.Factory;
 
+using Generic;
+
 public static class xIReadOnlyEnumerableFactoryRegistry
 {
-    public static TFactory? TryGetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory
-    {
-        if (registry == null) throw new ArgumentNullException(nameof(registry));
+    public static IEnumerableFactory<TEnumerable, T>? TryGet<TEnumerable, T>(this IReadOnlyEnumerableFactoryRegistry registry)
+        where TEnumerable : IEnumerable<T>
+        => registry.TryGet<IEnumerableFactory<TEnumerable, T>>();
 
-        return registry.TryGetValue(typeof(TFactory), out var factory) ? (TFactory?)factory : default;
-    }
+    public static IDictionaryFactory<TDictionary, TKey, TValue>? TryGet<TDictionary, TKey, TValue>(this IReadOnlyEnumerableFactoryRegistry registry)
+        where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
+        => registry.TryGet<IDictionaryFactory<TDictionary, TKey, TValue>>();
 
-    public static TFactory GetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory
-        => registry.TryGetFactory<TFactory>() ?? throw new ArgumentException($"Factory type '{typeof(TFactory).FullName}' not registered");
+    //if (registry == null) throw new ArgumentNullException(nameof(registry));
+
+    //var type = typeof(TEnumerable);
+
+    //if (registry.TryGetValue(type, out var factory))
+    //    return (IEnumerableFactory<TEnumerable, T>)factory;
+
+    //if (registry.TryGetValue(type.GetGenericTypeDefinition(), out factory))
+    //    return new EnumerableFactoryProxy<TEnumerable, T>((IEnumerableFactory)factory);
+
+    //return null;
+
+
+    //public static TFactory? TryGetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory
+    //{
+    //    if (registry == null) throw new ArgumentNullException(nameof(registry));
+
+    //    return registry.TryGetValue(typeof(TFactory), out var factory) ? (TFactory?)factory : default;
+    //}
+
+    //public static TFactory GetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory
+    //    => registry.TryGetFactory<TFactory>() ?? throw new ArgumentException($"Factory type '{typeof(TFactory).FullName}' not registered");
 
     //private static IEnumerableFactory? TryGetFactoryByType(this IReadOnlyEnumerableFactoryRegistry registry, Type factoryType)
     //{

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace IT.Collections.Factory;
+﻿namespace IT.Collections.Factory;
 
 public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactoryRegistry
     where TDictionary : IReadOnlyDictionary<Type, IEnumerableFactoryRegistrable>
@@ -18,6 +16,9 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
 
     public virtual bool TryRegister<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
         => TryRegister(typeof(TFactory), factory, behavior);
+
+    public virtual TFactory? TryGet<TFactory>() where TFactory : IEnumerableFactoryRegistrable
+        => _dictionary.TryGetValue(typeof(TFactory), out var factory) ? (TFactory)factory : default;
 
     #region IReadOnlyDictionary
 

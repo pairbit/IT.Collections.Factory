@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace IT.Collections.Factory.Factories;
+﻿namespace IT.Collections.Factory.Factories;
 
 public class ConcurrentDictionaryFactory :
 #if NET5_0_OR_GREATER

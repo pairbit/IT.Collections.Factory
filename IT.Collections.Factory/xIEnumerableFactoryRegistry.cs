@@ -2,6 +2,7 @@
 
 using Factories;
 using Internal;
+using Generic;
 
 public static class xIEnumerableFactoryRegistry
 {
@@ -27,6 +28,15 @@ public static class xIEnumerableFactoryRegistry
     //{
     //}
 
+    public static bool TryRegister<TEnumerable, T>(this IEnumerableFactoryRegistry registry, IEnumerableFactory<TEnumerable, T> factory, RegistrationBehavior behavior)
+        where TEnumerable : IEnumerable<T>
+        => registry.TryRegister(factory, behavior);
+
+    public static bool TryRegister<TDictionary, TKey, TValue>(
+        this IEnumerableFactoryRegistry registry, IDictionaryFactory<TDictionary, TKey, TValue> factory, RegistrationBehavior behavior)
+        where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
+        => registry.TryRegister(factory, behavior);
+
     public static bool TryRegisterAllDefaultFactories(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
         => registry.TryRegister(ArrayFactory.Default, behavior) &
            registry.TryRegister(ListFactory.Default, behavior) &
@@ -43,52 +53,32 @@ public static class xIEnumerableFactoryRegistry
 #if NET6_0_OR_GREATER
            registry.TryRegister(ReadOnlyHashSetFactory.Default, behavior) &
 #endif
-           registry.TryRegister(ConcurrentBagFactory.Default, behavior);
-
-    public static bool TryRegisterFactoriesDefault(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
-        => registry.TryRegister(typeof(List<>), ListFactory.Default, behavior) &
-           registry.TryRegister(typeof(IList<>), ListFactory.Default, behavior) &
-           registry.TryRegister(typeof(LinkedList<>), LinkedListFactory.Default, behavior) &
-           registry.TryRegister(typeof(ICollection<>), LinkedListFactory.Default, behavior) &
-           registry.TryRegister(typeof(HashSet<>), HashSetFactory.Default, behavior) &
-           registry.TryRegister(typeof(ISet<>), HashSetFactory.Default, behavior) &
-           registry.TryRegister(SortedSetFactory.Default, behavior);
-}
-/*
- 
- RegisterEnumerableFactory(ListFactory.Default, typeof(IList<>));
-        RegisterEnumerableFactory(LinkedListFactory.Default, typeof(ICollection<>), typeof(IEnumerable<>));
-        RegisterEnumerableFactory(HashSetFactory.Default, typeof(ISet<>));
-        RegisterEnumerableFactory(SortedSetFactory.Default);
-        RegisterEnumerableFactory(StackFactory.Default);
-        RegisterEnumerableFactory(QueueFactory.Default);
-        RegisterEnumerableFactory(CollectionFactory.Default);
-        RegisterEnumerableFactory(ObservableCollectionFactory.Default);
-        RegisterEnumerableFactory(ReadOnlyObservableCollectionFactory.Default);
-
-        RegisterEnumerableFactory(ReadOnlyListFactory.Default, typeof(IReadOnlyList<>));
-        RegisterEnumerableFactory(ReadOnlyLinkedListFactory.Default, typeof(IReadOnlyCollection<>));
-#if NET6_0_OR_GREATER
-        RegisterEnumerableFactory(ReadOnlyHashSetFactory.Default, typeof(IReadOnlySet<>));
-#endif
 #if NETCOREAPP3_1_OR_GREATER
-        RegisterEnumerableFactory(ImmutableArrayFactory.Default);
-        RegisterEnumerableFactory(ImmutableListFactory.Default, typeof(System.Collections.Immutable.IImmutableList<>));
-        RegisterEnumerableFactory(ImmutableHashSetFactory.Default, typeof(System.Collections.Immutable.IImmutableSet<>));
-        RegisterEnumerableFactory(ImmutableSortedSetFactory.Default);
-        RegisterEnumerableFactory(ImmutableStackFactory.Default, typeof(System.Collections.Immutable.IImmutableStack<>));
-        RegisterEnumerableFactory(ImmutableQueueFactory.Default, typeof(System.Collections.Immutable.IImmutableQueue<>));
-        RegisterDictionaryFactory(ImmutableDictionaryFactory.Default, typeof(System.Collections.Immutable.IImmutableDictionary<,>));
-        RegisterDictionaryFactory(ImmutableSortedDictionaryFactory.Default);
+           registry.TryRegister(ImmutableArrayFactory.Default, behavior) &
+           registry.TryRegister(ImmutableListFactory.Default, behavior) &
+           registry.TryRegister(ImmutableHashSetFactory.Default, behavior) &
+           registry.TryRegister(ImmutableSortedSetFactory.Default, behavior) &
+           registry.TryRegister(ImmutableStackFactory.Default, behavior) &
+           registry.TryRegister(ImmutableQueueFactory.Default, behavior) &
+           registry.TryRegister(ImmutableDictionaryFactory.Default, behavior) &
+           registry.TryRegister(ImmutableSortedDictionaryFactory.Default, behavior) &
 #endif
-        RegisterDictionaryFactory(DictionaryFactory.Default, typeof(IDictionary<,>));
-        RegisterDictionaryFactory(ReadOnlyDictionaryFactory.Default, typeof(IReadOnlyDictionary<,>));
-        RegisterDictionaryFactory(SortedDictionaryFactory.Default);
-        RegisterDictionaryFactory(SortedListFactory.Default);
+           registry.TryRegister(DictionaryFactory.Default, behavior) &
+           registry.TryRegister(ReadOnlyDictionaryFactory.Default, behavior) &
+           registry.TryRegister(SortedDictionaryFactory.Default, behavior) &
+           registry.TryRegister(SortedListFactory.Default, behavior) &
+           registry.TryRegister(ConcurrentDictionaryFactory.Default, behavior) &
+           registry.TryRegister(ConcurrentBagFactory.Default, behavior) &
+           registry.TryRegister(ConcurrentQueueFactory.Default, behavior) &
+           registry.TryRegister(ConcurrentStackFactory.Default, behavior) &
+           registry.TryRegister(BlockingCollectionFactory.Default, behavior);
 
-        RegisterDictionaryFactory(ConcurrentDictionaryFactory.Default);
-        RegisterEnumerableFactory(ConcurrentBagFactory.Default, typeof(IProducerConsumerCollection<>));
-        RegisterEnumerableFactory(ConcurrentQueueFactory.Default);
-        RegisterEnumerableFactory(ConcurrentStackFactory.Default);
-        RegisterEnumerableFactory(BlockingCollectionFactory.Default);
- */
+    //public static bool TryRegisterFactoriesDefault(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
+    //    => registry.TryRegister(typeof(List<>), ListFactory.Default, behavior) &
+    //       registry.TryRegister(typeof(IList<>), ListFactory.Default, behavior) &
+    //       registry.TryRegister(typeof(LinkedList<>), LinkedListFactory.Default, behavior) &
+    //       registry.TryRegister(typeof(ICollection<>), LinkedListFactory.Default, behavior) &
+    //       registry.TryRegister(typeof(HashSet<>), HashSetFactory.Default, behavior) &
+    //       registry.TryRegister(typeof(ISet<>), HashSetFactory.Default, behavior) &
+    //       registry.TryRegister(SortedSetFactory.Default, behavior);
+}
