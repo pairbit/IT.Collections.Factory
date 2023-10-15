@@ -44,7 +44,11 @@ internal static class xIEnumerable
         where TKey : notnull
     {
         if (TryGetCapacity<KeyValuePair<TKey, TValue>>(enumerable, out capacity)) return true;
-
+        if (enumerable is SortedList<TKey, TValue> sortedList)
+        {
+            capacity = sortedList.Capacity;
+            return true;
+        }
 #if NET6_0_OR_GREATER
         if (enumerable is Dictionary<TKey, TValue> dictionary)
         {
