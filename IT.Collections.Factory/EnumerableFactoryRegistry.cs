@@ -1,17 +1,20 @@
 ﻿namespace IT.Collections.Factory;
 
-public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, object>>
+public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, IEnumerableFactoryRegistrable>>
 {
     public EnumerableFactoryRegistry(int capacity)
-        : base(new Dictionary<Type, object>(capacity))
+        : base(new Dictionary<Type, IEnumerableFactoryRegistrable>(capacity))
     {
 
     }
 
     public override void Clear() => _dictionary.Clear();
 
-    public override bool TryRegister(Type type, object factory, RegistrationBehavior behavior)
+    public override bool TryRegister(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
     {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+
         if (behavior == RegistrationBehavior.None) return _dictionary.TryAdd(type, factory);
         if (behavior == RegistrationBehavior.OverwriteExisting)
         {

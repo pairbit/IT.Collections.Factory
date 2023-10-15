@@ -1,9 +1,7 @@
 ﻿namespace IT.Collections.Factory;
 
-public interface IEnumerableFactory
+public interface IEnumerableFactory : IEnumerableFactoryRegistrable
 {
-    EnumerableType Type { get; }
-
     IEnumerable<T> Empty<T>();
 
     IEnumerable<T> New<T>(int capacity);

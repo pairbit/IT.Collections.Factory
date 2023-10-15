@@ -2,15 +2,11 @@
 
 public static class xIReadOnlyEnumerableFactoryRegistry
 {
-    
-
     public static TFactory? TryGetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory
     {
         if (registry == null) throw new ArgumentNullException(nameof(registry));
 
-        var type = typeof(TFactory);
-
-        return registry.TryGetValue(type, out var factory) ? (TFactory?)factory : default;
+        return registry.TryGetValue(typeof(TFactory), out var factory) ? (TFactory?)factory : default;
     }
 
     public static TFactory GetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry) where TFactory : IEnumerableFactory

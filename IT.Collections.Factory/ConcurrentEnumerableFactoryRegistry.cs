@@ -1,19 +1,20 @@
-﻿using System.Collections.Concurrent;
+﻿namespace IT.Collections.Factory;
 
-namespace IT.Collections.Factory;
-
-public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<ConcurrentDictionary<Type, object>>
+public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>>
 {
     public ConcurrentEnumerableFactoryRegistry(int capacity) 
-        : base(new ConcurrentDictionary<Type, object>(Environment.ProcessorCount, capacity))
+        : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(Environment.ProcessorCount, capacity))
     {
 
     }
 
     public override void Clear() => _dictionary.Clear();
 
-    public override bool TryRegister(Type type, object factory, RegistrationBehavior behavior)
+    public override bool TryRegister(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
     {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+
         if (behavior == RegistrationBehavior.None) return _dictionary.TryAdd(type, factory);
         if (behavior == RegistrationBehavior.OverwriteExisting)
         {

@@ -1,9 +1,7 @@
 ﻿namespace IT.Collections.Factory;
 
-public interface IDictionaryFactory
+public interface IDictionaryFactory : IEnumerableFactoryRegistrable
 {
-    EnumerableType Type { get; }
-
     IEnumerable<KeyValuePair<TKey, TValue>> Empty<TKey, TValue>() where TKey : notnull;
 
     IEnumerable<KeyValuePair<TKey, TValue>> New<TKey, TValue>(int capacity) where TKey : notnull;

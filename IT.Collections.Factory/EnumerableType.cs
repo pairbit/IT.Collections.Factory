@@ -11,4 +11,10 @@ public enum EnumerableType
     Reverse = 16,
     //NoCapacity
     //Comparable
+    //LinkedList
+    //ThreadSafe
+    //Equatable
+    //Comparable
+    //EquatableKey
+    //ComparableKey
 }

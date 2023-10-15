@@ -1,5 +1,5 @@
 ﻿namespace IT.Collections.Factory;
 
-public interface IReadOnlyEnumerableFactoryRegistry : IReadOnlyDictionary<Type, object>
+public interface IReadOnlyEnumerableFactoryRegistry : IReadOnlyDictionary<Type, IEnumerableFactoryRegistrable>
 {
 }

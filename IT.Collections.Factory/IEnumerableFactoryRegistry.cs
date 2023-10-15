@@ -2,7 +2,9 @@
 
 public interface IEnumerableFactoryRegistry : IReadOnlyEnumerableFactoryRegistry
 {
-    bool TryRegister(Type type, object factory, RegistrationBehavior behavior);
-
     void Clear();
+
+    bool TryRegister(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior);
+
+    bool TryRegister<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable;
 }

@@ -2,10 +2,9 @@
 
 public delegate TEnumerable EnumerableFactory<TEnumerable, T>(int capacity) where TEnumerable : IEnumerable<T>;
 
-public interface IEnumerableFactory<TEnumerable, T> where TEnumerable : IEnumerable<T>
+public interface IEnumerableFactory<TEnumerable, T> : IEnumerableFactoryRegistrable
+    where TEnumerable : IEnumerable<T>
 {
-    EnumerableType Type { get; }
-
     TEnumerable Empty();
 
     TEnumerable New(int capacity);
