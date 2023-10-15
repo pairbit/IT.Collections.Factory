@@ -2,7 +2,7 @@
 
 public interface IEnumerableFactoryRegistry : IReadOnlyEnumerableFactoryRegistry
 {
-    bool Register(Type type, object factory, bool overwrite);
+    bool TryRegister(Type type, object factory, RegistrationBehavior behavior);
 
     void Clear();
 }

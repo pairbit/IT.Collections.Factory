@@ -12,7 +12,7 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
         _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
     }
 
-    public abstract bool Register(Type type, object factory, bool overwrite);
+    public abstract bool TryRegister(Type type, object factory, RegistrationBehavior behavior);
 
     public abstract void Clear();
 

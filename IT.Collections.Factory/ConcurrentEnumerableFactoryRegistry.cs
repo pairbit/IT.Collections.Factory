@@ -12,17 +12,19 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
 
     public override void Clear() => _dictionary.Clear();
 
-    public override bool Register(Type type, object factory, bool overwrite)
+    public override bool TryRegister(Type type, object factory, RegistrationBehavior behavior)
     {
-        if (overwrite)
+        if (behavior == RegistrationBehavior.None) return _dictionary.TryAdd(type, factory);
+        if (behavior == RegistrationBehavior.OverwriteExisting)
         {
-            //var exists = _dictionary.ContainsKey(type);
-
             _dictionary[type] = factory;
-
             return true;
         }
-
-        return _dictionary.TryAdd(type, factory);
+        if (behavior == RegistrationBehavior.ThrowOnExisting)
+        {
+            if (!_dictionary.TryAdd(type, factory)) throw new ArgumentException("Duplicate key", nameof(type));
+            return true;
+        }
+        throw new ArgumentOutOfRangeException(nameof(behavior));
     }
 }

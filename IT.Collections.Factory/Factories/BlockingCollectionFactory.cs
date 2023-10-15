@@ -45,7 +45,7 @@ public class BlockingCollectionFactory :
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(item => { queue.Enqueue(item); return true; });
+        builder(((IProducerConsumerCollection<T>)queue).TryAdd);
 
         return new(queue, capacity);
     }
@@ -61,7 +61,7 @@ public class BlockingCollectionFactory :
 
         var queue = new ConcurrentQueue<T>();
 
-        builder(item => { queue.Enqueue(item); return true; }, in state);
+        builder(((IProducerConsumerCollection<T>)queue).TryAdd, in state);
 
         return new(queue, capacity);
     }
