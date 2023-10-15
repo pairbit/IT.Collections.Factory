@@ -1,6 +1,6 @@
 namespace IT.Collections.Factory.Tests;
 
-public class DictionaryFactoryTest
+public class StaticDictionaryFactoryTest
 {
     private readonly static Random _random = new();
     private int _capacity;

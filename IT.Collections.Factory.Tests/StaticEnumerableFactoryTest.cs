@@ -1,6 +1,6 @@
 namespace IT.Collections.Factory.Tests;
 
-public class EnumerableFactoryTest
+public class StaticEnumerableFactoryTest
 {
     private readonly static Random _random = new();
     private int _capacity;
