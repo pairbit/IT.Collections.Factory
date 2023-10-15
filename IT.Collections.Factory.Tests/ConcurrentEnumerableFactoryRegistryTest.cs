@@ -2,16 +2,8 @@
 
 public class ConcurrentEnumerableFactoryRegistryTest : EnumerableFactoryRegistryTest
 {
-    private static readonly ConcurrentEnumerableFactoryRegistry _registry;
-
-    static ConcurrentEnumerableFactoryRegistryTest()
-    {
-        var registry = new ConcurrentEnumerableFactoryRegistry(-1, 50);
-
-        registry.TryRegisterAllDefaultFactories(RegistrationBehavior.ThrowOnExisting);
-
-        _registry = registry;
-    }
+    private static readonly IEnumerableFactoryRegistry _registry =
+        new ConcurrentEnumerableFactoryRegistry(-1, 50).RegisterAllDefaultFactories();
 
     public ConcurrentEnumerableFactoryRegistryTest() : base(_registry)
     {

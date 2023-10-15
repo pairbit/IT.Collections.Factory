@@ -4,19 +4,10 @@ using Internal;
 
 public class EnumerableFactoryRegistryTest
 {
-    private readonly static EnumerableFactoryRegistry _registry;
+    private readonly static IEnumerableFactoryRegistry _registry = new EnumerableFactoryRegistry(50).RegisterAllDefaultFactories();
 
     private readonly EnumerableFactoryTester _enumerableFactoryTester;
     private readonly DictionaryFactoryTester _dictionaryFactoryTester;
-
-    static EnumerableFactoryRegistryTest()
-    {
-        var registry = new EnumerableFactoryRegistry(50);
-
-        registry.TryRegisterAllDefaultFactories(RegistrationBehavior.ThrowOnExisting);
-
-        _registry = registry;
-    }
 
     public EnumerableFactoryRegistryTest() : this(_registry) { }
 

@@ -73,6 +73,13 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegister(ConcurrentStackFactory.Default, behavior) &
            registry.TryRegister(BlockingCollectionFactory.Default, behavior);
 
+    public static IEnumerableFactoryRegistry RegisterAllDefaultFactories(this IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
+    {
+        registry.TryRegisterAllDefaultFactories(behavior);
+        return registry;
+    }
+
     //public static bool TryRegisterFactoriesDefault(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
     //    => registry.TryRegister(typeof(List<>), ListFactory.Default, behavior) &
     //       registry.TryRegister(typeof(IList<>), ListFactory.Default, behavior) &
