@@ -3,7 +3,7 @@
 public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>>
 {
     public ConcurrentEnumerableFactoryRegistry(int concurrencyLevel, int capacity)
-        : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(concurrencyLevel, capacity))
+        : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(concurrencyLevel == -1 ? Environment.ProcessorCount : concurrencyLevel, capacity))
     {
 
     }
