@@ -41,11 +41,11 @@ public class ReadOnlyObservableCollectionFactory :
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var collection = new ObservableCollection<T>();
 
-        builder(item => { list.Add(item); return true; });
+        builder(item => { collection.Add(item); return true; });
 
-        return new(new ObservableCollection<T>(list));
+        return new(collection);
     }
 
     public
@@ -57,11 +57,11 @@ public class ReadOnlyObservableCollectionFactory :
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var collection = new ObservableCollection<T>();
 
-        builder(item => { list.Add(item); return true; }, in state);
+        builder(item => { collection.Add(item); return true; }, in state);
 
-        return new(new ObservableCollection<T>(list));
+        return new(collection);
     }
 
     static class Cache<T>

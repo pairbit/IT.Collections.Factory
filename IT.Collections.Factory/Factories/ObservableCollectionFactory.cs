@@ -27,12 +27,7 @@ public class ObservableCollectionFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        ObservableCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return new();
-
-        return new(new List<T>(capacity));
-    }
+        ObservableCollection<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
     public
 #if NET5_0_OR_GREATER
@@ -43,11 +38,11 @@ public class ObservableCollectionFactory :
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var collection = new ObservableCollection<T>();
 
-        builder(item => { list.Add(item); return true; });
+        builder(item => { collection.Add(item); return true; });
 
-        return new(list);
+        return collection;
     }
 
     public
@@ -59,11 +54,11 @@ public class ObservableCollectionFactory :
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var collection = new ObservableCollection<T>();
 
-        builder(item => { list.Add(item); return true; }, in state);
+        builder(item => { collection.Add(item); return true; }, in state);
 
-        return new(list);
+        return collection;
     }
 #if !NET5_0_OR_GREATER
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
