@@ -10,14 +10,14 @@ public class ReadOnlyHashSetFactory : EnumerableFactory
 
     public override EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
 
-    public override IReadOnlySet<T> Empty<T>() => ReadOnlySet<T>.Empty;
+    public override IReadOnlySet<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlySet<T>.Empty;
 
-    public override IReadOnlySet<T> New<T>(int capacity)
+    public override IReadOnlySet<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         throw new NotSupportedException();
     }
 
-    public override IReadOnlySet<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+    public override IReadOnlySet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -29,7 +29,7 @@ public class ReadOnlyHashSetFactory : EnumerableFactory
         return new ReadOnlySet<T>(hashSet);
     }
 
-    public override IReadOnlySet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+    public override IReadOnlySet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

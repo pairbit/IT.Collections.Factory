@@ -19,13 +19,13 @@ public class HashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        HashSet<T> Empty<T>() => new((IEqualityComparer<T>?)null);
+        HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new((IEqualityComparer<T>?)null);
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        HashSet<T> New<T>(int capacity)
+        HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
 #if NETSTANDARD2_0 || NET461
         => new();
 #else
@@ -36,7 +36,7 @@ public class HashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder)
+        HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new((IEqualityComparer<T>?)null);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -56,7 +56,7 @@ public class HashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state)
+        HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new((IEqualityComparer<T>?)null);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -72,9 +72,9 @@ public class HashSetFactory :
         return hashSet;
     }
 #if !NET5_0_OR_GREATER
-    IEnumerable<T> IEnumerableFactory.Empty<T>() => Empty<T>();
-    IEnumerable<T> IEnumerableFactory.New<T>(int capacity) => New<T>(capacity);
-    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder) => New(capacity, builder);
-    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state) => New(capacity, builder, in state);
+    IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
 #endif
 }

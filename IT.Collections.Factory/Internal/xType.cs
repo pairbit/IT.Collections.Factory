@@ -6,6 +6,7 @@ namespace System;
 
 internal static class xType
 {
+    private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
     public static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
     public static readonly Type IDictionaryFactoryType = typeof(IDictionaryFactory);
 
@@ -66,17 +67,17 @@ internal static class xType
     {
         if (factoryType.IsAssignableFromEnumerableFactory() || factoryType.IsAssignableFromDictionaryFactory())
         {
-            var emptyMethod = factoryType.GetMethod(nameof(IEnumerableFactory.Empty)) ?? throw new InvalidOperationException($"Method '{factoryType.FullName}.{nameof(IEnumerableFactory.Empty)}' not found");
+            var emptyMethod = factoryType.GetMethod(nameof(IEnumerableFactory.Empty), Bindings) ?? throw new InvalidOperationException($"Method '{factoryType.FullName}.{nameof(IEnumerableFactory.Empty)}' not found");
 
             var returnType = emptyMethod.ReturnType;
 
-            var methods = factoryType.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            var methods = factoryType.GetMethods(Bindings);
             var methodName = nameof(IEnumerableFactory.New);
 
             for (int i = 0; i < methods.Length; i++)
             {
                 var method = methods[i];
-                if (method.Name == methodName && method.DeclaringType == factoryType && !returnType.EqualsGenericType(method.ReturnType))
+                if (method.Name == methodName && !returnType.EqualsGenericType(method.ReturnType))
                     return null;
             }
 
