@@ -68,13 +68,14 @@ internal class DictionaryFactoryTester
     {
         var empty = factory.Empty<int, int>();
         Assert.That(empty.Any(), Is.False);
+        if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
         if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
         var type = empty.GetType();
+        var enumerableType = factory.Type;
 
-        if (factory.Type != EnumerableType.None)
-            Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' is {factory.Type}");
+        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableType}");
 
-        if (factory.Type.IsReadOnly())
+        if (enumerableType.IsReadOnly())
         {
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(0));
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(_capacity));
@@ -84,15 +85,28 @@ internal class DictionaryFactoryTester
             var withZero = factory.New<int, int>(0);
             Assert.That(withZero.GetType(), Is.EqualTo(type));
             Assert.That(withZero.Any(), Is.False);
+            if (withZero.TryGetCount(out count)) Assert.That(count, Is.EqualTo(0));
             if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
 
             var withCapacity = factory.New<int, int>(_capacity);
-            //Assert.That(withCapacity.Any(), Is.False);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
-            if (withCapacity.TryGetCapacity(out capacity))
+            if (enumerableType.IsFixed())
             {
-                Console.WriteLine($"Type '{type.GetGenericTypeDefinition().FullName}' has {capacity} capacity");
-                Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
+                Assert.That(withCapacity.Any(), Is.True);
+                if (withCapacity.TryGetCount(out count))
+                {
+                    Console.Write($", Count {count}");
+                    Assert.That(count, Is.EqualTo(_capacity));
+                }
+            }
+            else
+            {
+                Assert.That(withCapacity.Any(), Is.False);
+                if (withCapacity.TryGetCapacity(out capacity))
+                {
+                    Console.Write($", Capacity {capacity}");
+                    Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
+                }
             }
         }
 
@@ -103,15 +117,15 @@ internal class DictionaryFactoryTester
 
         var array = _array;
 
-        if ((factory.Type.IsOrdered() || factory.Type.IsUnordered()) && factory.Type.IsUnique())
+        if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()) && enumerableType.IsUnique())
         {
             array = _arraySortedUnique;
         }
-        else if (factory.Type.IsOrdered() || factory.Type.IsUnordered())
+        else if (enumerableType.IsOrdered() || enumerableType.IsUnordered())
         {
             array = _arraySorted;
         }
-        else if (factory.Type.IsUnique())
+        else if (enumerableType.IsUnique())
         {
             array = _arrayUnique;
         }
@@ -119,7 +133,7 @@ internal class DictionaryFactoryTester
         IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
-        if (factory.Type.IsUnordered())
+        if (enumerableType.IsUnordered())
         {
             withBuilder = withBuilder.OrderBy(x => x.Key).ToArray();
         }
@@ -128,18 +142,18 @@ internal class DictionaryFactoryTester
 
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
         var duplicates = new List<int>();
-        var state = (memory, factory.Type, duplicates);
+        var state = (memory, enumerableType, duplicates);
         IEnumerable<KeyValuePair<int, int>> withBuilderState =
             factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
-        if (factory.Type.IsUnordered())
+        if (enumerableType.IsUnordered())
         {
             withBuilderState = withBuilderState.OrderBy(x => x.Key).ToArray();
         }
         Assert.That(withBuilderState.SequenceEqual(array), Is.True);
 
-        if (factory.Type.IsUnique())
+        if (enumerableType.IsUnique())
         {
             Assert.That(duplicates.SequenceEqual(_arrayKeyDuplicates), Is.True);
         }
@@ -147,6 +161,7 @@ internal class DictionaryFactoryTester
         {
             Assert.That(duplicates.Count == 0, Is.True);
         }
+        Console.WriteLine();
     }
 
     private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, EnumerableType type)

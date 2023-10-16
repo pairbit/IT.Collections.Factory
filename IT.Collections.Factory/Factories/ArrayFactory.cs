@@ -13,7 +13,7 @@ public class ArrayFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.None;
+        EnumerableType Type => EnumerableType.Fixed;
 
     public
 #if NET5_0_OR_GREATER
