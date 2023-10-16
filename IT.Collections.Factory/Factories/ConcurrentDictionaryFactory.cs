@@ -13,7 +13,7 @@ public class ConcurrentDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique | EnumerableType.EquatableKey;
 
     public
 #if NET5_0_OR_GREATER
@@ -23,7 +23,11 @@ public class ConcurrentDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new();
+        => new(comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
 
     public
 #if NET5_0_OR_GREATER
@@ -33,7 +37,11 @@ public class ConcurrentDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(Environment.ProcessorCount, capacity);
+        => new(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
 
     public
 #if NET5_0_OR_GREATER
@@ -44,10 +52,18 @@ public class ConcurrentDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
+        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -63,10 +79,18 @@ public class ConcurrentDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity);
+        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+#if NET461_OR_GREATER
+            ?? EqualityComparer<TKey>.Default
+#endif
+            );
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

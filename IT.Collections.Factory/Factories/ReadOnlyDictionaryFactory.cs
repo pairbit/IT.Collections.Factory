@@ -15,7 +15,7 @@ public class ReadOnlyDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.EquatableKey;
 
     public
 #if NET5_0_OR_GREATER
@@ -51,7 +51,7 @@ public class ReadOnlyDictionaryFactory :
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -70,7 +70,7 @@ public class ReadOnlyDictionaryFactory :
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

@@ -13,7 +13,7 @@ public class SortedListFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.ComparableKey;
 
     public
 #if NET5_0_OR_GREATER
@@ -23,7 +23,7 @@ public class SortedListFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new();
+        => new(comparers.ComparerKey);
 
     public
 #if NET5_0_OR_GREATER
@@ -33,7 +33,7 @@ public class SortedListFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(capacity);
+        => new(capacity, comparers.ComparerKey);
 
     public
 #if NET5_0_OR_GREATER
@@ -44,10 +44,10 @@ public class SortedListFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.ComparerKey);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new SortedList<TKey, TValue>(capacity);
+        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.ComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -63,10 +63,10 @@ public class SortedListFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.ComparerKey);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new SortedList<TKey, TValue>(capacity);
+        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.ComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

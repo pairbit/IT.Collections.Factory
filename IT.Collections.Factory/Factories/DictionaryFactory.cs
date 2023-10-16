@@ -13,7 +13,7 @@ public class DictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Unique | EnumerableType.EquatableKey;
 
     public
 #if NET5_0_OR_GREATER
@@ -23,7 +23,7 @@ public class DictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new();
+        => new(comparers.EqualityComparerKey);
 
     public
 #if NET5_0_OR_GREATER
@@ -33,7 +33,7 @@ public class DictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(capacity, null);
+        => new(capacity, comparers.EqualityComparerKey);
 
     public
 #if NET5_0_OR_GREATER
@@ -44,10 +44,10 @@ public class DictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.EqualityComparerKey);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, null);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -63,10 +63,10 @@ public class DictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new Dictionary<TKey, TValue>();
+        if (capacity == 0) return new(comparers.EqualityComparerKey);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, null);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

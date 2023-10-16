@@ -18,9 +18,13 @@ public static class xEnumerableType
 
     public static bool IsEquatableKey(this EnumerableType type) => (type & EnumerableType.EquatableKey) == EnumerableType.EquatableKey;
 
+    public static bool IsEquatableValue(this EnumerableType type) => (type & EnumerableType.EquatableValue) == EnumerableType.EquatableValue;
+
     public static bool IsEquatable(this EnumerableType type) => (type & EnumerableType.Equatable) == EnumerableType.Equatable;
 
     public static bool IsComparableKey(this EnumerableType type) => (type & EnumerableType.ComparableKey) == EnumerableType.ComparableKey;
+
+    public static bool IsComparableValue(this EnumerableType type) => (type & EnumerableType.ComparableValue) == EnumerableType.ComparableValue;
 
     public static bool IsComparable(this EnumerableType type) => (type & EnumerableType.Comparable) == EnumerableType.Comparable;
 }

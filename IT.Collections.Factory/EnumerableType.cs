@@ -12,9 +12,11 @@ public enum EnumerableType
     Fixed = 2 << 4,
     Proxy = 2 << 5,
     EquatableKey = 2 << 6,
-    Equatable = 2 << 7,
+    EquatableValue = 2 << 7,
+    Equatable = EquatableKey | EquatableValue,
     ComparableKey = 2 << 8,
-    Comparable = 2 << 9
+    ComparableValue = 2 << 9,
+    Comparable = ComparableKey | ComparableValue,
     //NoCapacity
     //LinkedList
     //ThreadSafe
