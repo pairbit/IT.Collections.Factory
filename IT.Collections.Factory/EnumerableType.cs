@@ -10,6 +10,7 @@ public enum EnumerableType
     Unique = 2 << 2,
     Reverse = 2 << 3,
     Fixed = 2 << 4,
+    Proxy = 2 << 5,
     //NoCapacity
     //Comparable
     //LinkedList

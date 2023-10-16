@@ -61,12 +61,15 @@ public class EnumerableFactoryRegistryTest
     {
         var listFactory = _registry.GetFactory<List<T>, T>();
 
+        Assert.That(listFactory.Type.IsProxy(), Is.True);
         ListTest(listFactory.New(capacity), capacity);
     }
 
     private void GenericDictionaryFactoryTest<TKey, TValue>(int capacity = 20) where TKey : notnull
     {
         var dictionaryFactory = _registry.GetFactory<Dictionary<TKey, TValue>, TKey, TValue>();
+
+        Assert.That(dictionaryFactory.Type.IsProxy(), Is.True);
         DictionaryTest(dictionaryFactory.New(capacity));
     }
 

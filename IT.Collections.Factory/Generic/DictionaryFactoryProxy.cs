@@ -6,7 +6,7 @@ public class DictionaryFactoryProxy<TDictionary, TKey, TValue> : IDictionaryFact
 {
     private readonly IDictionaryFactory _factory;
 
-    public EnumerableType Type => _factory.Type;
+    public EnumerableType Type => _factory.Type | EnumerableType.Proxy;
 
     public DictionaryFactoryProxy(IDictionaryFactory factory)
     {

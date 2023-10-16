@@ -13,4 +13,6 @@ public static class xEnumerableType
     public static bool IsReverse(this EnumerableType type) => (type & EnumerableType.Reverse) == EnumerableType.Reverse;
 
     public static bool IsFixed(this EnumerableType type) => (type & EnumerableType.Fixed) == EnumerableType.Fixed;
+
+    public static bool IsProxy(this EnumerableType type) => (type & EnumerableType.Proxy) == EnumerableType.Proxy;
 }
