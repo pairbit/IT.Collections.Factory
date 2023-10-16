@@ -4,5 +4,5 @@ public interface IEnumerableFactoryRegistry : IReadOnlyEnumerableFactoryRegistry
 {
     void Clear();
 
-    bool TryRegister<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable;
+    bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable;
 }

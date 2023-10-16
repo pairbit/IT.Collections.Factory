@@ -10,7 +10,7 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
 
     public override void Clear() => _dictionary.Clear();
 
-    public override bool TryRegister(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
+    public override bool TryRegisterFactory(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (factory == null) throw new ArgumentNullException(nameof(factory));
