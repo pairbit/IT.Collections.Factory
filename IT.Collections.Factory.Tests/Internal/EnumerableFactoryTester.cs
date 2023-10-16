@@ -1,39 +1,34 @@
 ﻿namespace IT.Collections.Factory.Tests.Internal;
 
-internal class EnumerableFactoryTester
+internal class EnumerableFactoryTester<T>
 {
-    private readonly static Random _random = new();
     private readonly IReadOnlyList<IEnumerableFactory> _factoryList;
+    private readonly Comparers<T> _comparers;
 
     private int _capacity;
-    private int[] _array;
-    private int[] _arrayUnique;
-    private int[] _arraySorted;
-    private int[] _arraySortedUnique;
-    private int[] _arrayDuplicates;
+    private T[] _data;
+    private T[] _dataUnique;
+    private T[] _dataSorted;
+    private T[] _dataSortedUnique;
+    private T[] _dataDuplicates;
 
-    public EnumerableFactoryTester(IReadOnlyList<IEnumerableFactory> factoryList)
+    public EnumerableFactoryTester(
+        IReadOnlyList<IEnumerableFactory> factoryList,
+        T[] data,
+        Comparers<T> comparers = default)
     {
         _factoryList = factoryList;
-        _capacity = 10;
+        _comparers = comparers;
 
-        var array = new int[_capacity];
+        var equalityComparer = comparers.EqualityComparer;
+        var comparer = comparers.Comparer;
 
-        //Check Sorted and Unique
-        array[0] = 100;
-        array[1] = 2;
-        array[2] = 100;
-
-        for (int i = 3; i < array.Length; i++)
-        {
-            array[i] = _random.Next();
-        }
-
-        _array = array;
-        _arrayUnique = array.Distinct().ToArray();
-        _arraySorted = array.OrderBy(x => x).ToArray();
-        _arraySortedUnique = _arraySorted.Distinct().ToArray();
-        _arrayDuplicates = array.GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
+        _capacity = data.Length;
+        _data = data;
+        _dataUnique = data.Distinct(equalityComparer).ToArray();
+        _dataSorted = data.OrderBy(x => x, comparer).ToArray();
+        _dataSortedUnique = _dataSorted.Distinct(equalityComparer).ToArray();
+        _dataDuplicates = data.GroupBy(x => x, equalityComparer).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
     }
 
     public void Test()
@@ -52,15 +47,20 @@ internal class EnumerableFactoryTester
             }
             catch (Exception)
             {
+                Console.WriteLine();
                 Console.WriteLine($"Type '{factory.Empty<int>().GetType().GetGenericTypeDefinitionOrArray().FullName}' is exception");
                 throw;
+            }
+            finally
+            {
+                Console.WriteLine();
             }
         }
     }
 
     public void Test(IEnumerableFactory factory)
     {
-        var empty = factory.Empty<int>();
+        var empty = factory.Empty(in _comparers);
         Assert.That(empty.Any(), Is.False);
         if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
         if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
@@ -71,18 +71,18 @@ internal class EnumerableFactoryTester
 
         if (enumerableType.IsReadOnly())
         {
-            Assert.Throws<NotSupportedException>(() => factory.New<int>(0));
-            Assert.Throws<NotSupportedException>(() => factory.New<int>(_capacity));
+            Assert.Throws<NotSupportedException>(() => factory.New(0, in _comparers));
+            Assert.Throws<NotSupportedException>(() => factory.New(_capacity, in _comparers));
         }
         else
         {
-            var withZero = factory.New<int>(0);
+            var withZero = factory.New(0, in _comparers);
             Assert.That(withZero.GetType(), Is.EqualTo(type));
             Assert.That(withZero.Any(), Is.False);
             if (withZero.TryGetCount(out count)) Assert.That(count, Is.EqualTo(0));
             if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
 
-            var withCapacity = factory.New<int>(_capacity);
+            var withCapacity = factory.New(_capacity, in _comparers);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
             if (enumerableType.IsFixed())
             {
@@ -104,51 +104,62 @@ internal class EnumerableFactoryTester
             }
         }
 
-        Assert.That(factory.New<int>(0, null!).Any(), Is.False);
-        Assert.That(factory.New<int, int>(0, null!, 0).Any(), Is.False);
-        Assert.Throws<ArgumentNullException>(() => factory.New<int>(1, null!));
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!, 0));
+        Assert.That(factory.New(0, null!, in _comparers).Any(), Is.False);
+        Assert.That(factory.New(0, null!, 0, in _comparers).Any(), Is.False);
+        Assert.Throws<ArgumentNullException>(() => factory.New(1, null!, in _comparers));
+        Assert.Throws<ArgumentNullException>(() => factory.New(1, null!, 0, in _comparers));
 
-        var array = _array;
+        var data = _data;
 
-        if (enumerableType.IsOrdered() && enumerableType.IsUnique())
+        if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()) && enumerableType.IsUnique())
         {
-            array = _arraySortedUnique;
+            data = _dataSortedUnique;
         }
-        else if (enumerableType.IsOrdered())
+        else if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()))
         {
-            array = _arraySorted;
+            data = _dataSorted;
         }
         else if (enumerableType.IsUnique())
         {
-            array = _arrayUnique;
+            data = _dataUnique;
         }
 
-        var withBuilder = factory.New<int>(_capacity, add => Builder(add, enumerableType));
+        var withBuilder = factory.New(_capacity, add => Builder(add, enumerableType), in _comparers);
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
-        Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
-        var memory = new ReadOnlyMemory<int>(_array);
-        var duplicates = new List<int>();
+        if (enumerableType.IsUnordered())
+        {
+            withBuilder = withBuilder.OrderBy(x => x).ToArray();
+        }
+
+        Assert.That(withBuilder.SequenceEqual(data), Is.True);
+
+        var memory = new ReadOnlyMemory<T>(_data);
+        var duplicates = new List<T>();
         var state = (memory, enumerableType, duplicates);
-        var withBuilderState = factory.New<int, (ReadOnlyMemory<int>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
+        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableType, List<T>)>(_capacity, BuilderState, in state, in _comparers);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
-        Assert.That(withBuilderState.SequenceEqual(array), Is.True);
+
+        if (enumerableType.IsUnordered())
+        {
+            withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
+        }
+
+        Assert.That(withBuilderState.SequenceEqual(data), Is.True);
 
         if (enumerableType.IsUnique())
         {
-            Assert.That(duplicates.SequenceEqual(_arrayDuplicates), Is.True);
+            Assert.That(duplicates.SequenceEqual(_dataDuplicates, _comparers.EqualityComparer), Is.True);
         }
         else
         {
             Assert.That(duplicates.Count == 0, Is.True);
         }
-        Console.WriteLine();
     }
 
-    private void Builder(TryAdd<int> tryAdd, EnumerableType type)
+    private void Builder(TryAdd<T> tryAdd, EnumerableType type)
     {
-        var array = _array;
+        var array = _data;
         if (type.IsReverse())
         {
             for (int i = array.Length - 1; i >= 0; i--)
@@ -156,7 +167,7 @@ internal class EnumerableFactoryTester
                 var item = array[i];
                 if (!tryAdd(item))
                 {
-                    Assert.That(_arrayDuplicates.Contains(item), Is.True);
+                    Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
                 }
             }
         }
@@ -167,13 +178,13 @@ internal class EnumerableFactoryTester
                 var item = array[i];
                 if (!tryAdd(item))
                 {
-                    Assert.That(_arrayDuplicates.Contains(item), Is.True);
+                    Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
                 }
             }
         }
     }
 
-    private static void BuilderState(TryAdd<int> tryAdd, in (ReadOnlyMemory<int>, EnumerableType, List<int>) state)
+    private static void BuilderState(TryAdd<T> tryAdd, in (ReadOnlyMemory<T>, EnumerableType, List<T>) state)
     {
         (var memory, var type, var duplicates) = state;
 

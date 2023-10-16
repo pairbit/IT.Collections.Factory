@@ -8,7 +8,7 @@ public class EnumerableFactoryRegistryTest
     private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry(50).RegisterFactoriesDefault();
 
     private readonly IEnumerableFactoryRegistry _registry;
-    private readonly EnumerableFactoryTester _enumerableFactoryTester;
+    private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;
     private readonly DictionaryFactoryTester _dictionaryFactoryTester;
 
     public EnumerableFactoryRegistryTest() : this(Registry) { }
@@ -17,7 +17,12 @@ public class EnumerableFactoryRegistryTest
     {
         _registry = registry;
         var factories = registry.Values.Distinct().ToArray();
-        _enumerableFactoryTester = new(factories.OfType<IEnumerableFactory>().ToArray());
+        var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
+
+        var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "" };
+        var comparers = new Comparers<string?>(StringComparer.OrdinalIgnoreCase, StringComparer.OrdinalIgnoreCase);
+
+        _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
         _dictionaryFactoryTester = new(factories.OfType<IDictionaryFactory>().ToArray());
     }
 

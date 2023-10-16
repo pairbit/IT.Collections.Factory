@@ -108,11 +108,11 @@ public class StaticEnumerableFactoryTest
 
         var array = _array;
 
-        if (factory.Type.IsOrdered() && factory.Type.IsUnique())
+        if ((factory.Type.IsOrdered() || factory.Type.IsUnordered()) && factory.Type.IsUnique())
         {
             array = _arraySortedUnique;
         }
-        else if (factory.Type.IsOrdered())
+        else if ((factory.Type.IsOrdered() || factory.Type.IsUnordered()))
         {
             array = _arraySorted;
         }
@@ -123,6 +123,12 @@ public class StaticEnumerableFactoryTest
 
         var withBuilder = factory.New<int>(_capacity, add => Builder(add, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
+
+        if (factory.Type.IsUnordered())
+        {
+            withBuilder = withBuilder.OrderBy(x => x).ToArray();
+        }
+
         Assert.That(withBuilder.SequenceEqual(array), Is.True);
 
         var memory = new ReadOnlyMemory<int>(_array);
@@ -130,6 +136,12 @@ public class StaticEnumerableFactoryTest
         var state = (memory, factory.Type, duplicates);
         var withBuilderState = factory.New<int, (ReadOnlyMemory<int>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
+
+        if (factory.Type.IsUnordered())
+        {
+            withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
+        }
+
         Assert.That(withBuilderState.SequenceEqual(array), Is.True);
 
         if (factory.Type.IsUnique())

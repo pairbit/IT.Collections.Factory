@@ -17,7 +17,7 @@ public class ImmutableHashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Equatable;
+        EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique | EnumerableType.Equatable;
 
     public
 #if NET5_0_OR_GREATER
