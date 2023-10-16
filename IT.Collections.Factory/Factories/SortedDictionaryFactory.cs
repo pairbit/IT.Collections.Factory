@@ -19,7 +19,7 @@ public class SortedDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedDictionary<TKey, TValue> Empty<TKey, TValue>()
+        SortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default)
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
@@ -29,7 +29,7 @@ public class SortedDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity)
+        SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default)
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
@@ -39,7 +39,7 @@ public class SortedDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder)
+        SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default)
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
@@ -58,7 +58,7 @@ public class SortedDictionaryFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state)
+        SortedDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default)
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
@@ -73,9 +73,9 @@ public class SortedDictionaryFactory :
         return dictionary;
     }
 #if !NET5_0_OR_GREATER
-    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.Empty<TKey, TValue>() => Empty<TKey, TValue>();
-    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity) => New<TKey, TValue>(capacity);
-    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder) => New(capacity, builder);
-    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state) => New(capacity, builder, in state);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers) => Empty(in comparers);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers) => New(capacity, in comparers);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers) => New(capacity, builder, in comparers);
+    IEnumerable<KeyValuePair<TKey, TValue>> IDictionaryFactory.New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers) => New(capacity, builder, in state, in comparers);
 #endif
 }
