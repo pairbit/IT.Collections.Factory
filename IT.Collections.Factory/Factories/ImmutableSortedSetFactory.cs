@@ -17,19 +17,21 @@ public class ImmutableSortedSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        ImmutableSortedSet<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableSortedSet<T>.Empty;
+        ImmutableSortedSet<T> Empty<T>(in Comparers<T> comparers = default)
+            => ImmutableSortedSet<T>.Empty.WithComparer(comparers.Comparer);
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        ImmutableSortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => ImmutableSortedSet<T>.Empty;
+        ImmutableSortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) =>
+            ImmutableSortedSet<T>.Empty.WithComparer(comparers.Comparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -37,10 +39,12 @@ public class ImmutableSortedSetFactory :
 #endif
         ImmutableSortedSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return ImmutableSortedSet<T>.Empty;
+        if (capacity == 0) return ImmutableSortedSet<T>.Empty.WithComparer(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
+        var comparer = comparers.Comparer;
+        if (comparer != null) sortedSetBuilder.KeyComparer = comparer;
 
         builder(sortedSetBuilder.Add);
 
@@ -53,10 +57,12 @@ public class ImmutableSortedSetFactory :
 #endif
         ImmutableSortedSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return ImmutableSortedSet<T>.Empty;
+        if (capacity == 0) return ImmutableSortedSet<T>.Empty.WithComparer(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var sortedSetBuilder = ImmutableSortedSet<T>.Empty.ToBuilder();
+        var comparer = comparers.Comparer;
+        if (comparer != null) sortedSetBuilder.KeyComparer = comparer;
 
         builder(sortedSetBuilder.Add, in state);
 

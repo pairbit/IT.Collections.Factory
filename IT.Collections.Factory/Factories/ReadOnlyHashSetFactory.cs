@@ -8,7 +8,7 @@ public class ReadOnlyHashSetFactory : EnumerableFactory
 {
     public static readonly ReadOnlyHashSetFactory Default = new();
 
-    public override EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique;
+    public override EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.Equatable;
 
     public override IReadOnlySet<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlySet<T>.Empty;
 
@@ -22,7 +22,7 @@ public class ReadOnlyHashSetFactory : EnumerableFactory
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var hashSet = new HashSet<T>(capacity, null);
+        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
 
         builder(hashSet.Add);
 
@@ -34,7 +34,7 @@ public class ReadOnlyHashSetFactory : EnumerableFactory
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var hashSet = new HashSet<T>(capacity, null);
+        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
 
         builder(hashSet.Add, in state);
 

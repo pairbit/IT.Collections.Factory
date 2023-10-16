@@ -17,19 +17,21 @@ public class ImmutableHashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Equatable;
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        ImmutableHashSet<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableHashSet<T>.Empty;
+        ImmutableHashSet<T> Empty<T>(in Comparers<T> comparers = default)
+            => ImmutableHashSet<T>.Empty.WithComparer(comparers.EqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        ImmutableHashSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => ImmutableHashSet<T>.Empty;
+        ImmutableHashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
+            => ImmutableHashSet<T>.Empty.WithComparer(comparers.EqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -37,10 +39,12 @@ public class ImmutableHashSetFactory :
 #endif
         ImmutableHashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return ImmutableHashSet<T>.Empty;
+        if (capacity == 0) return ImmutableHashSet<T>.Empty.WithComparer(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
+        var equalityComparer = comparers.EqualityComparer;
+        if (equalityComparer != null) hashSetBuilder.KeyComparer = equalityComparer;
 
         builder(hashSetBuilder.Add);
 
@@ -53,10 +57,12 @@ public class ImmutableHashSetFactory :
 #endif
         ImmutableHashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return ImmutableHashSet<T>.Empty;
+        if (capacity == 0) return ImmutableHashSet<T>.Empty.WithComparer(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var hashSetBuilder = ImmutableHashSet<T>.Empty.ToBuilder();
+        var equalityComparer = comparers.EqualityComparer;
+        if (equalityComparer != null) hashSetBuilder.KeyComparer = equalityComparer;
 
         builder(hashSetBuilder.Add, in state);
 

@@ -11,12 +11,11 @@ public enum EnumerableType
     Reverse = 2 << 3,
     Fixed = 2 << 4,
     Proxy = 2 << 5,
+    EquatableKey = 2 << 6,
+    Equatable = 2 << 7,
+    ComparableKey = 2 << 8,
+    Comparable = 2 << 9
     //NoCapacity
-    //Comparable
     //LinkedList
     //ThreadSafe
-    //Equatable
-    //Comparable
-    //EquatableKey
-    //ComparableKey
 }

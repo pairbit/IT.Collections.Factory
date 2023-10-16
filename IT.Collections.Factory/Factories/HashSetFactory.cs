@@ -13,13 +13,13 @@ public class HashSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new((IEqualityComparer<T>?)null);
+        HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -27,9 +27,9 @@ public class HashSetFactory :
 #endif
         HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
 #if NETSTANDARD2_0 || NET461
-        => new();
+        => new(comparers.EqualityComparer);
 #else
-        => new(capacity, null);
+        => new(capacity, comparers.EqualityComparer);
 #endif
 
     public
@@ -38,13 +38,13 @@ public class HashSetFactory :
 #endif
         HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new((IEqualityComparer<T>?)null);
+        if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
 #if NETSTANDARD2_0 || NET461
-        var hashSet = new HashSet<T>();
+        var hashSet = new HashSet<T>(comparers.EqualityComparer);
 #else
-        var hashSet = new HashSet<T>(capacity, null);
+        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
 #endif
 
         builder(hashSet.Add);
@@ -58,13 +58,13 @@ public class HashSetFactory :
 #endif
         HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new((IEqualityComparer<T>?)null);
+        if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
 #if NETSTANDARD2_0 || NET461
-        var hashSet = new HashSet<T>();
+        var hashSet = new HashSet<T>(comparers.EqualityComparer);
 #else
-        var hashSet = new HashSet<T>(capacity, null);
+        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
 #endif
 
         builder(hashSet.Add, in state);

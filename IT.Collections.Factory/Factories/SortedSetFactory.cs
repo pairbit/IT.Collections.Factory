@@ -13,19 +13,19 @@ public class SortedSetFactory :
 #if NET5_0_OR_GREATER
         override
 #endif
-        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique;
+        EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedSet<T> Empty<T>(in Comparers<T> comparers = default) => new();
+        SortedSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.Comparer);
 
     public
 #if NET5_0_OR_GREATER
         override
 #endif
-        SortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+        SortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(comparers.Comparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -33,10 +33,10 @@ public class SortedSetFactory :
 #endif
         SortedSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var sortedSet = new SortedSet<T>();
+        var sortedSet = new SortedSet<T>(comparers.Comparer);
 
         builder(sortedSet.Add);
 
@@ -49,10 +49,10 @@ public class SortedSetFactory :
 #endif
         SortedSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return new(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var sortedSet = new SortedSet<T>();
+        var sortedSet = new SortedSet<T>(comparers.Comparer);
 
         builder(sortedSet.Add, in state);
 

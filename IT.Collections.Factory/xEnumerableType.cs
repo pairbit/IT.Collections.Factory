@@ -15,4 +15,12 @@ public static class xEnumerableType
     public static bool IsFixed(this EnumerableType type) => (type & EnumerableType.Fixed) == EnumerableType.Fixed;
 
     public static bool IsProxy(this EnumerableType type) => (type & EnumerableType.Proxy) == EnumerableType.Proxy;
+
+    public static bool IsEquatableKey(this EnumerableType type) => (type & EnumerableType.EquatableKey) == EnumerableType.EquatableKey;
+
+    public static bool IsEquatable(this EnumerableType type) => (type & EnumerableType.Equatable) == EnumerableType.Equatable;
+
+    public static bool IsComparableKey(this EnumerableType type) => (type & EnumerableType.ComparableKey) == EnumerableType.ComparableKey;
+
+    public static bool IsComparable(this EnumerableType type) => (type & EnumerableType.Comparable) == EnumerableType.Comparable;
 }
