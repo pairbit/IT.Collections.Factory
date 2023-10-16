@@ -5,22 +5,29 @@ public class DictionaryFactoryProxy<TDictionary, TKey, TValue> : IDictionaryFact
     where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
 {
     private readonly IDictionaryFactory _factory;
+    private readonly Comparers<TKey, TValue> _comparers;
 
     public EnumerableType Type => _factory.Type | EnumerableType.Proxy;
+
+    public DictionaryFactoryProxy(IDictionaryFactory factory, in Comparers<TKey, TValue> comparers = default)
+    {
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        _comparers = comparers;
+    }
 
     public DictionaryFactoryProxy(IDictionaryFactory factory)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
     }
 
-    public TDictionary Empty() => (TDictionary)_factory.Empty<TKey, TValue>();
+    public TDictionary Empty() => (TDictionary)_factory.Empty(in _comparers);
 
     public TDictionary New(int capacity)
-        => (TDictionary)_factory.New<TKey, TValue>(capacity);
+        => (TDictionary)_factory.New(capacity, in _comparers);
 
     public TDictionary New(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder)
-        => (TDictionary)_factory.New(capacity, builder);
+        => (TDictionary)_factory.New(capacity, builder, in _comparers);
 
     public TDictionary New<TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state)
-        => (TDictionary)_factory.New(capacity, builder, in state);
+        => (TDictionary)_factory.New(capacity, builder, in state, in _comparers);
 }
