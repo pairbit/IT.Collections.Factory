@@ -9,11 +9,6 @@ internal static class xType
     public static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
     public static readonly Type IDictionaryFactoryType = typeof(IDictionaryFactory);
 
-#if NET5_0_OR_GREATER
-    public static readonly Type EnumerableFactoryType = typeof(EnumerableFactory);
-    public static readonly Type BaseDictionaryFactoryType = typeof(BaseDictionaryFactory);
-#endif
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsAssignableFromEnumerableFactory(this Type type) => IEnumerableFactoryType.IsAssignableFrom(type);
 
@@ -81,11 +76,7 @@ internal static class xType
             for (int i = 0; i < methods.Length; i++)
             {
                 var method = methods[i];
-                if (method.Name == methodName &&
-#if NET5_0_OR_GREATER
-                    method.DeclaringType != EnumerableFactoryType && method.DeclaringType != BaseDictionaryFactoryType &&
-#endif
-                    !returnType.EqualsGenericType(method.ReturnType))
+                if (method.Name == methodName && method.DeclaringType == factoryType && !returnType.EqualsGenericType(method.ReturnType))
                     return null;
             }
 

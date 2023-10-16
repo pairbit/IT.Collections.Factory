@@ -28,4 +28,11 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
         }
         throw new ArgumentOutOfRangeException(nameof(behavior));
     }
+
+    //public override TFactory? TryGetFactory<TFactory>()
+    //{
+    //    var factory = _dictionary.GetOrAdd(typeof(TFactory), type => TryGetFactoryProxy(type));
+
+    //    return (TFactory?)factory;
+    //}
 }

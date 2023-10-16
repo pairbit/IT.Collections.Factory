@@ -1,7 +1,7 @@
 ﻿namespace IT.Collections.Factory.Tests;
 
-using Internal;
 using Factories;
+using Internal;
 
 public class EnumerableFactoryRegistryTest
 {
@@ -38,26 +38,36 @@ public class EnumerableFactoryRegistryTest
     {
         var listFactory = _registry.GetFactory<ListFactory>();
         ListTest(listFactory.New<int>(10), 10);
+    }
+
+    [Test]
+    public void GenericFactoryTest()
+    {
+        var registryCount = _registry.Count;
 
         GenericEnumerableFactoryTest<int>();
+        GenericEnumerableFactoryTest<int>(3);
         GenericEnumerableFactoryTest<int?>();
         GenericEnumerableFactoryTest<string>();
 
         GenericDictionaryFactoryTest<int, int>();
         GenericDictionaryFactoryTest<int, int?>();
         GenericDictionaryFactoryTest<string, string>();
+
+        Assert.That(registryCount + 6, Is.EqualTo(_registry.Count));
     }
 
-    private void GenericEnumerableFactoryTest<T>()
+    private void GenericEnumerableFactoryTest<T>(int capacity = 20)
     {
         var listFactory = _registry.GetFactory<List<T>, T>();
-        ListTest(listFactory.New(20), 20);
+
+        ListTest(listFactory.New(capacity), capacity);
     }
 
-    private void GenericDictionaryFactoryTest<TKey, TValue>() where TKey : notnull
+    private void GenericDictionaryFactoryTest<TKey, TValue>(int capacity = 20) where TKey : notnull
     {
         var dictionaryFactory = _registry.GetFactory<Dictionary<TKey, TValue>, TKey, TValue>();
-        DictionaryTest(dictionaryFactory.New(20));
+        DictionaryTest(dictionaryFactory.New(capacity));
     }
 
     private void ListTest<T>(List<T> list, int capacity)

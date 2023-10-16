@@ -19,12 +19,10 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
 
     public virtual bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
-        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException($"Type '{typeof(TFactory).FullName}' not valid");
+        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
 
         var factoryType = typeof(TFactory);
-        var enumerableTypeDefinition = CacheFactory<TFactory>.EnumerableTypeDefinition;
-        if (enumerableTypeDefinition == null)
-            throw new ArgumentException($"Type '{typeof(TFactory).FullName}' not contains same return type");
+        var enumerableTypeDefinition = CacheFactory<TFactory>.EnumerableTypeDefinition!;
 
         return TryRegisterFactory(factoryType, factory, behavior) &
                TryRegisterFactory(enumerableTypeDefinition, factory, behavior);
@@ -33,8 +31,24 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
     public virtual TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable
     {
         var factoryType = typeof(TFactory);
-        if (_dictionary.TryGetValue(factoryType, out var factory)) return (TFactory)factory;
+        if (_dictionary.TryGetValue(factoryType, out var factory)) return (TFactory?)factory;
 
+        factory = TryGetFactoryProxy(factoryType);
+        if (factory != null)
+        {
+            //Пробуем зарегистрировать прокси фабрику
+            if (!TryRegisterFactory(factoryType, factory, RegistrationBehavior.None))
+            {
+                //Кто-то успел зарегистрировать фабрику, получаем ее
+                factory = _dictionary[factoryType];
+            }
+            return (TFactory?)factory;
+        }
+        return default;
+    }
+
+    protected IEnumerableFactoryRegistrable? TryGetFactoryProxy(Type factoryType)
+    {
         if (factoryType.IsGenericType)
         {
             var factoryTypeDefinition = factoryType.GetGenericTypeDefinition();
@@ -43,10 +57,10 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
                 var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
 
-                if (_dictionary.TryGetValue(enumerableTypeDefinition, out factory))
+                if (_dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
                 {
                     var proxy = typeof(EnumerableFactoryProxy<,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (TFactory?)Activator.CreateInstance(proxy, (IEnumerableFactory)factory);
+                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableFactory)factory);
                 }
             }
             else if (factoryTypeDefinition == typeof(IDictionaryFactory<,,>))
@@ -54,15 +68,15 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
                 var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
 
-                if (_dictionary.TryGetValue(enumerableTypeDefinition, out factory))
+                if (_dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
                 {
                     var proxy = typeof(DictionaryFactoryProxy<,,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (TFactory?)Activator.CreateInstance(proxy, (IDictionaryFactory)factory);
+                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IDictionaryFactory)factory);
                 }
             }
         }
 
-        return default;
+        return null;
     }
 
     #region IReadOnlyDictionary
