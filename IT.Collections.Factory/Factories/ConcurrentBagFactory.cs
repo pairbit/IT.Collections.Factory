@@ -4,7 +4,7 @@ public class ConcurrentBagFactory : IProducerConsumerCollectionFactory, IReadOnl
 {
     public static readonly ConcurrentBagFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.Reverse;
+    public virtual EnumerableType Type => EnumerableType.Reverse | EnumerableType.Unordered | EnumerableType.ThreadSafe;
 
     public virtual ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) => new();
 

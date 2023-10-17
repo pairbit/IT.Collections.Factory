@@ -32,4 +32,6 @@ public static class xEnumerableType
     public static bool IsComparableValue(this EnumerableType type) => (type & EnumerableType.ComparableValue) == EnumerableType.ComparableValue;
 
     public static bool IsComparable(this EnumerableType type) => (type & EnumerableType.Comparable) == EnumerableType.Comparable;
+
+    public static bool IsThreadSafe(this EnumerableType type) => (type & EnumerableType.ThreadSafe) == EnumerableType.ThreadSafe;
 }

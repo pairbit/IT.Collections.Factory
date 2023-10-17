@@ -17,7 +17,7 @@ public enum EnumerableType
     ComparableKey = 2 << 8,
     ComparableValue = 2 << 9,
     Comparable = ComparableKey | ComparableValue,
+    ThreadSafe = 2 << 10,
     //NoCapacity
     //LinkedList
-    //ThreadSafe
 }

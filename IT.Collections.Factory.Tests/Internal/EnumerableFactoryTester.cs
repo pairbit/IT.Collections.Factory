@@ -160,25 +160,57 @@ internal class EnumerableFactoryTester<T>
     private void Builder(TryAdd<T> tryAdd, EnumerableType type)
     {
         var array = _data;
-        if (type.IsReverse())
+
+        if (type.IsThreadSafe())
         {
-            for (int i = array.Length - 1; i >= 0; i--)
+            var tasks = new Task<(bool, T)>[array.Length];
+            if (type.IsReverse())
             {
-                var item = array[i];
-                if (!tryAdd(item))
+                for (int i = array.Length - 1; i >= 0; i--)
                 {
-                    Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
+                    var item = array[i];
+                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
                 }
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
+                }
+            }
+            Task.WaitAll(tasks);
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var task = tasks[i];
+                (var added, var item) = task.Result;
+                if (!added) Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
             }
         }
         else
         {
-            for (int i = 0; i < array.Length; i++)
+            if (type.IsReverse())
             {
-                var item = array[i];
-                if (!tryAdd(item))
+                for (int i = array.Length - 1; i >= 0; i--)
                 {
-                    Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
+                    var item = array[i];
+                    if (!tryAdd(item))
+                    {
+                        Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    if (!tryAdd(item))
+                    {
+                        Assert.That(_dataDuplicates.Contains(item, _comparers.EqualityComparer), Is.True);
+                    }
                 }
             }
         }

@@ -19,7 +19,7 @@ public class EnumerableFactoryRegistryTest
         var factories = registry.Values.Distinct().ToArray();
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
 
-        var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "" };
+        var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "", "g", "tt", "sdfsdf", "9089" };
         var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
 
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
