@@ -4,7 +4,7 @@ public class ConcurrentQueueFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public static readonly ConcurrentQueueFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.ThreadSafe;
 
     public virtual ConcurrentQueue<T> Empty<T>(in Comparers<T> comparers = default) => new();
 

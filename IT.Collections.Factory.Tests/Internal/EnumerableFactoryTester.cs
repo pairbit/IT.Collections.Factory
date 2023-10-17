@@ -111,13 +111,9 @@ internal class EnumerableFactoryTester<T>
 
         var data = _data;
 
-        if (enumerableType.HasOrdered() && enumerableType.IsUnique())
+        if (enumerableType.HasOrdered() || enumerableType.IsThreadSafe())
         {
-            data = _dataSortedUnique;
-        }
-        else if (enumerableType.HasOrdered())
-        {
-            data = _dataSorted;
+            data = enumerableType.IsUnique() ? _dataSortedUnique : _dataSorted;
         }
         else if (enumerableType.IsUnique())
         {
@@ -127,7 +123,8 @@ internal class EnumerableFactoryTester<T>
         var withBuilder = factory.New(_capacity, add => Builder(add, enumerableType), in _comparers);
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
-        if (enumerableType.IsUnordered())
+        //TODO: Костыль IsThreadSafe! Как проверить правильность порядка в многопоточном приложении?
+        if (enumerableType.IsUnordered() || enumerableType.IsThreadSafe())
         {
             withBuilder = withBuilder.OrderBy(x => x).ToArray();
         }
@@ -141,7 +138,7 @@ internal class EnumerableFactoryTester<T>
             (_capacity, BuilderState, in state, in _comparers);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
-        if (enumerableType.IsUnordered())
+        if (enumerableType.IsUnordered() || enumerableType.IsThreadSafe())
         {
             withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
         }

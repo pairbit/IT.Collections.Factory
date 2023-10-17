@@ -4,7 +4,7 @@ public class BlockingCollectionFactory : IReadOnlyCollectionFactory
 {
     public static readonly BlockingCollectionFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.ThreadSafe;
 
     public virtual BlockingCollection<T> Empty<T>(in Comparers<T> comparers = default) => new();
 

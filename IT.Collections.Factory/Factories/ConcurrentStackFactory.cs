@@ -4,7 +4,7 @@ public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public static readonly ConcurrentStackFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.Reverse;
+    public virtual EnumerableType Type => EnumerableType.Reverse | EnumerableType.ThreadSafe;
 
     public virtual ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
