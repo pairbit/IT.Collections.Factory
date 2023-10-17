@@ -1,4 +1,4 @@
-﻿namespace System.Collections.Generic;
+﻿namespace IT.Collections.Factory.Tests.Internal;
 
 internal static class xIEnumerable
 {
@@ -11,7 +11,7 @@ internal static class xIEnumerable
         }
 #if NET6_0_OR_GREATER
         if (enumerable.TryGetNonEnumeratedCount(out count)) return true;
-        if (enumerable is Immutable.ImmutableArray<T> immutableArray)
+        if (enumerable is System.Collections.Immutable.ImmutableArray<T> immutableArray)
         {
             count = immutableArray.Length;
             return true;
@@ -22,7 +22,7 @@ internal static class xIEnumerable
             count = collectionGeneric.Count;
             return true;
         }
-        if (enumerable is ICollection collection)
+        if (enumerable is System.Collections.ICollection collection)
         {
             count = collection.Count;
             return true;
@@ -63,7 +63,7 @@ internal static class xIEnumerable
     public static bool TryGetCapacity<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> enumerable, out int capacity)
         where TKey : notnull
     {
-        if (TryGetCapacity<KeyValuePair<TKey, TValue>>(enumerable, out capacity)) return true;
+        if (enumerable.TryGetCapacity<KeyValuePair<TKey, TValue>>(out capacity)) return true;
         if (enumerable is SortedList<TKey, TValue> sortedList)
         {
             capacity = sortedList.Capacity;

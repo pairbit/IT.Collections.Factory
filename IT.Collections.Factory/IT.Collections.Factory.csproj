@@ -7,13 +7,13 @@
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description></Description>
+	<Description>remove static</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT.Collections.Factory</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
 	<Copyright>Ivan Tikhonov © 2023</Copyright>
-	<Version>2.0.0-pre1</Version>
+	<Version>2.0.0-pre2</Version>
 	<PackageTags>Collections Factory</PackageTags>
 	<PackageReadmeFile>Readme.md</PackageReadmeFile>
 	<PackageIcon>Icon.png</PackageIcon>
@@ -30,6 +30,10 @@
   <ItemGroup>
     <None Include="Readme.md" Pack="true" PackagePath="\" />
     <None Include="..\Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

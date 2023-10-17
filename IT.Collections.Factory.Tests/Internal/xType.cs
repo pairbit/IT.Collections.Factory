@@ -1,4 +1,4 @@
-﻿namespace System;
+﻿namespace IT.Collections.Factory.Tests.Internal;
 
 internal static class xType
 {
