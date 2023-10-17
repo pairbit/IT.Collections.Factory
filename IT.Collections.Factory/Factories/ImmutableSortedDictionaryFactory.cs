@@ -27,7 +27,7 @@ public class ImmutableSortedDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.ComparerKey, comparers.EqualityComparerValue);
+        => ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.KeyComparer, comparers.ValueEqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -37,7 +37,7 @@ public class ImmutableSortedDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.ComparerKey, comparers.EqualityComparerValue);
+        => ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.KeyComparer, comparers.ValueEqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -48,13 +48,13 @@ public class ImmutableSortedDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.ComparerKey, comparers.EqualityComparerValue);
+        if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.KeyComparer, comparers.ValueEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
-        var keyComparer = comparers.ComparerKey;
+        var keyComparer = comparers.KeyComparer;
         if (keyComparer != null) dictionaryBuilder.KeyComparer = keyComparer;
-        var valueEqualityComparer = comparers.EqualityComparerValue;
+        var valueEqualityComparer = comparers.ValueEqualityComparer;
         if (valueEqualityComparer != null) dictionaryBuilder.ValueComparer = valueEqualityComparer;
 
         builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value));
@@ -71,13 +71,13 @@ public class ImmutableSortedDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.ComparerKey, comparers.EqualityComparerValue);
+        if (capacity == 0) return ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.KeyComparer, comparers.ValueEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var dictionaryBuilder = ImmutableSortedDictionary<TKey, TValue>.Empty.ToBuilder();
-        var keyComparer = comparers.ComparerKey;
+        var keyComparer = comparers.KeyComparer;
         if (keyComparer != null) dictionaryBuilder.KeyComparer = keyComparer;
-        var valueEqualityComparer = comparers.EqualityComparerValue;
+        var valueEqualityComparer = comparers.ValueEqualityComparer;
         if (valueEqualityComparer != null) dictionaryBuilder.ValueComparer = valueEqualityComparer;
 
         builder(item => dictionaryBuilder.TryAdd(item.Key, item.Value), in state);

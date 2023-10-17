@@ -23,7 +23,7 @@ public class SortedListFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(comparers.ComparerKey);
+        => new(comparers.KeyComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -33,7 +33,7 @@ public class SortedListFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(capacity, comparers.ComparerKey);
+        => new(capacity, comparers.KeyComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -44,10 +44,10 @@ public class SortedListFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.ComparerKey);
+        if (capacity == 0) return new(comparers.KeyComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.ComparerKey);
+        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.KeyComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -63,10 +63,10 @@ public class SortedListFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.ComparerKey);
+        if (capacity == 0) return new(comparers.KeyComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.ComparerKey);
+        var dictionary = new SortedList<TKey, TValue>(capacity, comparers.KeyComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

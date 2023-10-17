@@ -51,7 +51,7 @@ public class ReadOnlyDictionaryFactory :
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.KeyEqualityComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -70,7 +70,7 @@ public class ReadOnlyDictionaryFactory :
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.KeyEqualityComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

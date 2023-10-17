@@ -23,7 +23,7 @@ public class DictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(comparers.EqualityComparerKey);
+        => new(comparers.KeyEqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -33,7 +33,7 @@ public class DictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(capacity, comparers.EqualityComparerKey);
+        => new(capacity, comparers.KeyEqualityComparer);
 
     public
 #if NET5_0_OR_GREATER
@@ -44,10 +44,10 @@ public class DictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.EqualityComparerKey);
+        if (capacity == 0) return new(comparers.KeyEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.KeyEqualityComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value));
 
@@ -63,10 +63,10 @@ public class DictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.EqualityComparerKey);
+        if (capacity == 0) return new(comparers.KeyEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.EqualityComparerKey);
+        var dictionary = new Dictionary<TKey, TValue>(capacity, comparers.KeyEqualityComparer);
 
         builder(item => dictionary.TryAdd(item.Key, item.Value), in state);
 

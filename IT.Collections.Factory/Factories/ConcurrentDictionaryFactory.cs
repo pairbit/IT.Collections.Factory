@@ -23,7 +23,7 @@ public class ConcurrentDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(comparers.EqualityComparerKey
+        => new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
@@ -37,7 +37,7 @@ public class ConcurrentDictionaryFactory :
 #if !NET5_0_OR_GREATER
         where TKey : notnull
 #endif
-        => new(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+        => new(Environment.ProcessorCount, capacity, comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
@@ -52,14 +52,14 @@ public class ConcurrentDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.EqualityComparerKey
+        if (capacity == 0) return new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
             );
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
@@ -79,14 +79,14 @@ public class ConcurrentDictionaryFactory :
         where TKey : notnull
 #endif
     {
-        if (capacity == 0) return new(comparers.EqualityComparerKey
+        if (capacity == 0) return new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
             );
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.EqualityComparerKey
+        var dictionary = new ConcurrentDictionary<TKey, TValue>(Environment.ProcessorCount, capacity, comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
