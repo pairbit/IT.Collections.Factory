@@ -20,7 +20,7 @@ public class EnumerableFactoryRegistryTest
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
 
         var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "" };
-        var comparers = new Comparers<string?>(StringComparer.OrdinalIgnoreCase, StringComparer.OrdinalIgnoreCase);
+        var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
 
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
         _dictionaryFactoryTester = new(factories.OfType<IDictionaryFactory>().ToArray());
