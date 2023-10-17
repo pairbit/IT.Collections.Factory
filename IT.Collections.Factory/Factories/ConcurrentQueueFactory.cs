@@ -4,13 +4,13 @@ public class ConcurrentQueueFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public static readonly ConcurrentQueueFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.None;
 
-    public ConcurrentQueue<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentQueue<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public ConcurrentQueue<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentQueue<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
-    public ConcurrentQueue<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual ConcurrentQueue<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -22,7 +22,7 @@ public class ConcurrentQueueFactory : IProducerConsumerCollectionFactory, IReadO
         return queue;
     }
 
-    public ConcurrentQueue<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual ConcurrentQueue<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));

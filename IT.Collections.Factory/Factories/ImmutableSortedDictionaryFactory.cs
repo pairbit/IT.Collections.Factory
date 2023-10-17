@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableSortedDictionaryFactory : IImmutableDictionaryFactory
+public sealed class ImmutableSortedDictionaryFactory : IImmutableDictionaryFactory
 {
     public static readonly ImmutableSortedDictionaryFactory Default = new();
 

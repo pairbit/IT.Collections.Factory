@@ -7,13 +7,13 @@ public class SortedSetFactory : ISetFactory, IReadOnlyCollectionFactory
 {
     public static readonly SortedSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
+    public virtual EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
 
-    public SortedSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.Comparer);
+    public virtual SortedSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.Comparer);
 
-    public SortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(comparers.Comparer);
+    public virtual SortedSet<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(comparers.Comparer);
 
-    public SortedSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual SortedSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -25,7 +25,7 @@ public class SortedSetFactory : ISetFactory, IReadOnlyCollectionFactory
         return sortedSet;
     }
 
-    public SortedSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual SortedSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.Comparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));

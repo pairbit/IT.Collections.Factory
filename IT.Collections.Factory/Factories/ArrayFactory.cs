@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class ArrayFactory : IEnumerableFactory
+public sealed class ArrayFactory : IEnumerableFactory
 {
     public static readonly ArrayFactory Default = new();
 

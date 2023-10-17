@@ -6,17 +6,17 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionary
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.EquatableKey;
+    public virtual EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.EquatableKey;
 
-    public ReadOnlyDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ReadOnlyDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => Cache<TKey, TValue>.Empty;
 
-    public ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         throw new NotSupportedException();
     }
 
-    public ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ReadOnlyDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -28,7 +28,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionary
         return new(dictionary);
     }
 
-    public ReadOnlyDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ReadOnlyDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return Cache<TKey, TValue>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

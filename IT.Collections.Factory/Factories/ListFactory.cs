@@ -4,35 +4,69 @@ public class ListFactory : IListFactory, IReadOnlyListFactory
 {
     public static readonly ListFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.None;
 
-    public List<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual List<T> Empty<T>(in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewList(0, in comparers);
+#endif
 
-    public List<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(capacity);
+    public virtual List<T> New<T>(int capacity, in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(capacity);
+#else
+        NewList(capacity, in comparers);
+#endif
 
-    public List<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual List<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewList(0, in comparers);
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var list =
+#if NET5_0_OR_GREATER
+        new List<T>(capacity);
+#else
+        NewList(capacity, in comparers);
+#endif
 
         builder(item => { list.Add(item); return true; });
 
         return list;
     }
 
-    public List<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual List<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewList(0, in comparers);
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+        var list =
+#if NET5_0_OR_GREATER
+        new List<T>(capacity);
+#else
+        NewList(capacity, in comparers);
+#endif
 
         builder(item => { list.Add(item); return true; }, in state);
 
         return list;
     }
+
+#if !NET5_0_OR_GREATER
+    protected virtual List<T> NewList<T>(int capacity, in Comparers<T> comparers) => new(capacity);
+#endif
 
     IList<T> IListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IList<T> IListFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

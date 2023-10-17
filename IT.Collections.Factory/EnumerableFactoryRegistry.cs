@@ -23,7 +23,14 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            _dictionary.Add(type, factory);
+            try
+            {
+                _dictionary.Add(type, factory);
+            }
+            catch (ArgumentException)
+            {
+                throw new ArgumentException($"Factory '{factory.GetType().FullName}' with type '{type.FullName}' is already registered", nameof(type));
+            }
             return true;
         }
         throw new ArgumentOutOfRangeException(nameof(behavior));

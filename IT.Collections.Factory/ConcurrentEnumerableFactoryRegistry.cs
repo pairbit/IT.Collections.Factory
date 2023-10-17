@@ -23,16 +23,9 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            if (!_dictionary.TryAdd(type, factory)) throw new ArgumentException("Duplicate key", nameof(type));
+            if (!_dictionary.TryAdd(type, factory)) throw new ArgumentException($"Factory '{factory.GetType().FullName}' with type '{type.FullName}' is already registered", nameof(type));
             return true;
         }
         throw new ArgumentOutOfRangeException(nameof(behavior));
     }
-
-    //public override TFactory? TryGetFactory<TFactory>()
-    //{
-    //    var factory = _dictionary.GetOrAdd(typeof(TFactory), type => TryGetFactoryProxy(type));
-
-    //    return (TFactory?)factory;
-    //}
 }

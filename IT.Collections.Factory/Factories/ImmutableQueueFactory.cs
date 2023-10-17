@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableQueueFactory : IImmutableQueueFactory
+public sealed class ImmutableQueueFactory : IImmutableQueueFactory
 {
     public static readonly ImmutableQueueFactory Default = new();
 

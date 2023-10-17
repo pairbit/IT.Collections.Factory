@@ -1,6 +1,5 @@
 ﻿namespace IT.Collections.Factory;
 
-using Generic;
 using Internal;
 
 public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactoryRegistry
@@ -33,7 +32,7 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
         var factoryType = typeof(TFactory);
         if (_dictionary.TryGetValue(factoryType, out var factory)) return (TFactory?)factory;
 
-        factory = TryGetFactoryProxy(factoryType);
+        factory = this.TryGetFactoryProxy(factoryType);
         if (factory != null)
         {
             //Пробуем зарегистрировать прокси фабрику
@@ -45,38 +44,6 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
             return (TFactory?)factory;
         }
         return default;
-    }
-
-    protected IEnumerableFactoryRegistrable? TryGetFactoryProxy(Type factoryType)
-    {
-        if (factoryType.IsGenericType)
-        {
-            var factoryTypeDefinition = factoryType.GetGenericTypeDefinition();
-            if (factoryTypeDefinition == typeof(IEnumerableFactory<,>))
-            {
-                var factoryTypeGenericArguments = factoryType.GetGenericArguments();
-                var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
-
-                if (_dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
-                {
-                    var proxy = typeof(EnumerableFactoryProxy<,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableFactory)factory);
-                }
-            }
-            else if (factoryTypeDefinition == typeof(IDictionaryFactory<,,>))
-            {
-                var factoryTypeGenericArguments = factoryType.GetGenericArguments();
-                var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
-
-                if (_dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
-                {
-                    var proxy = typeof(DictionaryFactoryProxy<,,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableKeyValueFactory)factory);
-                }
-            }
-        }
-
-        return null;
     }
 
     #region IReadOnlyDictionary

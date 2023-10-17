@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableHashSetFactory : IImmutableSetFactory
+public sealed class ImmutableHashSetFactory : IImmutableSetFactory
 {
     public static readonly ImmutableHashSetFactory Default = new();
 

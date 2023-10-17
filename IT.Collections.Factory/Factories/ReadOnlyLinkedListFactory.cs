@@ -6,16 +6,16 @@ public class ReadOnlyLinkedListFactory : IReadOnlyCollectionFactory
 {
     public static readonly ReadOnlyLinkedListFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly;
+    public virtual EnumerableType Type => EnumerableType.ReadOnly;
 
-    public IReadOnlyCollection<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlyCollection<T>.Empty;
+    public virtual IReadOnlyCollection<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlyCollection<T>.Empty;
 
-    public IReadOnlyCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public virtual IReadOnlyCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         throw new NotSupportedException();
     }
 
-    public IReadOnlyCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual IReadOnlyCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlyCollection<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -27,7 +27,7 @@ public class ReadOnlyLinkedListFactory : IReadOnlyCollectionFactory
         return new ReadOnlyCollection<T>(list);
     }
 
-    public IReadOnlyCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual IReadOnlyCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlyCollection<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

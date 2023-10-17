@@ -4,13 +4,13 @@ public class ConcurrentBagFactory : IProducerConsumerCollectionFactory, IReadOnl
 {
     public static readonly ConcurrentBagFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Reverse;
+    public virtual EnumerableType Type => EnumerableType.Reverse;
 
-    public ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public ConcurrentBag<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentBag<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
-    public ConcurrentBag<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual ConcurrentBag<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -22,7 +22,7 @@ public class ConcurrentBagFactory : IProducerConsumerCollectionFactory, IReadOnl
         return bag;
     }
 
-    public ConcurrentBag<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual ConcurrentBag<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));

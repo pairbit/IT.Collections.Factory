@@ -4,23 +4,23 @@ public class ConcurrentDictionaryFactory : IDictionaryFactory, IReadOnlyDictiona
 {
     public static readonly ConcurrentDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique | EnumerableType.EquatableKey;
+    public virtual EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique | EnumerableType.EquatableKey;
 
-    public ConcurrentDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ConcurrentDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
             );
 
-    public ConcurrentDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ConcurrentDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(Environment.ProcessorCount, capacity, comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
             ?? EqualityComparer<TKey>.Default
 #endif
             );
 
-    public ConcurrentDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ConcurrentDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER
@@ -40,7 +40,7 @@ public class ConcurrentDictionaryFactory : IDictionaryFactory, IReadOnlyDictiona
         return dictionary;
     }
 
-    public ConcurrentDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual ConcurrentDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyEqualityComparer
 #if NET461_OR_GREATER

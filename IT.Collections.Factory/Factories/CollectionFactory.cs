@@ -8,38 +8,74 @@ public class CollectionFactory : IListFactory, IReadOnlyListFactory
 
     public virtual EnumerableType Type => EnumerableType.None;
 
-    public virtual Collection<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual Collection<T> Empty<T>(in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewCollection<T>();
+#endif
 
     public virtual Collection<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewCollection<T>();
+#endif
 
+#if NET5_0_OR_GREATER
         return new(new List<T>(capacity));
+#else
+        return NewCollection(new List<T>(capacity));
+#endif
     }
 
     public virtual Collection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewCollection<T>();
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var list = new List<T>(capacity);
 
         builder(item => { list.Add(item); return true; });
 
+#if NET5_0_OR_GREATER
         return new(list);
+#else
+        return NewCollection(list);
+#endif
     }
 
     public virtual Collection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new();
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new();
+#else
+        NewCollection<T>();
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         var list = new List<T>(capacity);
 
         builder(item => { list.Add(item); return true; }, in state);
 
+#if NET5_0_OR_GREATER
         return new(list);
+#else
+        return NewCollection(list);
+#endif
     }
+
+#if !NET5_0_OR_GREATER
+    protected virtual Collection<T> NewCollection<T>(List<T>? list = null) => list == null ? new() : new(list);
+#endif
 
     IList<T> IListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IList<T> IListFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

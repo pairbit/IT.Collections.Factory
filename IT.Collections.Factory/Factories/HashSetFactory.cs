@@ -7,18 +7,18 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
 {
     public static readonly HashSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
+    public virtual EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
 
-    public HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
+    public virtual HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
 
-    public HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public virtual HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
 #if NETSTANDARD2_0 || NET461
         => new(comparers.EqualityComparer);
 #else
         => new(capacity, comparers.EqualityComparer);
 #endif
 
-    public HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -34,7 +34,7 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
         return hashSet;
     }
 
-    public HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));

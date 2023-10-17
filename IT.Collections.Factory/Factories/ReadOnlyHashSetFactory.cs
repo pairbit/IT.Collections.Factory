@@ -8,16 +8,16 @@ public class ReadOnlyHashSetFactory : IReadOnlySetFactory
 {
     public static readonly ReadOnlyHashSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.Equatable;
+    public virtual EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.Equatable;
 
-    public IReadOnlySet<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlySet<T>.Empty;
+    public virtual IReadOnlySet<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlySet<T>.Empty;
 
-    public IReadOnlySet<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public virtual IReadOnlySet<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         throw new NotSupportedException();
     }
 
-    public IReadOnlySet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual IReadOnlySet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -29,7 +29,7 @@ public class ReadOnlyHashSetFactory : IReadOnlySetFactory
         return new ReadOnlySet<T>(hashSet);
     }
 
-    public IReadOnlySet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual IReadOnlySet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ReadOnlySet<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

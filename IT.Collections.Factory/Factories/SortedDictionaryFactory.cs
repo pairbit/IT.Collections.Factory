@@ -4,15 +4,15 @@ public class SortedDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFa
 {
     public static readonly SortedDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.ComparableKey;
+    public virtual EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.ComparableKey;
 
-    public SortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual SortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(comparers.KeyComparer);
 
-    public SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(comparers.KeyComparer);
 
-    public SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual SortedDictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -24,7 +24,7 @@ public class SortedDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFa
         return dictionary;
     }
 
-    public SortedDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual SortedDictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));

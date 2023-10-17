@@ -4,15 +4,15 @@ public class DictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory
 {
     public static readonly DictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Unique | EnumerableType.EquatableKey;
+    public virtual EnumerableType Type => EnumerableType.Unique | EnumerableType.EquatableKey;
 
-    public Dictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual Dictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(comparers.KeyEqualityComparer);
 
-    public Dictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual Dictionary<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(capacity, comparers.KeyEqualityComparer);
 
-    public Dictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual Dictionary<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -24,7 +24,7 @@ public class DictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory
         return dictionary;
     }
 
-    public Dictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    public virtual Dictionary<TKey, TValue> New<TKey, TValue, TState>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>, TState> builder, in TState state, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
         if (capacity == 0) return new(comparers.KeyEqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));

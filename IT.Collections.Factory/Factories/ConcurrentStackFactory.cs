@@ -4,13 +4,13 @@ public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public static readonly ConcurrentStackFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Reverse;
+    public virtual EnumerableType Type => EnumerableType.Reverse;
 
-    public ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public ConcurrentStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+    public virtual ConcurrentStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
-    public ConcurrentStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual ConcurrentStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -22,7 +22,7 @@ public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadO
         return stack;
     }
 
-    public ConcurrentStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual ConcurrentStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));

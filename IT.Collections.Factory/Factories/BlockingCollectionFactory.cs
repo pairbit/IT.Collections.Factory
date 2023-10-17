@@ -4,18 +4,18 @@ public class BlockingCollectionFactory : IReadOnlyCollectionFactory
 {
     public static readonly BlockingCollectionFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.None;
 
-    public BlockingCollection<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual BlockingCollection<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public BlockingCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public virtual BlockingCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
 
         return new(new ConcurrentQueue<T>(), capacity);
     }
 
-    public BlockingCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual BlockingCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -27,7 +27,7 @@ public class BlockingCollectionFactory : IReadOnlyCollectionFactory
         return new(queue, capacity);
     }
 
-    public BlockingCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual BlockingCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));

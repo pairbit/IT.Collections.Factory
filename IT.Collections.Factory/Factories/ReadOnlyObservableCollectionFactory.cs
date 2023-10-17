@@ -6,16 +6,16 @@ public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFa
 {
     public static readonly ReadOnlyObservableCollectionFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.ReadOnly;
+    public virtual EnumerableType Type => EnumerableType.ReadOnly;
 
-    public ReadOnlyObservableCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
+    public virtual ReadOnlyObservableCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
 
-    public ReadOnlyObservableCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public virtual ReadOnlyObservableCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         throw new NotSupportedException();
     }
 
-    public ReadOnlyObservableCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual ReadOnlyObservableCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -27,7 +27,7 @@ public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFa
         return new(collection);
     }
 
-    public ReadOnlyObservableCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual ReadOnlyObservableCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));

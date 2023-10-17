@@ -4,13 +4,13 @@ public class QueueFactory : IReadOnlyCollectionFactory
 {
     public static readonly QueueFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableType Type => EnumerableType.None;
 
-    public Queue<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public virtual Queue<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public Queue<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(capacity);
+    public virtual Queue<T> New<T>(int capacity, in Comparers<T> comparers = default) => new(capacity);
 
-    public Queue<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public virtual Queue<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -22,7 +22,7 @@ public class QueueFactory : IReadOnlyCollectionFactory
         return queue;
     }
 
-    public Queue<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public virtual Queue<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
