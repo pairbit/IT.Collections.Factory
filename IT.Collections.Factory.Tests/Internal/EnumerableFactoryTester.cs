@@ -111,11 +111,11 @@ internal class EnumerableFactoryTester<T>
 
         var data = _data;
 
-        if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()) && enumerableType.IsUnique())
+        if (enumerableType.HasOrdered() && enumerableType.IsUnique())
         {
             data = _dataSortedUnique;
         }
-        else if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()))
+        else if (enumerableType.HasOrdered())
         {
             data = _dataSorted;
         }

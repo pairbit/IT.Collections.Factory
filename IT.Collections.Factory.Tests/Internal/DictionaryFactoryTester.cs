@@ -117,11 +117,11 @@ internal class DictionaryFactoryTester
 
         var array = _array;
 
-        if ((enumerableType.IsOrdered() || enumerableType.IsUnordered()) && enumerableType.IsUnique())
+        if (enumerableType.HasOrdered() && enumerableType.IsUnique())
         {
             array = _arraySortedUnique;
         }
-        else if (enumerableType.IsOrdered() || enumerableType.IsUnordered())
+        else if (enumerableType.HasOrdered())
         {
             array = _arraySorted;
         }

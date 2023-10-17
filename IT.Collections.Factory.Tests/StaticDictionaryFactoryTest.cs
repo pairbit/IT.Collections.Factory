@@ -111,11 +111,11 @@ public class StaticDictionaryFactoryTest
 
         var array = _array;
 
-        if ((factory.Type.IsOrdered() || factory.Type.IsUnordered()) && factory.Type.IsUnique())
+        if (factory.Type.HasOrdered() && factory.Type.IsUnique())
         {
             array = _arraySortedUnique;
         }
-        else if (factory.Type.IsOrdered() || factory.Type.IsUnordered())
+        else if (factory.Type.HasOrdered())
         {
             array = _arraySorted;
         }

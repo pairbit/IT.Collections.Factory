@@ -43,6 +43,23 @@ public class EnumerableFactoryRegistryTest
     {
         var listFactory = _registry.GetFactory<ListFactory>();
         ListTest(listFactory.New<int>(10), 10);
+
+#if NETCOREAPP3_1_OR_GREATER
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        var comparers = comparer.ToComparers();
+
+        IImmutableSetFactory immutableSetFactory = _registry.GetFactory<ImmutableHashSetFactory>();
+        Assert.That(immutableSetFactory.Type.IsUnordered(), Is.True);
+
+        ImmutableSetTest(immutableSetFactory.Empty<string?>(), order: true, unique: false);
+        ImmutableSetTest(immutableSetFactory.Empty(comparers), order: true, unique: true, comparer);
+
+        immutableSetFactory = _registry.GetFactory<ImmutableSortedSetFactory>();
+        Assert.That(immutableSetFactory.Type.IsOrdered(), Is.True);
+
+        ImmutableSetTest(immutableSetFactory.Empty<string?>(), order: false, unique: false);
+        ImmutableSetTest(immutableSetFactory.Empty(comparers), order: false, unique: true, comparer);
+#endif
     }
 
     [Test]
@@ -87,4 +104,26 @@ public class EnumerableFactoryRegistryTest
     {
         Assert.That(dictionary.Count, Is.EqualTo(0));
     }
+
+#if NETCOREAPP3_1_OR_GREATER
+    private void ImmutableSetTest(System.Collections.Immutable.IImmutableSet<string?> immutableSet, 
+        bool order, bool unique, IEqualityComparer<string?>? equalityComparer = null)
+    {
+        var array = new[] { "abc", "cc", "ABC", "34", "d", "" }.OrderBy(x => x).ToArray();
+        if (unique) array = array.Distinct(equalityComparer).ToArray();
+
+        int i;
+        for (i = 0; i < array.Length; i++)
+        {
+            immutableSet = immutableSet.Add(array[i]);
+        }
+        i = 0;
+        IEnumerable<string?> enumerable = order ? immutableSet.OrderBy(x => x) : immutableSet;
+
+        foreach (var item in enumerable)
+        {
+            Assert.That(item, Is.EqualTo(array[i++]));
+        }
+    }
+#endif
 }

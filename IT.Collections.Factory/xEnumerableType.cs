@@ -8,6 +8,11 @@ public static class xEnumerableType
 
     public static bool IsUnordered(this EnumerableType type) => (type & EnumerableType.Unordered) == EnumerableType.Unordered;
 
+    /// <summary>
+    /// type.IsOrdered() || type.IsUnordered()
+    /// </summary>
+    public static bool HasOrdered(this EnumerableType type) => type.IsOrdered() || type.IsUnordered();
+
     public static bool IsUnique(this EnumerableType type) => (type & EnumerableType.Unique) == EnumerableType.Unique;
 
     public static bool IsReverse(this EnumerableType type) => (type & EnumerableType.Reverse) == EnumerableType.Reverse;
