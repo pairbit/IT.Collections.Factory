@@ -9,12 +9,12 @@ using Generic;
 public static class StaticEnumerableFactoryRegistry
 {
     static readonly ConcurrentDictionary<Type, IEnumerableFactory> _enumerableFactories = new();
-    static readonly ConcurrentDictionary<Type, IDictionaryFactory> _dictionaryFactories = new();
+    static readonly ConcurrentDictionary<Type, IEnumerableKeyValueFactory> _dictionaryFactories = new();
 
     static readonly ConcurrentDictionary<Type, object> _genericEnumerableFactories = new();
 
     static readonly ReadOnlyDictionary<Type, IEnumerableFactory> _enumerableFactoriesReadOnly = new(_enumerableFactories);
-    static readonly ReadOnlyDictionary<Type, IDictionaryFactory> _dictionaryFactoriesReadOnly = new(_dictionaryFactories);
+    static readonly ReadOnlyDictionary<Type, IEnumerableKeyValueFactory> _dictionaryFactoriesReadOnly = new(_dictionaryFactories);
 
     static StaticEnumerableFactoryRegistry()
     {
@@ -59,7 +59,7 @@ public static class StaticEnumerableFactoryRegistry
 
     public static IReadOnlyDictionary<Type, IEnumerableFactory> EnumerableFactories => _enumerableFactoriesReadOnly;
 
-    public static IReadOnlyDictionary<Type, IDictionaryFactory> DictionaryFactories => _dictionaryFactoriesReadOnly;
+    public static IReadOnlyDictionary<Type, IEnumerableKeyValueFactory> DictionaryFactories => _dictionaryFactoriesReadOnly;
 
     public static void RegisterEnumerableFactory(IEnumerableFactory factory, params Type[] genericTypes)
     {
@@ -130,7 +130,7 @@ public static class StaticEnumerableFactoryRegistry
             new EnumerableFactoryDelegate<TEnumerable, T>(factory, (enumerable, item) => { add(enumerable, item); return true; }, type);
     }
 
-    public static void RegisterDictionaryFactory(IDictionaryFactory factory, params Type[] genericTypes)
+    public static void RegisterDictionaryFactory(IEnumerableKeyValueFactory factory, params Type[] genericTypes)
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
@@ -188,7 +188,7 @@ public static class StaticEnumerableFactoryRegistry
     public static IEnumerableFactory<TEnumerable, T> GetEnumerableFactory<TEnumerable, T>() where TEnumerable : IEnumerable<T>
         => TryGetEnumerableFactory<TEnumerable, T>() ?? throw new ArgumentException($"EnumerableFactory '{typeof(TEnumerable).FullName}' not registered");
 
-    public static IDictionaryFactory? TryGetDictionaryFactory(Type genericType)
+    public static IEnumerableKeyValueFactory? TryGetDictionaryFactory(Type genericType)
         => _dictionaryFactories.TryGetValue(genericType, out var factory) ? factory : null;
 
     public static IDictionaryFactory<TDictionary, TKey, TValue>? TryGetDictionaryFactory<TDictionary, TKey, TValue>()
@@ -204,7 +204,7 @@ public static class StaticEnumerableFactoryRegistry
         return null;
     }
 
-    public static IDictionaryFactory GetDictionaryFactory(Type genericType)
+    public static IEnumerableKeyValueFactory GetDictionaryFactory(Type genericType)
         => _dictionaryFactories.TryGetValue(genericType, out var factory) ? factory : throw new ArgumentException($"DictionaryFactory '{genericType.FullName}' not registered", nameof(genericType));
 
     public static IDictionaryFactory<TDictionary, TKey, TValue> GetDictionaryFactory<TDictionary, TKey, TValue>()

@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public interface IReadOnlyDictionaryFactory : IDictionaryFactory
+public interface IReadOnlyDictionaryFactory : IEnumerableKeyValueFactory
 {
     new IReadOnlyDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull;
 

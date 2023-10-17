@@ -72,7 +72,7 @@ public class StaticDictionaryFactoryTest
         }
     }
 
-    private void FactoryTest(IDictionaryFactory factory)
+    private void FactoryTest(IEnumerableKeyValueFactory factory)
     {
         var empty = factory.Empty<int, int>();
         Assert.That(empty.Any(), Is.False);

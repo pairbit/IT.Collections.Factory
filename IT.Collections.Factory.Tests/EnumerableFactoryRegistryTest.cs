@@ -23,7 +23,7 @@ public class EnumerableFactoryRegistryTest
         var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
 
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
-        _dictionaryFactoryTester = new(factories.OfType<IDictionaryFactory>().ToArray());
+        _dictionaryFactoryTester = new(factories.OfType<IEnumerableKeyValueFactory>().ToArray());
     }
 
     [SetUp]

@@ -4,18 +4,18 @@ public class DictionaryFactoryProxy<TDictionary, TKey, TValue> : IDictionaryFact
     where TKey : notnull
     where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
 {
-    private readonly IDictionaryFactory _factory;
+    private readonly IEnumerableKeyValueFactory _factory;
     private readonly Comparers<TKey, TValue> _comparers;
 
     public EnumerableType Type => _factory.Type | EnumerableType.Proxy;
 
-    public DictionaryFactoryProxy(IDictionaryFactory factory, in Comparers<TKey, TValue> comparers = default)
+    public DictionaryFactoryProxy(IEnumerableKeyValueFactory factory, in Comparers<TKey, TValue> comparers = default)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         _comparers = comparers;
     }
 
-    public DictionaryFactoryProxy(IDictionaryFactory factory)
+    public DictionaryFactoryProxy(IEnumerableKeyValueFactory factory)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
     }

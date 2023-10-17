@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory;
 
-public interface IDictionaryFactory : IEnumerableFactoryRegistrable
+public interface IEnumerableKeyValueFactory : IEnumerableFactoryRegistrable
 {
     IEnumerable<KeyValuePair<TKey, TValue>> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull;
 

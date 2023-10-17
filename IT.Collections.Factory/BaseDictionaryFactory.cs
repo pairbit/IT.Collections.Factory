@@ -2,7 +2,7 @@
 
 namespace IT.Collections.Factory;
 
-public abstract class BaseDictionaryFactory : IDictionaryFactory
+public abstract class BaseDictionaryFactory : IEnumerableKeyValueFactory
 {
     public abstract EnumerableType Type { get; }
 

@@ -8,7 +8,7 @@ internal static class xType
 {
     private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
     public static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
-    public static readonly Type IDictionaryFactoryType = typeof(IDictionaryFactory);
+    public static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsAssignableFromEnumerableFactory(this Type type) => IEnumerableFactoryType.IsAssignableFrom(type);

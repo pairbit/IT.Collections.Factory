@@ -71,7 +71,7 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
                 if (_dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
                 {
                     var proxy = typeof(DictionaryFactoryProxy<,,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IDictionaryFactory)factory);
+                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableKeyValueFactory)factory);
                 }
             }
         }

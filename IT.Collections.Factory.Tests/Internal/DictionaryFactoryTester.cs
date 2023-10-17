@@ -3,7 +3,7 @@
 internal class DictionaryFactoryTester
 {
     private readonly static Random _random = new();
-    private readonly IReadOnlyList<IDictionaryFactory> _factoryList;
+    private readonly IReadOnlyList<IEnumerableKeyValueFactory> _factoryList;
     private int _capacity;
     private KeyValuePair<int, int>[] _array;
     private KeyValuePair<int, int>[] _arrayUnique;
@@ -11,7 +11,7 @@ internal class DictionaryFactoryTester
     private KeyValuePair<int, int>[] _arraySortedUnique;
     private int[] _arrayKeyDuplicates;
 
-    public DictionaryFactoryTester(IReadOnlyList<IDictionaryFactory> factoryList)
+    public DictionaryFactoryTester(IReadOnlyList<IEnumerableKeyValueFactory> factoryList)
     {
         _factoryList = factoryList;
         _capacity = 10;
@@ -64,7 +64,7 @@ internal class DictionaryFactoryTester
         }
     }
 
-    public void Test(IDictionaryFactory factory)
+    public void Test(IEnumerableKeyValueFactory factory)
     {
         var empty = factory.Empty<int, int>();
         Assert.That(empty.Any(), Is.False);
