@@ -61,8 +61,10 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<IImmutableSetFactory>(ImmutableHashSetFactory.Default, behavior) &
            registry.TryRegisterFactory<IImmutableStackFactory>(ImmutableStackFactory.Default, behavior) &
            registry.TryRegisterFactory<IImmutableQueueFactory>(ImmutableQueueFactory.Default, behavior) &
-           //registry.TryRegisterFactory<IImmutableDictionaryFactory>(ImmutableDictionaryFactory.Default, behavior) &
+           registry.TryRegisterFactory<IImmutableDictionaryFactory>(ImmutableDictionaryFactory.Default, behavior) &
 #endif
+           registry.TryRegisterFactory<IDictionaryFactory>(DictionaryFactory.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlyDictionaryFactory>(ReadOnlyDictionaryFactory.Default, behavior) &
            registry.TryRegisterFactory<IProducerConsumerCollectionFactory>(ConcurrentBagFactory.Default, behavior);
 
     public static bool TryRegisterFactoriesDefaultAndInterfaces(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
@@ -90,31 +92,3 @@ public static class xIEnumerableFactoryRegistry
         return registry;
     }
 }
-
-/*
- 
-RegisterEnumerableFactory(ListFactory.Default, typeof(IList<>));
-RegisterEnumerableFactory(LinkedListFactory.Default, typeof(ICollection<>), typeof(IEnumerable<>));
-RegisterEnumerableFactory(HashSetFactory.Default, typeof(ISet<>));
-
-RegisterEnumerableFactory(ReadOnlyListFactory.Default, typeof(IReadOnlyList<>));
-RegisterEnumerableFactory(ReadOnlyLinkedListFactory.Default, typeof(IReadOnlyCollection<>));
-#if NET6_0_OR_GREATER
-RegisterEnumerableFactory(ReadOnlyHashSetFactory.Default, typeof(IReadOnlySet<>));
-#endif
-
-RegisterEnumerableFactory(ImmutableListFactory.Default, typeof(System.Collections.Immutable.IImmutableList<>));
-RegisterEnumerableFactory(ImmutableHashSetFactory.Default, typeof(System.Collections.Immutable.IImmutableSet<>));
-RegisterEnumerableFactory(ImmutableSortedSetFactory.Default);
-RegisterEnumerableFactory(ImmutableStackFactory.Default, typeof(System.Collections.Immutable.IImmutableStack<>));
-RegisterEnumerableFactory(ImmutableQueueFactory.Default, typeof(System.Collections.Immutable.IImmutableQueue<>));
-RegisterDictionaryFactory(ImmutableDictionaryFactory.Default, typeof(System.Collections.Immutable.IImmutableDictionary<,>));
-
-RegisterDictionaryFactory(DictionaryFactory.Default, typeof(IDictionary<,>));
-RegisterDictionaryFactory(ReadOnlyDictionaryFactory.Default, typeof(IReadOnlyDictionary<,>));
-RegisterDictionaryFactory(SortedDictionaryFactory.Default);
-RegisterDictionaryFactory(SortedListFactory.Default);
-
-RegisterDictionaryFactory(ConcurrentDictionaryFactory.Default);
-RegisterEnumerableFactory(ConcurrentBagFactory.Default, typeof(IProducerConsumerCollection<>));
- */
