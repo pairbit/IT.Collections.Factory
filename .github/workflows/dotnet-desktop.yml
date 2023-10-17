@@ -29,6 +29,9 @@ jobs:
     
       - name: Build
         run: dotnet build IT.Collections.Factory.sln --configuration Release --no-restore 
+        
+      - name: Test
+        run: dotnet test IT.Collections.Factory.Tests/IT.Collections.Factory.Tests.csproj --no-restore
 
   publish:
     needs: [build]
