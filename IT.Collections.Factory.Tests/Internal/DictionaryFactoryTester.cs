@@ -6,10 +6,11 @@ internal class DictionaryFactoryTester
     private readonly IReadOnlyList<IEnumerableKeyValueFactory> _factoryList;
     private int _capacity;
     private KeyValuePair<int, int>[] _array;
-    private KeyValuePair<int, int>[] _arrayUnique;
-    private KeyValuePair<int, int>[] _arraySorted;
-    private KeyValuePair<int, int>[] _arraySortedUnique;
-    private int[] _arrayKeyDuplicates;
+    private int[] _keys;
+    private int[] _keysUnique;
+    private int[] _keysSorted;
+    private int[] _keysSortedUnique;
+    private int[] _keysDuplicates;
 
     public DictionaryFactoryTester(IReadOnlyList<IEnumerableKeyValueFactory> factoryList)
     {
@@ -36,10 +37,11 @@ internal class DictionaryFactoryTester
         }
 
         _array = array;
-        _arrayUnique = dic.ToArray();
-        _arraySorted = array.OrderBy(x => x.Key).ToArray();
-        _arraySortedUnique = dic.OrderBy(x => x.Key).ToArray();
-        _arrayKeyDuplicates = array.GroupBy(x => x.Key).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
+        _keys = array.Select(x => x.Key).ToArray();
+        _keysUnique = dic.Keys.ToArray();
+        _keysSorted = _keys.OrderBy(x => x).ToArray();
+        _keysSortedUnique = _keysUnique.OrderBy(x => x).ToArray();
+        _keysDuplicates = array.GroupBy(x => x.Key).Where(x => x.Count() > 1).Select(x => x.Key).ToArray();
     }
 
     public void Test()
@@ -58,8 +60,13 @@ internal class DictionaryFactoryTester
             }
             catch (Exception)
             {
+                Console.WriteLine();
                 Console.WriteLine($"Type '{factory.Empty<int, int>().GetType().GetGenericTypeDefinition().FullName}' is exception in Factory '{factory.GetType().FullName}'");
                 throw;
+            }
+            finally
+            {
+                Console.WriteLine();
             }
         }
     }
@@ -115,30 +122,28 @@ internal class DictionaryFactoryTester
         Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!));
         Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0));
 
-        var array = _array;
+        var keys = _keys;
 
-        if (enumerableType.HasOrdered() && enumerableType.IsUnique())
+        if (enumerableType.HasOrdered())
         {
-            array = _arraySortedUnique;
-        }
-        else if (enumerableType.HasOrdered())
-        {
-            array = _arraySorted;
+            keys = enumerableType.IsUnique() ? _keysSortedUnique : _keysSorted;
         }
         else if (enumerableType.IsUnique())
         {
-            array = _arrayUnique;
+            keys = _keysUnique;
         }
 
         IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Type));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
+        var newKeys = withBuilder.Select(x => x.Key).ToArray();
+
         if (enumerableType.IsUnordered())
         {
-            withBuilder = withBuilder.OrderBy(x => x.Key).ToArray();
+            newKeys = newKeys.OrderBy(x => x).ToArray();
         }
 
-        Assert.That(withBuilder.SequenceEqual(array), Is.True);
+        Assert.That(newKeys.SequenceEqual(keys), Is.True);
 
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
         var duplicates = new List<int>();
@@ -147,45 +152,77 @@ internal class DictionaryFactoryTester
             factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
+        newKeys = withBuilderState.Select(x => x.Key).ToArray();
+
         if (enumerableType.IsUnordered())
         {
-            withBuilderState = withBuilderState.OrderBy(x => x.Key).ToArray();
+            newKeys = newKeys.OrderBy(x => x).ToArray();
         }
-        Assert.That(withBuilderState.SequenceEqual(array), Is.True);
+        Assert.That(newKeys.SequenceEqual(keys), Is.True);
 
         if (enumerableType.IsUnique())
         {
-            Assert.That(duplicates.SequenceEqual(_arrayKeyDuplicates), Is.True);
+            Assert.That(duplicates.SequenceEqual(_keysDuplicates), Is.True);
         }
         else
         {
             Assert.That(duplicates.Count == 0, Is.True);
         }
-        Console.WriteLine();
     }
 
     private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, EnumerableType type)
     {
         var array = _array;
-        if (type.IsReverse())
+        if (type.IsThreadSafe())
         {
-            for (int i = array.Length - 1; i >= 0; i--)
+            var tasks = new Task<(bool, int)>[array.Length];
+            if (type.IsReverse())
             {
-                var item = array[i];
-                if (!tryAdd(item))
+                for (int i = array.Length - 1; i >= 0; i--)
                 {
-                    Assert.That(_arrayKeyDuplicates.Contains(item.Key), Is.True);
+                    var item = array[i];
+                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
                 }
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
+                }
+            }
+            Task.WaitAll(tasks);
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var task = tasks[i];
+                (var added, var key) = task.Result;
+                if (!added) Assert.That(_keysDuplicates.Contains(key), Is.True);
             }
         }
         else
         {
-            for (int i = 0; i < array.Length; i++)
+            if (type.IsReverse())
             {
-                var item = array[i];
-                if (!tryAdd(item))
+                for (int i = array.Length - 1; i >= 0; i--)
                 {
-                    Assert.That(_arrayKeyDuplicates.Contains(item.Key), Is.True);
+                    var item = array[i];
+                    if (!tryAdd(item))
+                    {
+                        Assert.That(_keysDuplicates.Contains(item.Key), Is.True);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    var item = array[i];
+                    if (!tryAdd(item))
+                    {
+                        Assert.That(_keysDuplicates.Contains(item.Key), Is.True);
+                    }
                 }
             }
         }
@@ -196,20 +233,52 @@ internal class DictionaryFactoryTester
         (var memory, var type, var duplicates) = state;
 
         var span = memory.Span;
-        if (type.IsReverse())
+
+        if (type.IsThreadSafe())
         {
-            for (int i = span.Length - 1; i >= 0; i--)
+            var tasks = new Task<(bool, int)>[span.Length];
+            if (type.IsReverse())
             {
-                var item = span[i];
-                if (!tryAdd(item)) duplicates.Add(item.Key);
+                for (int i = span.Length - 1; i >= 0; i--)
+                {
+                    var item = span[i];
+                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < span.Length; i++)
+                {
+                    var item = span[i];
+                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
+                }
+            }
+            Task.WaitAll(tasks);
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var task = tasks[i];
+                (var added, var key) = task.Result;
+                if (!added) duplicates.Add(key);
             }
         }
         else
         {
-            for (int i = 0; i < span.Length; i++)
+            if (type.IsReverse())
             {
-                var item = span[i];
-                if (!tryAdd(item)) duplicates.Add(item.Key);
+                for (int i = span.Length - 1; i >= 0; i--)
+                {
+                    var item = span[i];
+                    if (!tryAdd(item)) duplicates.Add(item.Key);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < span.Length; i++)
+                {
+                    var item = span[i];
+                    if (!tryAdd(item)) duplicates.Add(item.Key);
+                }
             }
         }
     }

@@ -136,8 +136,9 @@ internal class EnumerableFactoryTester<T>
 
         var memory = new ReadOnlyMemory<T>(_data);
         var duplicates = new List<T>();
-        var state = (memory, enumerableType, duplicates);
-        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableType, List<T>)>(_capacity, BuilderState, in state, in _comparers);
+        var state = (memory, enumerableType, duplicates, _comparers);
+        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableType, List<T>, Comparers<T>)>
+            (_capacity, BuilderState, in state, in _comparers);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
         if (enumerableType.IsUnordered())
@@ -216,25 +217,56 @@ internal class EnumerableFactoryTester<T>
         }
     }
 
-    private static void BuilderState(TryAdd<T> tryAdd, in (ReadOnlyMemory<T>, EnumerableType, List<T>) state)
+    private static void BuilderState(TryAdd<T> tryAdd, in (ReadOnlyMemory<T>, EnumerableType, List<T>, Comparers<T>) state)
     {
-        (var memory, var type, var duplicates) = state;
-
+        (var memory, var type, var duplicates, var comparers) = state;
         var span = memory.Span;
-        if (type.IsReverse())
+
+        if (type.IsThreadSafe())
         {
-            for (int i = span.Length - 1; i >= 0; i--)
+            var tasks = new Task<(bool, T)>[span.Length];
+            if (type.IsReverse())
             {
-                var item = span[i];
-                if (!tryAdd(item)) duplicates.Add(item);
+                for (int i = span.Length - 1; i >= 0; i--)
+                {
+                    var item = span[i];
+                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < span.Length; i++)
+                {
+                    var item = span[i];
+                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
+                }
+            }
+            Task.WaitAll(tasks);
+
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var task = tasks[i];
+                (var added, var item) = task.Result;
+                if (!added) duplicates.Add(item);
             }
         }
         else
         {
-            for (int i = 0; i < span.Length; i++)
+            if (type.IsReverse())
             {
-                var item = span[i];
-                if (!tryAdd(item)) duplicates.Add(item);
+                for (int i = span.Length - 1; i >= 0; i--)
+                {
+                    var item = span[i];
+                    if (!tryAdd(item)) duplicates.Add(item);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < span.Length; i++)
+                {
+                    var item = span[i];
+                    if (!tryAdd(item)) duplicates.Add(item);
+                }
             }
         }
     }
