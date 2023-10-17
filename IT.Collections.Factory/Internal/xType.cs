@@ -53,8 +53,8 @@ internal static class xType
             var rank = type.GetArrayRank();
             if (rank == type2.GetArrayRank())
             {
-                var elementType = type.GetElementType();
-                var elementType2 = type2.GetElementType();
+                var elementType = type.GetElementType() ?? throw new InvalidOperationException("type.GetElementType() is null");
+                var elementType2 = type2.GetElementType() ?? throw new InvalidOperationException("type2.GetElementType() is null");
 
                 return elementType.IsGenericMethodParameter() && elementType2.IsGenericMethodParameter();
             }

@@ -5,7 +5,7 @@ namespace IT.Collections.Factory.Tests;
 
 public class GenericTests
 {
-    private int _capacity;
+    private readonly int _capacity = 0;
 
     [Test]
     public void Test()
