@@ -1,37 +1,16 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class ConcurrentStackFactory :
-#if NET5_0_OR_GREATER
-    EnumerableFactory
-#else
-    IEnumerableFactory
-#endif
+public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadOnlyCollectionFactory
 {
     public static readonly ConcurrentStackFactory Default = new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        EnumerableType Type => EnumerableType.Reverse;
+    public EnumerableType Type => EnumerableType.Reverse;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+    public ConcurrentStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public ConcurrentStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -43,11 +22,7 @@ public class ConcurrentStackFactory :
         return stack;
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public ConcurrentStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -58,10 +33,17 @@ public class ConcurrentStackFactory :
 
         return stack;
     }
-#if !NET5_0_OR_GREATER
+
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
-#endif
 }
