@@ -3,7 +3,7 @@
 public class ConcurrentEnumerableFactoryRegistryTest : EnumerableFactoryRegistryTest
 {
     private static readonly IEnumerableFactoryRegistry Registry =
-        new ConcurrentEnumerableFactoryRegistry(-1, 50).RegisterFactoriesDefault();
+        new ConcurrentEnumerableFactoryRegistry(-1, 50).RegisterFactoriesDefaultAndInterfaces();
 
     public ConcurrentEnumerableFactoryRegistryTest() : base(Registry)
     {

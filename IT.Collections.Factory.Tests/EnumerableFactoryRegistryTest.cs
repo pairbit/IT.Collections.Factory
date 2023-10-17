@@ -5,7 +5,7 @@ using Internal;
 
 public class EnumerableFactoryRegistryTest
 {
-    private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry(50).RegisterFactoriesDefault();
+    private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry(50).RegisterFactoriesDefaultAndInterfaces();
 
     private readonly IEnumerableFactoryRegistry _registry;
     private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;
@@ -48,7 +48,9 @@ public class EnumerableFactoryRegistryTest
         var comparer = StringComparer.OrdinalIgnoreCase;
         var comparers = comparer.ToComparers();
 
-        IImmutableSetFactory immutableSetFactory = _registry.GetFactory<ImmutableHashSetFactory>();
+        var immutableSetFactory = _registry.GetFactory<IImmutableSetFactory>();
+
+        Assert.That(immutableSetFactory.GetType(), Is.EqualTo(typeof(ImmutableHashSetFactory)));
         Assert.That(immutableSetFactory.Type.IsUnordered(), Is.True);
 
         ImmutableSetTest(immutableSetFactory.Empty<string?>(), order: true, unique: false);

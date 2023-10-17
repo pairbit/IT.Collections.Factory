@@ -1,37 +1,16 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class ConcurrentBagFactory :
-#if NET5_0_OR_GREATER
-    EnumerableFactory
-#else
-    IEnumerableFactory
-#endif
+public class ConcurrentBagFactory : IProducerConsumerCollectionFactory
 {
     public static readonly ConcurrentBagFactory Default = new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        EnumerableType Type => EnumerableType.Reverse;
+    public EnumerableType Type => EnumerableType.Reverse;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) => new();
+    public ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) => new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentBag<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
+    public ConcurrentBag<T> New<T>(int capacity, in Comparers<T> comparers = default) => new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentBag<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public ConcurrentBag<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -43,11 +22,7 @@ public class ConcurrentBagFactory :
         return bag;
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ConcurrentBag<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public ConcurrentBag<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -58,10 +33,13 @@ public class ConcurrentBagFactory :
 
         return bag;
     }
-#if !NET5_0_OR_GREATER
+
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IProducerConsumerCollection<T> IProducerConsumerCollectionFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
-#endif
 }

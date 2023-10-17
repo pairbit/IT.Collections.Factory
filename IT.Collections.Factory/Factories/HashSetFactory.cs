@@ -1,42 +1,21 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class HashSetFactory :
-#if NET5_0_OR_GREATER
-    EnumerableFactory
-#else
-    IEnumerableFactory
-#endif
+public class HashSetFactory : ISetFactory
 {
     public static readonly HashSetFactory Default = new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
+    public EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
+    public HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
 #if NETSTANDARD2_0 || NET461
         => new(comparers.EqualityComparer);
 #else
         => new(capacity, comparers.EqualityComparer);
 #endif
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -52,11 +31,7 @@ public class HashSetFactory :
         return hashSet;
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return new(comparers.EqualityComparer);
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -71,10 +46,17 @@ public class HashSetFactory :
 
         return hashSet;
     }
-#if !NET5_0_OR_GREATER
+
+    ISet<T> ISetFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    ISet<T> ISetFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    ISet<T> ISetFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    ISet<T> ISetFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
+    ICollection<T> ICollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    ICollection<T> ICollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    ICollection<T> ICollectionFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    ICollection<T> ICollectionFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
-#endif
 }
