@@ -5,28 +5,6 @@ using Generic;
 
 public static class xIEnumerableFactoryRegistry
 {
-    //public static bool TryRegister(this IEnumerableFactoryRegistry registry, Type factoryType, IEnumerableFactory factory, RegistrationBehavior behavior)
-    //{
-    //    if (registry == null) throw new ArgumentNullException(nameof(registry));
-    //    if (factory == null) throw new ArgumentNullException(nameof(factory));
-    //    if (!factoryType.IsAssignableFromEnumerableFactory()) throw Ex.NotAssignableFromEnumerableFactory(factoryType, nameof(factoryType));
-
-    //    return registry.TryRegister(factoryType, factory, behavior);
-    //}
-
-    //public static bool TryRegister<TFactory>(this IEnumerableFactoryRegistry registry, TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactory
-    //{
-    //    if (registry == null) throw new ArgumentNullException(nameof(registry));
-    //    if (factory == null) throw new ArgumentNullException(nameof(factory));
-
-    //    return registry.TryRegister(typeof(TFactory), factory, behavior);
-    //}
-
-    //public static bool TryReg<TFactory, TEnumerable, T>(this IEnumerableFactoryRegistry registry, TFactory factory, RegistrationBehavior behavior)
-    //    where TEnumerable : IEnumerable<T>
-    //{
-    //}
-
     public static bool TryRegisterFactory<TEnumerable, T>(this IEnumerableFactoryRegistry registry, IEnumerableFactory<TEnumerable, T> factory, RegistrationBehavior behavior)
         where TEnumerable : IEnumerable<T>
         => registry.TryRegisterFactory(factory, behavior);
@@ -48,10 +26,6 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory(ObservableCollectionFactory.Default, behavior) &
            registry.TryRegisterFactory(ReadOnlyObservableCollectionFactory.Default, behavior) &
            registry.TryRegisterFactory(ReadOnlyListFactory.Default, behavior) &
-           registry.TryRegisterFactory(ReadOnlyLinkedListFactory.Default, behavior) &
-#if NET6_0_OR_GREATER
-           registry.TryRegisterFactory(ReadOnlyHashSetFactory.Default, behavior) &
-#endif
 #if NETCOREAPP3_1_OR_GREATER
            registry.TryRegisterFactory(ImmutableArrayFactory.Default, behavior) &
            registry.TryRegisterFactory(ImmutableListFactory.Default, behavior) &
@@ -77,8 +51,17 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<ICollectionFactory>(LinkedListFactory.Default, behavior) &
            registry.TryRegisterFactory<IListFactory>(ListFactory.Default, behavior) &
            registry.TryRegisterFactory<ISetFactory>(HashSetFactory.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlyCollectionFactory>(ReadOnlyLinkedListFactory.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlyListFactory>(ReadOnlyListFactory.Default, behavior) &
+#if NET6_0_OR_GREATER
+           registry.TryRegisterFactory<IReadOnlySetFactory>(ReadOnlyHashSetFactory.Default, behavior) &
+#endif
 #if NETCOREAPP3_1_OR_GREATER
+           registry.TryRegisterFactory<IImmutableListFactory>(ImmutableListFactory.Default, behavior) &
            registry.TryRegisterFactory<IImmutableSetFactory>(ImmutableHashSetFactory.Default, behavior) &
+           registry.TryRegisterFactory<IImmutableStackFactory>(ImmutableStackFactory.Default, behavior) &
+           registry.TryRegisterFactory<IImmutableQueueFactory>(ImmutableQueueFactory.Default, behavior) &
+           //registry.TryRegisterFactory<IImmutableDictionaryFactory>(ImmutableDictionaryFactory.Default, behavior) &
 #endif
            registry.TryRegisterFactory<IProducerConsumerCollectionFactory>(ConcurrentBagFactory.Default, behavior);
 

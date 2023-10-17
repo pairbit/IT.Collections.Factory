@@ -4,38 +4,17 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public class ImmutableStackFactory :
-#if NET5_0_OR_GREATER
-    EnumerableFactory
-#else
-    IEnumerableFactory
-#endif
+public class ImmutableStackFactory : IImmutableStackFactory
 {
     public static readonly ImmutableStackFactory Default = new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        EnumerableType Type => EnumerableType.Reverse;
+    public EnumerableType Type => EnumerableType.Reverse;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ImmutableStack<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
+    public ImmutableStack<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ImmutableStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
+    public ImmutableStack<T> New<T>(int capacity, in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ImmutableStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public ImmutableStack<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ImmutableStack<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -47,11 +26,7 @@ public class ImmutableStackFactory :
         return stack;
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ImmutableStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public ImmutableStack<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return ImmutableStack<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -62,12 +37,15 @@ public class ImmutableStackFactory :
 
         return stack;
     }
-#if !NET5_0_OR_GREATER
+
+    IImmutableStack<T> IImmutableStackFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IImmutableStack<T> IImmutableStackFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IImmutableStack<T> IImmutableStackFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IImmutableStack<T> IImmutableStackFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
-#endif
 }
 
 #endif

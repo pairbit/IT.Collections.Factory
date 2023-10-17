@@ -2,41 +2,20 @@
 
 namespace IT.Collections.Factory.Factories;
 
-public class ReadOnlyListFactory :
-#if NET5_0_OR_GREATER
-    EnumerableFactory
-#else
-    IEnumerableFactory
-#endif
+public class ReadOnlyListFactory : IReadOnlyListFactory
 {
     public static readonly ReadOnlyListFactory Default = new();
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        EnumerableType Type => EnumerableType.ReadOnly;
+    public EnumerableType Type => EnumerableType.ReadOnly;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ReadOnlyCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
+    public ReadOnlyCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ReadOnlyCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public ReadOnlyCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
     {
         throw new NotSupportedException();
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ReadOnlyCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
+    public ReadOnlyCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -48,11 +27,7 @@ public class ReadOnlyListFactory :
         return new(list);
     }
 
-    public
-#if NET5_0_OR_GREATER
-        override
-#endif
-        ReadOnlyCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
+    public ReadOnlyCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return Cache<T>.Empty;
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -68,10 +43,17 @@ public class ReadOnlyListFactory :
     {
         public readonly static ReadOnlyCollection<T> Empty = new(new List<T>());
     }
-#if !NET5_0_OR_GREATER
+
+    IReadOnlyList<T> IReadOnlyListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IReadOnlyList<T> IReadOnlyListFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IReadOnlyList<T> IReadOnlyListFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IReadOnlyList<T> IReadOnlyListFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
+    IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers) => New(capacity, builder, in state, in comparers);
-#endif
 }

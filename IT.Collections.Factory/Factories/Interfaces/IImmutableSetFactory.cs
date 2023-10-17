@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public interface IImmutableSetFactory : IEnumerableFactory
+public interface IImmutableSetFactory : IReadOnlyCollectionFactory
 {
     new IImmutableSet<T> Empty<T>(in Comparers<T> comparers = default);
 
