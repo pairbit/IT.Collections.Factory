@@ -6,7 +6,7 @@ public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFa
 {
     public static readonly ReadOnlyObservableCollectionFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.ReadOnly;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
 
     public virtual ReadOnlyObservableCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
 

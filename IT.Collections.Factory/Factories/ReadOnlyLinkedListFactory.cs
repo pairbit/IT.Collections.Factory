@@ -6,7 +6,7 @@ public class ReadOnlyLinkedListFactory : IReadOnlyCollectionFactory
 {
     public static readonly ReadOnlyLinkedListFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.ReadOnly;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
 
     public virtual IReadOnlyCollection<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlyCollection<T>.Empty;
 

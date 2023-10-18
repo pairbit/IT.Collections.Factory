@@ -8,7 +8,7 @@ public sealed class ImmutableSortedSetFactory : IImmutableSetFactory
 {
     public static readonly ImmutableSortedSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
+    public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;
 
     public ImmutableSortedSet<T> Empty<T>(in Comparers<T> comparers = default)
         => ImmutableSortedSet<T>.Empty.WithComparer(comparers.Comparer);

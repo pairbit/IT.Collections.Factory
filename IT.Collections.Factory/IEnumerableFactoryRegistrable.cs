@@ -2,5 +2,5 @@
 
 public interface IEnumerableFactoryRegistrable
 {
-    EnumerableType Type { get; }
+    EnumerableKind Kind { get; }
 }

@@ -8,7 +8,7 @@ public sealed class ImmutableStackFactory : IImmutableStackFactory
 {
     public static readonly ImmutableStackFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Reverse;
+    public EnumerableKind Kind => EnumerableKind.Reverse;
 
     public ImmutableStack<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
 

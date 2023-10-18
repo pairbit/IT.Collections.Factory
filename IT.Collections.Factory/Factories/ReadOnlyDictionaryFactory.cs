@@ -6,7 +6,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionary
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.EquatableKey;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.EquatableKey;
 
     public virtual ReadOnlyDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => Cache<TKey, TValue>.Empty;

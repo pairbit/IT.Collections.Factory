@@ -7,7 +7,7 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
 {
     public static readonly HashSetFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.Unique | EnumerableType.Equatable;
+    public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.Equatable;
 
     public virtual HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
 

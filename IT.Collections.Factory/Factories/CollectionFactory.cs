@@ -6,7 +6,7 @@ public class CollectionFactory : IListFactory, IReadOnlyListFactory
 {
     public static readonly CollectionFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.None;
+    public virtual EnumerableKind Kind => EnumerableKind.None;
 
     public virtual Collection<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

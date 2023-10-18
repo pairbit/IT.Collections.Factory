@@ -8,7 +8,7 @@ public class ReadOnlyHashSetFactory : IReadOnlySetFactory
 {
     public static readonly ReadOnlyHashSetFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.ReadOnly | EnumerableType.Unique | EnumerableType.Equatable;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.Equatable;
 
     public virtual IReadOnlySet<T> Empty<T>(in Comparers<T> comparers = default) => ReadOnlySet<T>.Empty;
 

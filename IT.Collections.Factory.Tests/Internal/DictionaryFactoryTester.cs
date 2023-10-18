@@ -78,11 +78,11 @@ internal class DictionaryFactoryTester
         if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
         if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
         var type = empty.GetType();
-        var enumerableType = factory.Type;
+        var enumerableKind = factory.Kind;
 
-        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableType}");
+        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableKind}");
 
-        if (enumerableType.IsReadOnly())
+        if (enumerableKind.IsReadOnly())
         {
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(0));
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(_capacity));
@@ -97,7 +97,7 @@ internal class DictionaryFactoryTester
 
             var withCapacity = factory.New<int, int>(_capacity);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
-            if (enumerableType.IsFixed())
+            if (enumerableKind.IsFixed())
             {
                 Assert.That(withCapacity.Any(), Is.True);
                 if (withCapacity.TryGetCount(out count))
@@ -124,21 +124,21 @@ internal class DictionaryFactoryTester
 
         var keys = _keys;
 
-        if (enumerableType.HasOrdered())
+        if (enumerableKind.HasOrdered())
         {
-            keys = enumerableType.IsUnique() ? _keysSortedUnique : _keysSorted;
+            keys = enumerableKind.IsUnique() ? _keysSortedUnique : _keysSorted;
         }
-        else if (enumerableType.IsUnique())
+        else if (enumerableKind.IsUnique())
         {
             keys = _keysUnique;
         }
 
-        IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Type));
+        IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Kind));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
         var newKeys = withBuilder.Select(x => x.Key).ToArray();
 
-        if (enumerableType.IsUnordered())
+        if (enumerableKind.IsUnordered())
         {
             newKeys = newKeys.OrderBy(x => x).ToArray();
         }
@@ -147,20 +147,20 @@ internal class DictionaryFactoryTester
 
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
         var duplicates = new List<int>();
-        var state = (memory, enumerableType, duplicates);
+        var state = (memory, enumerableKind, duplicates);
         IEnumerable<KeyValuePair<int, int>> withBuilderState =
-            factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>)>(_capacity, BuilderState, in state);
+            factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableKind, List<int>)>(_capacity, BuilderState, in state);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
         newKeys = withBuilderState.Select(x => x.Key).ToArray();
 
-        if (enumerableType.IsUnordered())
+        if (enumerableKind.IsUnordered())
         {
             newKeys = newKeys.OrderBy(x => x).ToArray();
         }
         Assert.That(newKeys.SequenceEqual(keys), Is.True);
 
-        if (enumerableType.IsUnique())
+        if (enumerableKind.IsUnique())
         {
             Assert.That(duplicates.SequenceEqual(_keysDuplicates), Is.True);
         }
@@ -170,13 +170,13 @@ internal class DictionaryFactoryTester
         }
     }
 
-    private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, EnumerableType type)
+    private void Builder(TryAdd<KeyValuePair<int, int>> tryAdd, EnumerableKind kind)
     {
         var array = _array;
-        if (type.IsThreadSafe())
+        if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, int)>[array.Length];
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = array.Length - 1; i >= 0; i--)
                 {
@@ -203,7 +203,7 @@ internal class DictionaryFactoryTester
         }
         else
         {
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = array.Length - 1; i >= 0; i--)
                 {
@@ -228,16 +228,16 @@ internal class DictionaryFactoryTester
         }
     }
 
-    private static void BuilderState(TryAdd<KeyValuePair<int, int>> tryAdd, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableType, List<int>) state)
+    private static void BuilderState(TryAdd<KeyValuePair<int, int>> tryAdd, in (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableKind, List<int>) state)
     {
-        (var memory, var type, var duplicates) = state;
+        (var memory, var kind, var duplicates) = state;
 
         var span = memory.Span;
 
-        if (type.IsThreadSafe())
+        if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, int)>[span.Length];
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = span.Length - 1; i >= 0; i--)
                 {
@@ -264,7 +264,7 @@ internal class DictionaryFactoryTester
         }
         else
         {
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = span.Length - 1; i >= 0; i--)
                 {

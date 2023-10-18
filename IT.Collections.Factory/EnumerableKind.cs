@@ -1,7 +1,7 @@
 ﻿namespace IT.Collections.Factory;
 
 [Flags]
-public enum EnumerableType
+public enum EnumerableKind
 {
     None = 0,
     ReadOnly = 1,

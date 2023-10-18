@@ -8,7 +8,7 @@ public sealed class ImmutableHashSetFactory : IImmutableSetFactory
 {
     public static readonly ImmutableHashSetFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Unordered | EnumerableType.Unique | EnumerableType.Equatable;
+    public EnumerableKind Kind => EnumerableKind.Unordered | EnumerableKind.Unique | EnumerableKind.Equatable;
 
     public ImmutableHashSet<T> Empty<T>(in Comparers<T> comparers = default)
         => ImmutableHashSet<T>.Empty.WithComparer(comparers.EqualityComparer);

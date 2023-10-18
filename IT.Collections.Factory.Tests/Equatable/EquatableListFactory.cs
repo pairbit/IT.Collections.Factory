@@ -7,7 +7,7 @@ public class EquatableListFactory : ListFactory
 {
     public static new readonly EquatableListFactory Default = new();
 
-    public override EnumerableType Type => EnumerableType.Equatable;
+    public override EnumerableKind Kind => EnumerableKind.Equatable;
 
     public
 #if NET5_0_OR_GREATER

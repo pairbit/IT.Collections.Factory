@@ -5,18 +5,18 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
 {
     private readonly EnumerableFactory<TEnumerable, T> _factory;
     private readonly Func<TEnumerable, T, bool> _tryAdd;
-    private readonly EnumerableType _type;
+    private readonly EnumerableKind _kind;
 
-    public EnumerableType Type => _type;
+    public EnumerableKind Kind => _kind;
 
     public EnumerableFactoryDelegate(
         EnumerableFactory<TEnumerable, T> factory, 
         Func<TEnumerable, T, bool> tryAdd, 
-        EnumerableType type = EnumerableType.None)
+        EnumerableKind kind = EnumerableKind.None)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         _tryAdd = tryAdd ?? throw new ArgumentNullException(nameof(tryAdd));
-        _type = type;
+        _kind = kind;
     }
 
     public TEnumerable Empty() => _factory(0);

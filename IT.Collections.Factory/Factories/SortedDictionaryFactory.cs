@@ -4,7 +4,7 @@ public class SortedDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFa
 {
     public static readonly SortedDictionaryFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.ComparableKey;
+    public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.ComparableKey;
 
     public virtual SortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => new(comparers.KeyComparer);

@@ -6,7 +6,7 @@ public class ObservableCollectionFactory : CollectionFactory
 {
     public static new readonly ObservableCollectionFactory Default = new();
 
-    public override EnumerableType Type => EnumerableType.None;
+    public override EnumerableKind Kind => EnumerableKind.None;
 
     public
 #if NET5_0_OR_GREATER

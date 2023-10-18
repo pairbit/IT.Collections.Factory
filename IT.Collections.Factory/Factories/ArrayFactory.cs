@@ -4,7 +4,7 @@ public sealed class ArrayFactory : IEnumerableFactory
 {
     public static readonly ArrayFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Fixed;
+    public EnumerableKind Kind => EnumerableKind.Fixed;
 
     public T[] Empty<T>(in Comparers<T> comparers = default) => Array.Empty<T>();
 

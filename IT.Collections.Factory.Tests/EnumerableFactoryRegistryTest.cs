@@ -51,13 +51,13 @@ public class EnumerableFactoryRegistryTest
         var immutableSetFactory = _registry.GetFactory<IImmutableSetFactory>();
 
         Assert.That(immutableSetFactory.GetType(), Is.EqualTo(typeof(ImmutableHashSetFactory)));
-        Assert.That(immutableSetFactory.Type.IsUnordered(), Is.True);
+        Assert.That(immutableSetFactory.Kind.IsUnordered(), Is.True);
 
         ImmutableSetTest(immutableSetFactory.Empty<string?>(), order: true, unique: false);
         ImmutableSetTest(immutableSetFactory.Empty(comparers), order: true, unique: true, comparer);
 
         immutableSetFactory = _registry.GetFactory<ImmutableSortedSetFactory>();
-        Assert.That(immutableSetFactory.Type.IsOrdered(), Is.True);
+        Assert.That(immutableSetFactory.Kind.IsOrdered(), Is.True);
 
         ImmutableSetTest(immutableSetFactory.Empty<string?>(), order: false, unique: false);
         ImmutableSetTest(immutableSetFactory.Empty(comparers), order: false, unique: true, comparer);
@@ -85,7 +85,7 @@ public class EnumerableFactoryRegistryTest
     {
         var listFactory = _registry.GetFactory<List<T>, T>();
 
-        Assert.That(listFactory.Type.IsProxy(), Is.True);
+        Assert.That(listFactory.Kind.IsProxy(), Is.True);
         ListTest(listFactory.New(capacity), capacity);
     }
 
@@ -93,7 +93,7 @@ public class EnumerableFactoryRegistryTest
     {
         var dictionaryFactory = _registry.GetFactory<Dictionary<TKey, TValue>, TKey, TValue>();
 
-        Assert.That(dictionaryFactory.Type.IsProxy(), Is.True);
+        Assert.That(dictionaryFactory.Kind.IsProxy(), Is.True);
         DictionaryTest(dictionaryFactory.New(capacity));
     }
 

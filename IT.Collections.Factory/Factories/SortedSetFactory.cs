@@ -7,7 +7,7 @@ public class SortedSetFactory : ISetFactory, IReadOnlyCollectionFactory
 {
     public static readonly SortedSetFactory Default = new();
 
-    public virtual EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.Comparable;
+    public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;
 
     public virtual SortedSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.Comparer);
 

@@ -8,7 +8,7 @@ public sealed class ImmutableSortedDictionaryFactory : IImmutableDictionaryFacto
 {
     public static readonly ImmutableSortedDictionaryFactory Default = new();
 
-    public EnumerableType Type => EnumerableType.Ordered | EnumerableType.Unique | EnumerableType.ComparableKey | EnumerableType.EquatableValue;
+    public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.ComparableKey | EnumerableKind.EquatableValue;
 
     public ImmutableSortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull
         => ImmutableSortedDictionary<TKey, TValue>.Empty.WithComparers(comparers.KeyComparer, comparers.ValueEqualityComparer);

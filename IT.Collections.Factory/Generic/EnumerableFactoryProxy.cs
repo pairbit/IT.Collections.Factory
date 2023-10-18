@@ -5,7 +5,7 @@ public class EnumerableFactoryProxy<TEnumerable, T> : IEnumerableFactory<TEnumer
     private readonly IEnumerableFactory _factory;
     private readonly Comparers<T> _comparers;
 
-    public EnumerableType Type => _factory.Type | EnumerableType.Proxy;
+    public EnumerableKind Kind => _factory.Kind | EnumerableKind.Proxy;
 
     public EnumerableFactoryProxy(IEnumerableFactory factory, in Comparers<T> comparers = default)
     {

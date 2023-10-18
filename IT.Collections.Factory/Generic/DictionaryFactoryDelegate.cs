@@ -5,18 +5,18 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
 {
     private readonly DictionaryFactory<TDictionary, TKey, TValue> _factory;
     private readonly Func<TDictionary, KeyValuePair<TKey, TValue>, bool> _tryAdd;
-    private readonly EnumerableType _type;
+    private readonly EnumerableKind _kind;
 
-    public EnumerableType Type => _type;
+    public EnumerableKind Kind => _kind;
 
     public DictionaryFactoryDelegate(
         DictionaryFactory<TDictionary, TKey, TValue> factory,
         Func<TDictionary, KeyValuePair<TKey, TValue>, bool> tryAdd,
-        EnumerableType type = EnumerableType.None)
+        EnumerableKind kind = EnumerableKind.None)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         _tryAdd = tryAdd ?? throw new ArgumentNullException(nameof(tryAdd));
-        _type = type;
+        _kind = kind;
     }
 
     public TDictionary Empty() => _factory(0);

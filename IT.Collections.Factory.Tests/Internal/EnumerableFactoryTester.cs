@@ -65,11 +65,11 @@ internal class EnumerableFactoryTester<T>
         if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
         if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
         var type = empty.GetType();
-        var enumerableType = factory.Type;
+        var enumerableKind = factory.Kind;
 
-        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableType}");
+        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableKind}");
 
-        if (enumerableType.IsReadOnly())
+        if (enumerableKind.IsReadOnly())
         {
             Assert.Throws<NotSupportedException>(() => factory.New(0, in _comparers));
             Assert.Throws<NotSupportedException>(() => factory.New(_capacity, in _comparers));
@@ -84,7 +84,7 @@ internal class EnumerableFactoryTester<T>
 
             var withCapacity = factory.New(_capacity, in _comparers);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
-            if (enumerableType.IsFixed())
+            if (enumerableKind.IsFixed())
             {
                 Assert.That(withCapacity.Any(), Is.True);
                 if (withCapacity.TryGetCount(out count))
@@ -112,20 +112,20 @@ internal class EnumerableFactoryTester<T>
         var data = _data;
 
         //TODO: Костыль IsThreadSafe
-        if (enumerableType.HasOrdered() || enumerableType.IsThreadSafe())
+        if (enumerableKind.HasOrdered() || enumerableKind.IsThreadSafe())
         {
-            data = enumerableType.IsUnique() ? _dataSortedUnique : _dataSorted;
+            data = enumerableKind.IsUnique() ? _dataSortedUnique : _dataSorted;
         }
-        else if (enumerableType.IsUnique())
+        else if (enumerableKind.IsUnique())
         {
             data = _dataUnique;
         }
 
-        var withBuilder = factory.New(_capacity, add => Builder(add, enumerableType), in _comparers);
+        var withBuilder = factory.New(_capacity, add => Builder(add, enumerableKind), in _comparers);
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
         //TODO: Костыль IsThreadSafe! Как проверить правильность порядка в многопоточном приложении?
-        if (enumerableType.IsUnordered() || enumerableType.IsThreadSafe())
+        if (enumerableKind.IsUnordered() || enumerableKind.IsThreadSafe())
         {
             withBuilder = withBuilder.OrderBy(x => x).ToArray();
         }
@@ -134,20 +134,20 @@ internal class EnumerableFactoryTester<T>
 
         var memory = new ReadOnlyMemory<T>(_data);
         var duplicates = new List<T>();
-        var state = (memory, enumerableType, duplicates, _comparers);
-        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableType, List<T>, Comparers<T>)>
+        var state = (memory, enumerableKind, duplicates, _comparers);
+        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableKind, List<T>, Comparers<T>)>
             (_capacity, BuilderState, in state, in _comparers);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
         
         //TODO: Костыль IsThreadSafe
-        if (enumerableType.IsUnordered() || enumerableType.IsThreadSafe())
+        if (enumerableKind.IsUnordered() || enumerableKind.IsThreadSafe())
         {
             withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
         }
 
         Assert.That(withBuilderState.SequenceEqual(data), Is.True);
 
-        if (enumerableType.IsUnique())
+        if (enumerableKind.IsUnique())
         {
             Assert.That(duplicates.SequenceEqual(_dataDuplicates, _comparers.EqualityComparer), Is.True);
         }
@@ -157,14 +157,14 @@ internal class EnumerableFactoryTester<T>
         }
     }
 
-    private void Builder(TryAdd<T> tryAdd, EnumerableType type)
+    private void Builder(TryAdd<T> tryAdd, EnumerableKind kind)
     {
         var array = _data;
 
-        if (type.IsThreadSafe())
+        if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, T)>[array.Length];
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = array.Length - 1; i >= 0; i--)
                 {
@@ -191,7 +191,7 @@ internal class EnumerableFactoryTester<T>
         }
         else
         {
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = array.Length - 1; i >= 0; i--)
                 {
@@ -216,15 +216,15 @@ internal class EnumerableFactoryTester<T>
         }
     }
 
-    private static void BuilderState(TryAdd<T> tryAdd, in (ReadOnlyMemory<T>, EnumerableType, List<T>, Comparers<T>) state)
+    private static void BuilderState(TryAdd<T> tryAdd, in (ReadOnlyMemory<T>, EnumerableKind, List<T>, Comparers<T>) state)
     {
-        (var memory, var type, var duplicates, var comparers) = state;
+        (var memory, var kind, var duplicates, var comparers) = state;
         var span = memory.Span;
 
-        if (type.IsThreadSafe())
+        if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, T)>[span.Length];
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = span.Length - 1; i >= 0; i--)
                 {
@@ -251,7 +251,7 @@ internal class EnumerableFactoryTester<T>
         }
         else
         {
-            if (type.IsReverse())
+            if (kind.IsReverse())
             {
                 for (int i = span.Length - 1; i >= 0; i--)
                 {
