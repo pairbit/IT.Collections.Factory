@@ -1,12 +1,13 @@
 ﻿namespace IT.Collections.Factory;
 
 using Generic;
+using Internal;
 
 public static class xIReadOnlyEnumerableFactoryRegistry
 {
     public static TFactory GetFactory<TFactory>(this IReadOnlyEnumerableFactoryRegistry registry)
         where TFactory : IEnumerableFactoryRegistrable
-        => registry.TryGetFactory<TFactory>() ?? throw new ArgumentException($"Factory '{typeof(TFactory).FullName}' not registered");
+        => registry.TryGetFactory<TFactory>() ?? throw Ex.FactoryTypeNotRegistered(typeof(TFactory));
 
     public static IEnumerableFactory<TEnumerable, T>? TryGetFactory<TEnumerable, T>(this IReadOnlyEnumerableFactoryRegistry registry)
         where TEnumerable : IEnumerable<T>

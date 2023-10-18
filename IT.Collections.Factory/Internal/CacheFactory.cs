@@ -8,28 +8,7 @@ internal static class CacheFactory<TFactory> where TFactory : IEnumerableFactory
 
     static CacheFactory()
     {
-        var factoryType = typeof(TFactory);
-
-        var isValid = factoryType.IsAssignableToEnumerableFactory() ||
-                      factoryType.IsAssignableToDictionaryFactory();
-
-        if (isValid)
-        {
-            var returnType = factoryType.GetReturnType();
-
-            if (returnType == null)
-            {
-                Error = $"Type '{typeof(TFactory).FullName}' not contains same return type";
-                isValid = false;
-            }
-
-            ReturnType = returnType;
-        }
-        else
-        {
-            Error = $"Type '{typeof(TFactory).FullName}' not valid";
-        }
-
-        IsValid = isValid;
+        ReturnType = typeof(TFactory).TryGetReturnType(out Error);
+        IsValid = ReturnType != null;
     }
 }

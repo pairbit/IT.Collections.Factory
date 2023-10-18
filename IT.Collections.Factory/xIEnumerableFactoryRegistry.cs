@@ -54,6 +54,7 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<IReadOnlyCollectionFactory>(ReadOnlyLinkedListFactory.Default, behavior) &
            registry.TryRegisterFactory<IReadOnlyListFactory>(ReadOnlyListFactory.Default, behavior) &
 #if NET6_0_OR_GREATER
+           //registry.TryRegisterFactory(PriorityQueueFactory.Default, behavior) &
            registry.TryRegisterFactory<IReadOnlySetFactory>(ReadOnlyHashSetFactory.Default, behavior) &
 #endif
 #if NETCOREAPP3_1_OR_GREATER

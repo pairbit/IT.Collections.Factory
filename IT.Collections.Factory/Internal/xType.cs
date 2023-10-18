@@ -1,19 +1,13 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace IT.Collections.Factory.Internal;
 
 internal static class xType
 {
     private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
-    public static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
-    public static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsAssignableToEnumerableFactory(this Type type) => IEnumerableFactoryType.IsAssignableFrom(type);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsAssignableToDictionaryFactory(this Type type) => IDictionaryFactoryType.IsAssignableFrom(type);
+    private static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
+    private static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
+    private static readonly Type ArrayType = typeof(Array);
 
     public static bool IsAssignableToDefinition(this Type type, Type baseType)
     {
@@ -32,9 +26,6 @@ internal static class xType
 
         return baseType.IsAssignableFrom(type);
     }
-
-    public static Type GetGenericTypeDefinitionOrArray(this Type type)
-        => type.IsArray ? typeof(Array) : type.GetGenericTypeDefinition();
 
     public static bool IsGenericMethodParameter(this Type type) => type.IsGenericParameter && type.DeclaringMethod != null;
 
@@ -80,27 +71,55 @@ internal static class xType
         return false;
     }
 
-    public static Type? GetReturnType(this Type factoryType)
+    public static Type? TryGetReturnType(this Type factoryType, out string? error)
     {
-        if (factoryType.IsAssignableToEnumerableFactory() || factoryType.IsAssignableToDictionaryFactory())
+        if (!IEnumerableFactoryType.IsAssignableFrom(factoryType) &&
+            !IDictionaryFactoryType.IsAssignableFrom(factoryType))
         {
-            var emptyMethod = factoryType.GetMethod(nameof(IEnumerableFactory.Empty), Bindings) ?? throw new InvalidOperationException($"Method '{factoryType.FullName}.{nameof(IEnumerableFactory.Empty)}' not found");
-
-            var returnType = emptyMethod.ReturnType;
-
-            var methods = factoryType.GetMethods(Bindings);
-            var methodName = nameof(IEnumerableFactory.New);
-
-            for (int i = 0; i < methods.Length; i++)
-            {
-                var method = methods[i];
-                if (method.Name == methodName && !returnType.EqualsGenericType(method.ReturnType))
-                    return null;
-            }
-
-            return returnType.GetGenericTypeDefinitionOrArray();
+            error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IDictionaryFactoryType.FullName}'";
+            return null;
+        }
+        var emptyMethodName = nameof(IEnumerableFactory.Empty);
+        var emptyMethod = factoryType.GetMethod(emptyMethodName, Bindings);
+        if (emptyMethod == null)
+        {
+            error = $"Type '{factoryType.FullName}' does not contain method '{emptyMethodName}'";
+            return null;
         }
 
-        return null;
+        var returnType = emptyMethod.ReturnType;
+        var methods = factoryType.GetMethods(Bindings);
+        var newMethodName = nameof(IEnumerableFactory.New);
+        var newMethodAny = false;
+        var returnTypeSame = true;
+        for (int i = 0; i < methods.Length; i++)
+        {
+            var method = methods[i];
+            if (method.Name == newMethodName)
+            {
+                newMethodAny = true;
+                if (!returnType.EqualsGenericType(method.ReturnType))
+                {
+                    returnTypeSame = false;
+                    break;
+                }
+            }
+        }
+        if (!newMethodAny)
+        {
+            error = $"Type '{factoryType.FullName}' does not contain method '{newMethodName}'";
+            return null;
+        }
+        if (!returnTypeSame)
+        {
+            error = $"Type '{factoryType.FullName}' must contain the same return types of methods '{emptyMethodName}' and '{newMethodName}'";
+            return null;
+        }
+
+        error = null;
+
+        if (returnType.IsArray) return ArrayType;
+        if (returnType.IsGenericType) return returnType.GetGenericTypeDefinition();
+        return returnType;
     }
 }
