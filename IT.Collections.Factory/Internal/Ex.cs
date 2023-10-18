@@ -5,7 +5,10 @@ internal static class Ex
     public static ArgumentException EnumerableTypeIsNull(Type factoryType, string? paramName = null)
         => new($"Property '{nameof(IEnumerableFactoryRegistrable.EnumerableType)}' of type '{factoryType.FullName}' must not be null", paramName);
 
-    public static ArgumentException EnumerableTypeNotInheritedFromReturnType(Type enumerableType, Type returnType, string? paramName = null)
+    public static ArgumentException EnumerableTypeNotEnumerable(Type factoryType, Type enumerableType, string? paramName = null)
+        => new($"EnumerableType '{enumerableType.FullName}' must inherit type '{xType.IEnumerableGenericType.FullName}'", paramName);
+
+    public static ArgumentException EnumerableTypeNotInheritedFromReturnType(Type factoryType, Type enumerableType, Type returnType, string? paramName = null)
         => new($"EnumerableType '{enumerableType.FullName}' must inherit return type '{returnType.FullName}'", paramName);
     //TODO: Указать тип фабрики в ошибке
     //is not inherited from

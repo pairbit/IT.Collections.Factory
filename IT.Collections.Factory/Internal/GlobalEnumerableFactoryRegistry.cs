@@ -53,12 +53,13 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
         if (!behavior.IsValid()) throw Ex.BehaviorInvalid(behavior, nameof(behavior));
 
         var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(typeof(TFactory), nameof(factory));
+        if (!enumerableType.IsAssignableToEnumerable()) throw Ex.EnumerableTypeNotEnumerable(typeof(TFactory), enumerableType, nameof(factory));
         if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
 
         //TODO: EnumerableType как быть? Регистрировать отдельно? как проверять?
         var returnType = CacheFactory<TFactory>.ReturnType!;
         if (enumerableType != returnType && !enumerableType.IsAssignableToDefinition(returnType))
-            throw Ex.EnumerableTypeNotInheritedFromReturnType(enumerableType, returnType, nameof(factory));
+            throw Ex.EnumerableTypeNotInheritedFromReturnType(typeof(TFactory), enumerableType, returnType, nameof(factory));
 
         if (behavior == RegistrationBehavior.None)
         {

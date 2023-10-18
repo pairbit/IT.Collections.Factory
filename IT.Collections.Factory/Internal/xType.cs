@@ -5,23 +5,54 @@ namespace IT.Collections.Factory.Internal;
 internal static class xType
 {
     private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
+    internal static readonly Type IEnumerableGenericType = typeof(IEnumerable<>);
     private static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
     private static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
     private static readonly Type ArrayType = typeof(Array);
+
+    public static bool IsAssignableToEnumerable(this Type type) => type == ArrayType || type.IsAssignableToDefinition(IEnumerableGenericType);
 
     public static bool IsAssignableToDefinition(this Type type, Type baseType)
     {
         if (type.IsGenericTypeDefinition && baseType.IsGenericTypeDefinition)
         {
-            var typeArgumentsLength = type.GetGenericArguments().Length;
-            if (typeArgumentsLength != baseType.GetGenericArguments().Length) return false;
+            if (baseType.IsInterface)
+            {
+                var itypes = type.GetInterfaces();
+                for (int i = 0; i < itypes.Length; i++)
+                {
+                    var itype = itypes[i];
 
-            var typeArguments = new Type[typeArgumentsLength];
-            var intType = typeof(int);
-            for (int i = 0; i < typeArguments.Length; i++) typeArguments[i] = intType;
+                    if (!itype.IsGenericType) continue;
 
-            type = type.MakeGenericType(typeArguments);
-            baseType = baseType.MakeGenericType(typeArguments);
+                    if (!itype.IsGenericTypeDefinition)
+                    {
+                        itype = itype.GetGenericTypeDefinition();
+                    }
+
+                    if (itype == baseType) return true;
+                }
+
+                return false;
+            }
+
+            Type? typeBaseType;
+            do
+            {
+                typeBaseType = type.BaseType;
+                if (typeBaseType == baseType) return true;
+            } while (baseType != null);
+
+            return false;
+            //var typeArgumentsLength = type.GetGenericArguments().Length;
+            //if (typeArgumentsLength != baseType.GetGenericArguments().Length) return false;
+
+            //var typeArguments = new Type[typeArgumentsLength];
+            //var intType = typeof(int);
+            //for (int i = 0; i < typeArguments.Length; i++) typeArguments[i] = intType;
+
+            //type = type.MakeGenericType(typeArguments);
+            //baseType = baseType.MakeGenericType(typeArguments);
         }
 
         return baseType.IsAssignableFrom(type);
