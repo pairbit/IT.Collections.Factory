@@ -8,6 +8,8 @@ public sealed class ImmutableDictionaryFactory : IImmutableDictionaryFactory
 {
     public static readonly ImmutableDictionaryFactory Default = new();
 
+    public Type EnumerableType => typeof(ImmutableDictionary<,>);
+
     public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Equatable;
 
     public ImmutableDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull

@@ -5,7 +5,8 @@ using Internal;
 
 public class EnumerableFactoryRegistryTest
 {
-    private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry(50).RegisterFactoriesDefaultAndInterfaces();
+    private readonly static IEnumerableFactoryRegistry Registry = 
+        new EnumerableFactoryRegistry().RegisterFactoriesDefaultAndInterfaces();
 
     private readonly IEnumerableFactoryRegistry _registry;
     private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;

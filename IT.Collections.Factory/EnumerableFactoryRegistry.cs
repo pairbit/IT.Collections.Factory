@@ -1,14 +1,17 @@
 ﻿namespace IT.Collections.Factory;
 
+using Internal;
+
 public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, IEnumerableFactoryRegistrable>>
 {
+    public static readonly int CapacityDefault = 60;
+
     public static IEnumerableFactoryRegistry Global => GlobalEnumerableFactoryRegistry.Default;
 
-    public EnumerableFactoryRegistry(int capacity)
-        : base(new Dictionary<Type, IEnumerableFactoryRegistrable>(capacity))
-    {
+    public EnumerableFactoryRegistry() : this(-1) { }
 
-    }
+    public EnumerableFactoryRegistry(int capacity)
+        : base(new Dictionary<Type, IEnumerableFactoryRegistrable>(capacity == -1 ? CapacityDefault : capacity)) { }
 
     public override void Clear() => _dictionary.Clear();
 
@@ -31,7 +34,7 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
             }
             catch (ArgumentException)
             {
-                throw new ArgumentException($"Factory '{factory.GetType().FullName}' with type '{type.FullName}' is already registered", nameof(type));
+                throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
             }
             return true;
         }

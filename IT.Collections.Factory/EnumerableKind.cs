@@ -18,6 +18,10 @@ public enum EnumerableKind
     ComparableValue = 2 << 9,
     Comparable = ComparableKey | ComparableValue,
     ThreadSafe = 2 << 10,
-    //NoCapacity
     //LinkedList
+    //Stack
+    //Queue
+    //Generic
+    //KeyValue
+    //NoCapacity
 }

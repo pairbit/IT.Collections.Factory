@@ -8,6 +8,8 @@ public sealed class ImmutableArrayFactory : IImmutableListFactory
 {
     public static readonly ImmutableArrayFactory Default = new();
 
+    public Type EnumerableType => typeof(ImmutableArray<>);
+
     public EnumerableKind Kind => EnumerableKind.Fixed;
 
     public ImmutableArray<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableArray<T>.Empty;

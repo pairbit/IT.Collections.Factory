@@ -4,6 +4,8 @@ public class ListFactory : IListFactory, IReadOnlyListFactory
 {
     public static readonly ListFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(List<>);
+
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
     public virtual List<T> Empty<T>(in Comparers<T> comparers = default) =>

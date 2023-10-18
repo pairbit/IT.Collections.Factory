@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
-
-namespace IT.Collections.Factory.Factories;
+﻿namespace IT.Collections.Factory.Factories;
 
 public class ReadOnlyListFactory : IListFactory, IReadOnlyListFactory
 {
     public static readonly ReadOnlyListFactory Default = new();
+
+    public virtual Type EnumerableType => typeof(ReadOnlyCollection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
 

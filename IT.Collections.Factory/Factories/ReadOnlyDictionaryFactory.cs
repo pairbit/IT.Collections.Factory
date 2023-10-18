@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
-
-namespace IT.Collections.Factory.Factories;
+﻿namespace IT.Collections.Factory.Factories;
 
 public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory
 {
     public static readonly ReadOnlyDictionaryFactory Default = new();
+
+    public virtual Type EnumerableType => typeof(ReadOnlyDictionary<,>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.EquatableKey;
 

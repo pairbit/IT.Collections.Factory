@@ -1,7 +1,6 @@
 ﻿using IT.Collections.Equatable;
 using IT.Collections.Factory.Factories;
 using System.Collections.ObjectModel;
-using System.Drawing;
 
 namespace IT.Collections.Factory.Tests;
 

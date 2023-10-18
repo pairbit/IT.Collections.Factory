@@ -8,6 +8,8 @@ public sealed class ImmutableHashSetFactory : IImmutableSetFactory
 {
     public static readonly ImmutableHashSetFactory Default = new();
 
+    public Type EnumerableType => typeof(ImmutableHashSet<>);
+
     public EnumerableKind Kind => EnumerableKind.Unordered | EnumerableKind.Unique | EnumerableKind.Equatable;
 
     public ImmutableHashSet<T> Empty<T>(in Comparers<T> comparers = default)

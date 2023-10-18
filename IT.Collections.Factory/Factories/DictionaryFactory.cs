@@ -4,6 +4,8 @@ public class DictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory
 {
     public static readonly DictionaryFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(Dictionary<,>);
+
     public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.EquatableKey;
 
     public virtual Dictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull

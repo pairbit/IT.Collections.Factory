@@ -4,6 +4,8 @@ public class StackFactory : IReadOnlyCollectionFactory
 {
     public static readonly StackFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(Stack<>);
+
     public virtual EnumerableKind Kind => EnumerableKind.Reverse;
 
     public virtual Stack<T> Empty<T>(in Comparers<T> comparers = default) => new();

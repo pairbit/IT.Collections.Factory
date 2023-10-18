@@ -7,6 +7,8 @@ public class DictionaryFactoryDelegate<TDictionary, TKey, TValue> : IDictionaryF
     private readonly Func<TDictionary, KeyValuePair<TKey, TValue>, bool> _tryAdd;
     private readonly EnumerableKind _kind;
 
+    public Type EnumerableType => typeof(TDictionary);
+
     public EnumerableKind Kind => _kind;
 
     public DictionaryFactoryDelegate(

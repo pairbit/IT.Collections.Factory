@@ -7,6 +7,8 @@ public class DictionaryFactoryProxy<TDictionary, TKey, TValue> : IDictionaryFact
     private readonly IEnumerableKeyValueFactory _factory;
     private readonly Comparers<TKey, TValue> _comparers;
 
+    public Type EnumerableType => typeof(TDictionary);
+
     public EnumerableKind Kind => _factory.Kind | EnumerableKind.Proxy;
 
     public DictionaryFactoryProxy(IEnumerableKeyValueFactory factory, in Comparers<TKey, TValue> comparers = default)

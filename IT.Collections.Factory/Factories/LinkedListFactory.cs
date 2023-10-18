@@ -4,6 +4,8 @@ public class LinkedListFactory : ICollectionFactory
 {
     public static readonly LinkedListFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(LinkedList<>);
+
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
     public virtual LinkedList<T> Empty<T>(in Comparers<T> comparers = default) => new();

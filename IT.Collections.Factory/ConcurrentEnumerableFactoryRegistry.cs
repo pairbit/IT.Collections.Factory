@@ -1,12 +1,16 @@
 ﻿namespace IT.Collections.Factory;
 
+using Internal;
+
 public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>>
 {
-    public ConcurrentEnumerableFactoryRegistry(int concurrencyLevel, int capacity)
-        : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(concurrencyLevel == -1 ? Environment.ProcessorCount : concurrencyLevel, capacity))
-    {
+    public ConcurrentEnumerableFactoryRegistry() : this(-1, -1) { }
 
-    }
+    public ConcurrentEnumerableFactoryRegistry(int concurrencyLevel, int capacity)
+        : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(
+            concurrencyLevel == -1 ? Environment.ProcessorCount : concurrencyLevel, 
+            capacity == -1 ? EnumerableFactoryRegistry.CapacityDefault : capacity))
+    { }
 
     public override void Clear() => _dictionary.Clear();
 
@@ -23,7 +27,7 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            if (!_dictionary.TryAdd(type, factory)) throw new ArgumentException($"Factory '{factory.GetType().FullName}' with type '{type.FullName}' is already registered", nameof(type));
+            if (!_dictionary.TryAdd(type, factory)) throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
             return true;
         }
         throw new ArgumentOutOfRangeException(nameof(behavior));

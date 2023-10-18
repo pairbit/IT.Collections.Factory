@@ -5,7 +5,7 @@ namespace IT.Collections.Factory;
 internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegistry
 {
     private static readonly ConcurrentDictionary<Type, IEnumerableFactoryRegistrable> _dictionary 
-        = new(Environment.ProcessorCount, 100);
+        = new(Environment.ProcessorCount, EnumerableFactoryRegistry.CapacityDefault);
 
     public static readonly GlobalEnumerableFactoryRegistry Default = new();
 
@@ -31,12 +31,12 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
             }
         }
 
-        public static void Register(TFactory factory)
+        public static void Register(TFactory factory, Type type)
         {
             _factory = factory;
             _dictionary[typeof(TFactory)] = factory;
-            //TODO: EnumerableTypeDefinition как быть? Регистрировать отдельно? как проверять?
-            _dictionary[CacheFactory<TFactory>.EnumerableTypeDefinition!] = factory;
+            //TODO: EnumerableType как быть? Регистрировать отдельно? как проверять?
+            _dictionary[type] = factory;
         }
     }
 
@@ -50,28 +50,34 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
     public bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
+        var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(nameof(factory));
         if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
+
+        //TODO: EnumerableType как быть? Регистрировать отдельно? как проверять?
+        var returnType = CacheFactory<TFactory>.ReturnType!;
+        if (enumerableType != returnType && !enumerableType.IsAssignableToDefinition(returnType))
+            throw Ex.EnumerableTypeNotAssignableToReturnType(enumerableType, returnType, nameof(factory));
 
         if (behavior == RegistrationBehavior.None)
         {
             if (Check<TFactory>._registered) return false;
 
             Check<TFactory>._registered = true;
-            Cache<TFactory>.Register(factory);
+            Cache<TFactory>.Register(factory, returnType);
             return true;
         }
         if (behavior == RegistrationBehavior.OverwriteExisting)
         {
             Check<TFactory>._registered = true;
-            Cache<TFactory>.Register(factory);
+            Cache<TFactory>.Register(factory, returnType);
             return true;
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            if (Check<TFactory>._registered) throw new ArgumentException($"Factory '{factory.GetType().FullName}' with type '{typeof(TFactory).FullName}' is already registered");
+            if (Check<TFactory>._registered) throw Ex.FactoryTypeRegistered(factory.GetType(), typeof(TFactory));
 
             Check<TFactory>._registered = true;
-            Cache<TFactory>.Register(factory);
+            Cache<TFactory>.Register(factory, returnType);
             return true;
         }
         throw new ArgumentOutOfRangeException(nameof(behavior));

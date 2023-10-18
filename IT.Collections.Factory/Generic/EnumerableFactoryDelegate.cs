@@ -7,6 +7,8 @@ public class EnumerableFactoryDelegate<TEnumerable, T> : IEnumerableFactory<TEnu
     private readonly Func<TEnumerable, T, bool> _tryAdd;
     private readonly EnumerableKind _kind;
 
+    public Type EnumerableType => typeof(TEnumerable);
+
     public EnumerableKind Kind => _kind;
 
     public EnumerableFactoryDelegate(

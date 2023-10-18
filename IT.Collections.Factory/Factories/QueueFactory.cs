@@ -4,6 +4,8 @@ public class QueueFactory : IReadOnlyCollectionFactory
 {
     public static readonly QueueFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(Queue<>);
+
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
     public virtual Queue<T> Empty<T>(in Comparers<T> comparers = default) => new();

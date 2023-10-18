@@ -4,6 +4,8 @@ public class ConcurrentDictionaryFactory : IDictionaryFactory, IReadOnlyDictiona
 {
     public static readonly ConcurrentDictionaryFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(ConcurrentDictionary<,>);
+
     public virtual EnumerableKind Kind => EnumerableKind.Unordered | EnumerableKind.Unique | EnumerableKind.EquatableKey | EnumerableKind.ThreadSafe;
 
     public virtual ConcurrentDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull

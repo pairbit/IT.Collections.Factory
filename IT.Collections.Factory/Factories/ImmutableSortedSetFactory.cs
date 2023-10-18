@@ -8,6 +8,8 @@ public sealed class ImmutableSortedSetFactory : IImmutableSetFactory
 {
     public static readonly ImmutableSortedSetFactory Default = new();
 
+    public Type EnumerableType => typeof(ImmutableSortedSet<>);
+
     public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;
 
     public ImmutableSortedSet<T> Empty<T>(in Comparers<T> comparers = default)

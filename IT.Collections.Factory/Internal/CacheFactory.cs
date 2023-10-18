@@ -4,26 +4,26 @@ internal static class CacheFactory<TFactory> where TFactory : IEnumerableFactory
 {
     public static readonly bool IsValid;
     public static readonly string? Error;
-    public static readonly Type? EnumerableTypeDefinition;
+    public static readonly Type? ReturnType;
 
     static CacheFactory()
     {
         var factoryType = typeof(TFactory);
 
-        var isValid = factoryType.IsAssignableFromEnumerableFactory() ||
-                      factoryType.IsAssignableFromDictionaryFactory();
+        var isValid = factoryType.IsAssignableToEnumerableFactory() ||
+                      factoryType.IsAssignableToDictionaryFactory();
 
         if (isValid)
         {
-            var enumerableTypeDefinition = factoryType.GetEnumerableTypeDefinition();
+            var returnType = factoryType.GetReturnType();
 
-            if (enumerableTypeDefinition == null)
+            if (returnType == null)
             {
                 Error = $"Type '{typeof(TFactory).FullName}' not contains same return type";
                 isValid = false;
             }
 
-            EnumerableTypeDefinition = enumerableTypeDefinition;
+            ReturnType = returnType;
         }
         else
         {

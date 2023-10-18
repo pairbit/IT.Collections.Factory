@@ -4,6 +4,8 @@ public class SortedDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFa
 {
     public static readonly SortedDictionaryFactory Default = new();
 
+    public virtual Type EnumerableType => typeof(SortedDictionary<,>);
+
     public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.ComparableKey;
 
     public virtual SortedDictionary<TKey, TValue> Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers = default) where TKey : notnull

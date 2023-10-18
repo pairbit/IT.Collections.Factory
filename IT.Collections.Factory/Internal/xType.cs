@@ -11,10 +11,28 @@ internal static class xType
     public static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsAssignableFromEnumerableFactory(this Type type) => IEnumerableFactoryType.IsAssignableFrom(type);
+    public static bool IsAssignableToEnumerableFactory(this Type type) => IEnumerableFactoryType.IsAssignableFrom(type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsAssignableFromDictionaryFactory(this Type type) => IDictionaryFactoryType.IsAssignableFrom(type);
+    public static bool IsAssignableToDictionaryFactory(this Type type) => IDictionaryFactoryType.IsAssignableFrom(type);
+
+    public static bool IsAssignableToDefinition(this Type type, Type baseType)
+    {
+        if (type.IsGenericTypeDefinition && baseType.IsGenericTypeDefinition)
+        {
+            var typeArgumentsLength = type.GetGenericArguments().Length;
+            if (typeArgumentsLength != baseType.GetGenericArguments().Length) return false;
+
+            var typeArguments = new Type[typeArgumentsLength];
+            var intType = typeof(int);
+            for (int i = 0; i < typeArguments.Length; i++) typeArguments[i] = intType;
+
+            type = type.MakeGenericType(typeArguments);
+            baseType = baseType.MakeGenericType(typeArguments);
+        }
+
+        return baseType.IsAssignableFrom(type);
+    }
 
     public static Type GetGenericTypeDefinitionOrArray(this Type type)
         => type.IsArray ? typeof(Array) : type.GetGenericTypeDefinition();
@@ -63,9 +81,9 @@ internal static class xType
         return false;
     }
 
-    public static Type? GetEnumerableTypeDefinition(this Type factoryType)
+    public static Type? GetReturnType(this Type factoryType)
     {
-        if (factoryType.IsAssignableFromEnumerableFactory() || factoryType.IsAssignableFromDictionaryFactory())
+        if (factoryType.IsAssignableToEnumerableFactory() || factoryType.IsAssignableToDictionaryFactory())
         {
             var emptyMethod = factoryType.GetMethod(nameof(IEnumerableFactory.Empty), Bindings) ?? throw new InvalidOperationException($"Method '{factoryType.FullName}.{nameof(IEnumerableFactory.Empty)}' not found");
 

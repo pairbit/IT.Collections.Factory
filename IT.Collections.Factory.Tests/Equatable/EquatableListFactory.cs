@@ -7,6 +7,8 @@ public class EquatableListFactory : ListFactory
 {
     public static new readonly EquatableListFactory Default = new();
 
+    public override Type EnumerableType => typeof(EquatableList<>);
+
     public override EnumerableKind Kind => EnumerableKind.Equatable;
 
     public

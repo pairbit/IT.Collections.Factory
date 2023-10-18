@@ -8,6 +8,8 @@ public sealed class ImmutableQueueFactory : IImmutableQueueFactory
 {
     public static readonly ImmutableQueueFactory Default = new();
 
+    public Type EnumerableType => typeof(ImmutableQueue<>);
+
     public EnumerableKind Kind => EnumerableKind.None;
 
     public ImmutableQueue<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableQueue<T>.Empty;
