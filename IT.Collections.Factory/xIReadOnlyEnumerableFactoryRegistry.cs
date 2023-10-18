@@ -24,7 +24,8 @@ public static class xIReadOnlyEnumerableFactoryRegistry
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
         => registry.GetFactory<IDictionaryFactory<TDictionary, TKey, TValue>>();
 
-    internal static IEnumerableFactoryRegistrable? TryGetFactoryProxy(this IReadOnlyEnumerableFactoryRegistry registry, Type factoryType)
+    internal static IEnumerableFactoryRegistrable? TryGetFactoryProxy(
+        this IReadOnlyDictionary<Type, IEnumerableFactoryRegistrable> dictionary, Type factoryType)
     {
         if (factoryType.IsGenericType)
         {
@@ -34,7 +35,7 @@ public static class xIReadOnlyEnumerableFactoryRegistry
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
                 var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
 
-                if (registry.TryGetValue(enumerableTypeDefinition, out var factory))
+                if (dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
                 {
                     var proxy = typeof(EnumerableFactoryProxy<,>).MakeGenericType(factoryTypeGenericArguments);
                     return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableFactory)factory);
@@ -45,7 +46,7 @@ public static class xIReadOnlyEnumerableFactoryRegistry
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
                 var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
 
-                if (registry.TryGetValue(enumerableTypeDefinition, out var factory))
+                if (dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
                 {
                     var proxy = typeof(DictionaryFactoryProxy<,,>).MakeGenericType(factoryTypeGenericArguments);
                     return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableKeyValueFactory)factory);

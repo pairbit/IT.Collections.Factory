@@ -2,6 +2,8 @@
 
 public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, IEnumerableFactoryRegistrable>>
 {
+    public static IEnumerableFactoryRegistry Global => GlobalEnumerableFactoryRegistry.Default;
+
     public EnumerableFactoryRegistry(int capacity)
         : base(new Dictionary<Type, IEnumerableFactoryRegistrable>(capacity))
     {

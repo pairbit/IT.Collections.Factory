@@ -21,6 +21,8 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
         if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
 
         var factoryType = typeof(TFactory);
+
+        //TODO: EnumerableTypeDefinition как быть? Регистрировать отдельно? как проверять?
         var enumerableTypeDefinition = CacheFactory<TFactory>.EnumerableTypeDefinition!;
 
         return TryRegisterFactory(factoryType, factory, behavior) &

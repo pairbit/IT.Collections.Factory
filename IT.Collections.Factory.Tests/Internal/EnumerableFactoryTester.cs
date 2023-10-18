@@ -111,6 +111,7 @@ internal class EnumerableFactoryTester<T>
 
         var data = _data;
 
+        //TODO: Костыль IsThreadSafe
         if (enumerableType.HasOrdered() || enumerableType.IsThreadSafe())
         {
             data = enumerableType.IsUnique() ? _dataSortedUnique : _dataSorted;
@@ -137,7 +138,8 @@ internal class EnumerableFactoryTester<T>
         var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableType, List<T>, Comparers<T>)>
             (_capacity, BuilderState, in state, in _comparers);
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
-
+        
+        //TODO: Костыль IsThreadSafe
         if (enumerableType.IsUnordered() || enumerableType.IsThreadSafe())
         {
             withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
