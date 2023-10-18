@@ -1,8 +1,7 @@
-﻿using IT.Collections.Factory;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace System;
+namespace IT.Collections.Factory.Internal;
 
 internal static class xType
 {

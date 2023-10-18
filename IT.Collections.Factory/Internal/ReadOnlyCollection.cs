@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace IT.Collections.Factory.Internal;
+﻿namespace IT.Collections.Factory.Internal;
 
 internal class ReadOnlyCollection<T> : IReadOnlyCollection<T>
 {

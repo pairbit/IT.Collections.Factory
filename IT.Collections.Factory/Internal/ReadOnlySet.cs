@@ -1,7 +1,5 @@
 ﻿#if NET6_0_OR_GREATER
 
-using System.Collections;
-
 namespace IT.Collections.Factory.Internal;
 
 internal class ReadOnlySet<T> : IReadOnlySet<T>

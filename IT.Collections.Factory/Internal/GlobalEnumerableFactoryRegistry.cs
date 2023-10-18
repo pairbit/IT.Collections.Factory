@@ -1,6 +1,6 @@
-﻿using IT.Collections.Factory.Internal;
+﻿namespace IT.Collections.Factory;
 
-namespace IT.Collections.Factory;
+using Internal;
 
 internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegistry
 {
