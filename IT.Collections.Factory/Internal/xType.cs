@@ -22,37 +22,29 @@ internal static class xType
                 for (int i = 0; i < itypes.Length; i++)
                 {
                     var itype = itypes[i];
-
-                    if (!itype.IsGenericType) continue;
-
-                    if (!itype.IsGenericTypeDefinition)
+                    if (itype.IsGenericType)
                     {
-                        itype = itype.GetGenericTypeDefinition();
+                        if (!itype.IsGenericTypeDefinition) itype = itype.GetGenericTypeDefinition();
+                        if (itype == baseType) return true;
                     }
-
-                    if (itype == baseType) return true;
                 }
 
                 return false;
             }
 
-            Type? typeBaseType;
-            do
+            Type? typeBaseType = type.BaseType;
+            while (typeBaseType != null)
             {
-                typeBaseType = type.BaseType;
-                if (typeBaseType == baseType) return true;
-            } while (baseType != null);
+                if (typeBaseType.IsGenericType)
+                {
+                    if (!typeBaseType.IsGenericTypeDefinition) typeBaseType = typeBaseType.GetGenericTypeDefinition();
+                    if (typeBaseType == baseType) return true;
+                }
+
+                typeBaseType = typeBaseType.BaseType;
+            }
 
             return false;
-            //var typeArgumentsLength = type.GetGenericArguments().Length;
-            //if (typeArgumentsLength != baseType.GetGenericArguments().Length) return false;
-
-            //var typeArguments = new Type[typeArgumentsLength];
-            //var intType = typeof(int);
-            //for (int i = 0; i < typeArguments.Length; i++) typeArguments[i] = intType;
-
-            //type = type.MakeGenericType(typeArguments);
-            //baseType = baseType.MakeGenericType(typeArguments);
         }
 
         return baseType.IsAssignableFrom(type);
