@@ -17,16 +17,22 @@ public class EnumerableFactoryRegistryTest
     public EnumerableFactoryRegistryTest(IEnumerableFactoryRegistry registry)
     {
         registry.RegisterFactoriesDefaultAndInterfaces();
-        var hssFactory = new HashSetStringFactory(StringComparer.OrdinalIgnoreCase);
+
+        var comparer = StringComparer.OrdinalIgnoreCase;
+        var hssFactory = new HashSetStringFactory(comparer);
         registry.RegisterFactory(hssFactory);
         //registry.RegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hssFactory, RegistrationBehavior.None);
         registry.RegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hssFactory, RegistrationBehavior.None);
+
+        var dks = new DictionaryKeyStringFactory<int>(comparer);
+        registry.RegisterFactory(dks);
+        registry.RegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks);
 
         var factories = registry.Values.Distinct().ToArray();
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
 
         var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "", "g", "tt", "sdfsdf", "9089" };
-        var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
+        var comparers = comparer.ToComparers();
         
         _registry = registry;
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
@@ -93,15 +99,15 @@ public class EnumerableFactoryRegistryTest
     {
         var hssFactory = _registry.GetFactory<HashSetStringFactory>();
         Assert.That(hssFactory.Kind.IsProxy(), Is.False);
+        SetStringTest(hssFactory.New(10), hssFactory.Comparer == StringComparer.OrdinalIgnoreCase);
+        Assert.That(ReferenceEquals(hssFactory, _registry.GetFactory<HashSet<string>, string>()), Is.True);
+        Assert.That(ReferenceEquals(hssFactory, _registry.GetFactory<ISet<string>, string>()), Is.True);
 
-        var ignoreCase = hssFactory.Comparer == StringComparer.OrdinalIgnoreCase;
-        SetStringTest(hssFactory.New(10), ignoreCase);
-
-        var hhsFactory2 = _registry.GetFactory<HashSet<string>, string>();
-        Assert.That(ReferenceEquals(hssFactory, hhsFactory2), Is.True);
-
-        var hhsFactory3 = _registry.GetFactory<ISet<string>, string>();
-        Assert.That(ReferenceEquals(hssFactory, hhsFactory3), Is.True);
+        var dksFactory = _registry.GetFactory<DictionaryKeyStringFactory<int>>();
+        Assert.That(dksFactory.Kind.IsProxy(), Is.False);
+        DictionaryKeyStringTest(dksFactory.New(3), dksFactory.Comparer == StringComparer.OrdinalIgnoreCase, 5);
+        Assert.That(ReferenceEquals(dksFactory, _registry.GetFactory<Dictionary<string, int>, string, int>()), Is.True);
+        Assert.That(ReferenceEquals(dksFactory, _registry.GetFactory<IDictionary<string, int>, string, int>()), Is.True);
     }
 
     private void SetStringTest(ISet<string?> ss, bool ignoreCase)
@@ -122,6 +128,25 @@ public class EnumerableFactoryRegistryTest
             Assert.That(ss.Add("test"), Is.True);
             Assert.That(ss.Add("tEsT"), Is.True);
             Assert.That(ss.Count, Is.EqualTo(4));
+        }
+    }
+
+    private void DictionaryKeyStringTest<TValue>(IDictionary<string, TValue> dks, 
+        bool ignoreCase, TValue value)
+    {
+        if (ignoreCase)
+        {
+            Assert.That(dks.TryAdd("Test", value), Is.True);
+            Assert.That(dks.TryAdd("test", value), Is.False);
+            Assert.That(dks.TryAdd("tEsT", value), Is.False);
+            Assert.That(dks.Count, Is.EqualTo(1));
+        }
+        else
+        {
+            Assert.That(dks.TryAdd("Test", value), Is.True);
+            Assert.That(dks.TryAdd("test", value), Is.True);
+            Assert.That(dks.TryAdd("tEsT", value), Is.True);
+            Assert.That(dks.Count, Is.EqualTo(3));
         }
     }
 

@@ -7,6 +7,7 @@ internal static class xType
     private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
     internal static readonly Type IEnumerableGenericType = typeof(IEnumerable<>);
     private static readonly Type IEnumerableFactoryGenericType = typeof(Generic.IEnumerableFactory<,>);
+    private static readonly Type IDictionaryFactoryGenericType = typeof(Generic.IDictionaryFactory<,,>);
     private static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
     private static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
     private static readonly Type ArrayType = typeof(Array);
@@ -106,6 +107,17 @@ internal static class xType
 
     public static Type? TryGetReturnType(this Type factoryType, out string? error)
     {
+        if (factoryType.IsGenericType)
+        {
+            var factoryTypeDefinition = factoryType.GetGenericTypeDefinition();
+            if (factoryTypeDefinition == IEnumerableFactoryGenericType ||
+                factoryTypeDefinition == IDictionaryFactoryGenericType)
+            {
+                error = null;
+                return factoryType.GetGenericArguments()[0];
+            }
+        }
+
         if (!IEnumerableFactoryType.IsAssignableFrom(factoryType) &&
             !IDictionaryFactoryType.IsAssignableFrom(factoryType) &&
             !factoryType.IsAssignableToDefinition(IEnumerableFactoryGenericType))
