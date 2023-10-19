@@ -4,7 +4,7 @@ using Internal;
 
 public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Type, IEnumerableFactoryRegistrable>>
 {
-    public static readonly int CapacityDefault = 60;
+    public static readonly int CapacityDefault = 100;
 
     public static IEnumerableFactoryRegistry Global => GlobalEnumerableFactoryRegistry.Default;
 
