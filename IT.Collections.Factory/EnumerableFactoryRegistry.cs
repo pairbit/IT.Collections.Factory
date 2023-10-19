@@ -42,21 +42,14 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
 #if NETSTANDARD2_0 || NET461_OR_GREATER
-            try
-            {
-                _dictionary.Add(type, factory);
-            }
-            catch (ArgumentException)
-            {
-                if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+            if (_dictionary.TryGetValue(type, out var factoryRegistered))
+                return factoryRegistered.Equals(factory) ? true : throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
 
-                throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
-            }
+            _dictionary.Add(type, factory);
             return true;
 #else
             if (_dictionary.TryAdd(type, factory)) return true;
             if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
-
             throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
 #endif
         }
