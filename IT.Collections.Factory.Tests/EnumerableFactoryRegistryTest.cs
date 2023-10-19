@@ -119,8 +119,8 @@ public class EnumerableFactoryRegistryTest
         RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
     {
         var comparer = StringComparer.Ordinal;
-        var hssFactory = _hssFactory;//new HashSetStringFactory(comparer);
-        var dks = _dks;//new DictionaryKeyStringFactory<int>(StringComparer.Ordinal);
+        var hssFactory = new HashSetStringFactory(comparer);
+        var dks = new DictionaryKeyStringFactory<int>(comparer);
 
         return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
                registry.TryRegisterFactory(hssFactory, behavior) &

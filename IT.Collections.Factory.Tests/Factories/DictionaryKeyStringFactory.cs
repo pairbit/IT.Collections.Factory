@@ -2,7 +2,8 @@
 
 namespace IT.Collections.Factory.Tests;
 
-public class DictionaryKeyStringFactory<TValue> : IDictionaryFactory<Dictionary<string, TValue>, string, TValue>
+public class DictionaryKeyStringFactory<TValue> : IDictionaryFactory<Dictionary<string, TValue>, string, TValue>,
+    IEquatable<DictionaryKeyStringFactory<TValue>>
 {
     private readonly IEqualityComparer<string?>? _comparer;
 
@@ -44,4 +45,11 @@ public class DictionaryKeyStringFactory<TValue> : IDictionaryFactory<Dictionary<
 
         return dictionary;
     }
+
+    public override int GetHashCode() => HashCode.Combine(_comparer, GetType());
+
+    public override bool Equals(object obj) => Equals(obj as DictionaryKeyStringFactory<TValue>);
+
+    public bool Equals(DictionaryKeyStringFactory<TValue>? other)
+        => other != null && _comparer == other._comparer && GetType() == other.GetType();
 }
