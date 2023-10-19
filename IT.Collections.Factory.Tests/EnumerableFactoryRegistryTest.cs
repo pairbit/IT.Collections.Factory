@@ -5,8 +5,10 @@ using Internal;
 
 public class EnumerableFactoryRegistryTest
 {
-    private readonly static IEnumerableFactoryRegistry Registry = 
-        new EnumerableFactoryRegistry();
+    private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry();
+
+    private readonly static HashSetStringFactory _hssFactory = new(StringComparer.Ordinal);
+    private readonly static DictionaryKeyStringFactory<int> _dks = new(StringComparer.Ordinal);
 
     private readonly IEnumerableFactoryRegistry _registry;
     private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;
@@ -16,26 +18,15 @@ public class EnumerableFactoryRegistryTest
 
     public EnumerableFactoryRegistryTest(IEnumerableFactoryRegistry registry)
     {
-        registry.RegisterFactoriesDefaultAndInterfaces();
-
-        var comparer = StringComparer.Ordinal;
-        var hssFactory = new HashSetStringFactory(comparer);
-        registry.RegisterFactory(hssFactory);
-        //registry.RegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hssFactory, RegistrationBehavior.None);
-        registry.RegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hssFactory);
-
-        var dks = new DictionaryKeyStringFactory<int>(comparer);
-        registry.RegisterFactory(dks);
-        //registry.RegisterFactory<Generic.IDictionaryFactory<Dictionary<string, int>, string, int>>(dks, RegistrationBehavior.None);
-        registry.RegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks);
+        TryRegisterFactories(registry);
 
         var factories = registry.Values.Distinct().ToArray();
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
 
-        var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "", "g", "tt", "sdfsdf", "9089" };
+        var listStrings = new[] { "abc", "cc", "ABC", "34", "d", "", "g", "tt", "sdfsdf", "9089" };
         //TODO: с StringComparer.Ordinal тесты падают
         var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
-        
+
         _registry = registry;
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
         _dictionaryFactoryTester = new(factories.OfType<IEnumerableKeyValueFactory>().ToArray());
@@ -45,6 +36,18 @@ public class EnumerableFactoryRegistryTest
     public void Setup()
     {
 
+    }
+
+    [Test]
+    public void TryRegisterFactoriesTest()
+    {
+        var registryCount = _registry.Count;
+
+        Assert.That(TryRegisterFactories(_registry, RegistrationBehavior.None), Is.True);
+        Assert.That(TryRegisterFactories(_registry, RegistrationBehavior.OverwriteExisting), Is.True);
+        Assert.That(TryRegisterFactories(_registry, RegistrationBehavior.ThrowOnExisting), Is.True);
+
+        Assert.That(registryCount, Is.EqualTo(_registry.Count));
     }
 
     [Test]
@@ -112,6 +115,22 @@ public class EnumerableFactoryRegistryTest
         Assert.That(ReferenceEquals(dksFactory, _registry.GetFactory<IDictionary<string, int>, string, int>()), Is.True);
     }
 
+    private static bool TryRegisterFactories(IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
+    {
+        var comparer = StringComparer.Ordinal;
+        var hssFactory = _hssFactory;//new HashSetStringFactory(comparer);
+        var dks = _dks;//new DictionaryKeyStringFactory<int>(StringComparer.Ordinal);
+
+        return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
+               registry.TryRegisterFactory(hssFactory, behavior) &
+               registry.TryRegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hssFactory, behavior) &
+               registry.TryRegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hssFactory, behavior) &
+               registry.TryRegisterFactory(dks, behavior) &
+               registry.TryRegisterFactory<Generic.IDictionaryFactory<Dictionary<string, int>, string, int>>(dks, behavior) &
+               registry.TryRegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks, behavior);
+    }
+
     private void SetStringTest(ISet<string?> ss, bool ignoreCase)
     {
         Assert.That(ss.Add(null), Is.True);
@@ -133,7 +152,7 @@ public class EnumerableFactoryRegistryTest
         }
     }
 
-    private void DictionaryKeyStringTest<TValue>(IDictionary<string, TValue> dks, 
+    private void DictionaryKeyStringTest<TValue>(IDictionary<string, TValue> dks,
         bool ignoreCase, TValue value)
     {
         if (ignoreCase)

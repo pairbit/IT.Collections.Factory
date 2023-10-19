@@ -20,7 +20,20 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-        if (behavior == RegistrationBehavior.None) return _dictionary.TryAdd(type, factory);
+        if (behavior == RegistrationBehavior.None)
+        {
+#if NETSTANDARD2_0 || NET461_OR_GREATER
+            if (_dictionary.TryGetValue(type, out var factoryRegistered))
+                return factoryRegistered.Equals(factory);
+
+            _dictionary.Add(type, factory);
+            return true;
+#else
+            if (_dictionary.TryAdd(type, factory)) return true;
+            if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+            return false;
+#endif
+        }
         if (behavior == RegistrationBehavior.OverwriteExisting)
         {
             _dictionary[type] = factory;
@@ -28,16 +41,25 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
+#if NETSTANDARD2_0 || NET461_OR_GREATER
             try
             {
                 _dictionary.Add(type, factory);
             }
             catch (ArgumentException)
             {
+                if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+
                 throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
             }
             return true;
+#else
+            if (_dictionary.TryAdd(type, factory)) return true;
+            if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+
+            throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
+#endif
         }
-        throw new ArgumentOutOfRangeException(nameof(behavior));
+        throw Ex.BehaviorInvalid(behavior, nameof(behavior));
     }
 }

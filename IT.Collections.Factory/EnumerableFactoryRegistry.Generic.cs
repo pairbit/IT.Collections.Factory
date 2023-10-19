@@ -19,7 +19,6 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
     public virtual bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
-        //if (!behavior.IsValid()) throw Ex.BehaviorInvalid(behavior, nameof(behavior));
 
         var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(typeof(TFactory), nameof(factory));
         if (!enumerableType.IsAssignableToEnumerable()) throw Ex.EnumerableTypeNotEnumerable(typeof(TFactory), enumerableType, nameof(factory));
@@ -30,8 +29,8 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
         if (enumerableType != returnType && !enumerableType.IsAssignableToDefinition(returnType))
             throw Ex.EnumerableTypeNotInheritedFromReturnType(typeof(TFactory), enumerableType, returnType, nameof(factory));
 
-        return TryRegisterFactory(typeof(TFactory), factory, behavior) &
-               TryRegisterFactory(returnType, factory, behavior);
+        return TryRegisterFactory(returnType, factory, behavior) &
+               TryRegisterFactory(typeof(TFactory), factory, behavior);
     }
 
     public virtual TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable

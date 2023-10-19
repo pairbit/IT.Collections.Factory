@@ -50,7 +50,6 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
     public bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
         if (factory == null) throw new ArgumentNullException(nameof(factory));
-        //if (!behavior.IsValid()) throw Ex.BehaviorInvalid(behavior, nameof(behavior));
 
         var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(typeof(TFactory), nameof(factory));
         if (!enumerableType.IsAssignableToEnumerable()) throw Ex.EnumerableTypeNotEnumerable(typeof(TFactory), enumerableType, nameof(factory));
@@ -63,7 +62,8 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
 
         if (behavior == RegistrationBehavior.None)
         {
-            if (Check<TFactory>._registered) return false;
+            if (Check<TFactory>._registered)
+                return Cache<TFactory>._factory!.Equals(factory);
 
             Check<TFactory>._registered = true;
             Cache<TFactory>.Register(factory, returnType);
@@ -77,13 +77,17 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            if (Check<TFactory>._registered) throw Ex.FactoryTypeRegistered(factory.GetType(), typeof(TFactory));
+            if (Check<TFactory>._registered)
+            {
+                if (Cache<TFactory>._factory!.Equals(factory)) return true;
+                throw Ex.FactoryTypeRegistered(factory.GetType(), typeof(TFactory));
+            }
 
             Check<TFactory>._registered = true;
             Cache<TFactory>.Register(factory, returnType);
             return true;
         }
-        throw new ArgumentOutOfRangeException(nameof(behavior));
+        throw Ex.BehaviorInvalid(behavior, nameof(behavior));
     }
 
     public TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable

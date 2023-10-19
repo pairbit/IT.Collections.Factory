@@ -8,7 +8,7 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
 
     public ConcurrentEnumerableFactoryRegistry(int concurrencyLevel, int capacity)
         : base(new ConcurrentDictionary<Type, IEnumerableFactoryRegistrable>(
-            concurrencyLevel == -1 ? Environment.ProcessorCount : concurrencyLevel, 
+            concurrencyLevel == -1 ? Environment.ProcessorCount : concurrencyLevel,
             capacity == -1 ? EnumerableFactoryRegistry.CapacityDefault : capacity))
     { }
 
@@ -19,7 +19,14 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
         if (type == null) throw new ArgumentNullException(nameof(type));
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-        if (behavior == RegistrationBehavior.None) return _dictionary.TryAdd(type, factory);
+        if (behavior == RegistrationBehavior.None)
+        {
+            //_dictionary.GetOrAdd
+            if (_dictionary.TryAdd(type, factory)) return true;
+            if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+
+            return false;
+        }
         if (behavior == RegistrationBehavior.OverwriteExisting)
         {
             _dictionary[type] = factory;
@@ -27,9 +34,11 @@ public class ConcurrentEnumerableFactoryRegistry : EnumerableFactoryRegistry<Con
         }
         if (behavior == RegistrationBehavior.ThrowOnExisting)
         {
-            if (!_dictionary.TryAdd(type, factory)) throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
-            return true;
+            if (_dictionary.TryAdd(type, factory)) return true;
+            if (_dictionary.TryGetValue(type, out var factoryRegistered) && factoryRegistered.Equals(factory)) return true;
+
+            throw Ex.FactoryTypeRegistered(factory.GetType(), type, nameof(type));
         }
-        throw new ArgumentOutOfRangeException(nameof(behavior));
+        throw Ex.BehaviorInvalid(behavior, nameof(behavior));
     }
 }
