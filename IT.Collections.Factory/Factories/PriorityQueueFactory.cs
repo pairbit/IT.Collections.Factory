@@ -2,7 +2,7 @@
 
 namespace IT.Collections.Factory.Factories;
 
-internal class PriorityQueueFactory : IEnumerableFactory
+internal class PriorityQueueFactory : IEnumerableKeyValueTupleFactory
 {
     public static readonly PriorityQueueFactory Default = new();
 
@@ -40,25 +40,10 @@ internal class PriorityQueueFactory : IEnumerableFactory
         return priorityQueue;
     }
 
-    IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers)
-    {
-        throw new NotImplementedException();
-    }
-
-    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers)
-    {
-        throw new NotImplementedException();
-    }
-
-    IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers)
-    {
-        throw new NotImplementedException();
-    }
-
-    IEnumerable<T> IEnumerableFactory.New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers)
-    {
-        throw new NotImplementedException();
-    }
+    IEnumerable<(TKey, TValue)> IEnumerableKeyValueTupleFactory.Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers) => Empty(in comparers).UnorderedItems;
+    IEnumerable<(TKey, TValue)> IEnumerableKeyValueTupleFactory.New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers) => New(capacity, in comparers).UnorderedItems;
+    IEnumerable<(TKey, TValue)> IEnumerableKeyValueTupleFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<(TKey, TValue)> builder, in Comparers<TKey, TValue> comparers) => New(capacity, builder, in comparers).UnorderedItems;
+    IEnumerable<(TKey, TValue)> IEnumerableKeyValueTupleFactory.New<TKey, TValue, TState>(int capacity, EnumerableBuilder<(TKey, TValue), TState> builder, in TState state, in Comparers<TKey, TValue> comparers) => New(capacity, builder, in state, in comparers).UnorderedItems;
 }
 
 #endif

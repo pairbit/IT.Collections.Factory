@@ -61,7 +61,7 @@ public class HashSetStringFactory : IEnumerableFactory<HashSet<string?>, string?
 
     public override int GetHashCode() => HashCode.Combine(_comparer, GetType());
 
-    public override bool Equals(object obj) => Equals(obj as HashSetStringFactory);
+    public override bool Equals(object? obj) => Equals(obj as HashSetStringFactory);
 
     public bool Equals(HashSetStringFactory? other)
         => other != null && _comparer == other._comparer && GetType() == other.GetType();

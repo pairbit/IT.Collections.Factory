@@ -48,7 +48,7 @@ public class DictionaryKeyStringFactory<TValue> : IDictionaryFactory<Dictionary<
 
     public override int GetHashCode() => HashCode.Combine(_comparer, GetType());
 
-    public override bool Equals(object obj) => Equals(obj as DictionaryKeyStringFactory<TValue>);
+    public override bool Equals(object? obj) => Equals(obj as DictionaryKeyStringFactory<TValue>);
 
     public bool Equals(DictionaryKeyStringFactory<TValue>? other)
         => other != null && _comparer == other._comparer && GetType() == other.GetType();

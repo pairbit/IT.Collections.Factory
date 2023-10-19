@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
 	<NoWarn>$(NoWarn);IDE1006;IDE0049</NoWarn>
+	<SignAssembly>true</SignAssembly>
+	<AssemblyOriginatorKeyFile>..\IT.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

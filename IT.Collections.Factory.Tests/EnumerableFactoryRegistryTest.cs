@@ -56,6 +56,31 @@ public class EnumerableFactoryRegistryTest
     [Test]
     public void DictionaryFactoryTest() => _dictionaryFactoryTester.Test();
 
+#if !NET462
+    [Test]
+    public void EnumerableTupleFactoryTest()
+    {
+        var factories = _registry.Values.OfType<IEnumerableKeyValueTupleFactory>().Distinct().ToArray();
+        
+        Console.WriteLine($"{factories.Length} enumerable tuple factories");
+
+        foreach (var factory in factories)
+        {
+            var empty = factory.Empty<string,int>();
+            Assert.That(empty.Any(), Is.False);
+            if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
+            //if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+
+            var withBuilder = factory.New<string, int>(10, tryAdd => tryAdd(("data", 10)));
+            Assert.That(withBuilder.Any(), Is.True);
+            if (withBuilder.TryGetCount(out count)) Assert.That(count, Is.EqualTo(1));
+            //if (withBuilder.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(10));
+        }
+
+        //var factory1 = _registry.GetFactory<IEnumerable<(string, int)>, (string, int)>();
+    }
+#endif
+
     [Test]
     public void ManualTest()
     {

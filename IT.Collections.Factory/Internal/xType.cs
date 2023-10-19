@@ -9,7 +9,10 @@ internal static class xType
     private static readonly Type IEnumerableFactoryGenericType = typeof(Generic.IEnumerableFactory<,>);
     private static readonly Type IDictionaryFactoryGenericType = typeof(Generic.IDictionaryFactory<,,>);
     private static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
-    private static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
+    private static readonly Type IEnumerableKeyValueFactoryType = typeof(IEnumerableKeyValueFactory);
+#if !NET461
+    private static readonly Type IEnumerableKeyValueTupleFactoryType = typeof(IEnumerableKeyValueTupleFactory);
+#endif
     private static readonly Type ArrayType = typeof(Array);
 
     public static bool IsAssignableToEnumerable(this Type type) => type == ArrayType || type.IsAssignableToDefinition(IEnumerableGenericType);
@@ -119,10 +122,13 @@ internal static class xType
         }
 
         if (!IEnumerableFactoryType.IsAssignableFrom(factoryType) &&
-            !IDictionaryFactoryType.IsAssignableFrom(factoryType) &&
+            !IEnumerableKeyValueFactoryType.IsAssignableFrom(factoryType) &&
+#if !NET461
+            !IEnumerableKeyValueTupleFactoryType.IsAssignableFrom(factoryType) &&
+#endif
             !factoryType.IsAssignableToDefinition(IEnumerableFactoryGenericType))
         {
-            error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IDictionaryFactoryType.FullName}', '{IEnumerableFactoryGenericType.FullName}'";
+            error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IEnumerableKeyValueFactoryType.FullName}', '{IEnumerableFactoryGenericType.FullName}'";
             return null;
         }
         var emptyMethodName = nameof(IEnumerableFactory.Empty);
