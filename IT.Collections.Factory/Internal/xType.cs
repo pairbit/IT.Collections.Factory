@@ -18,8 +18,10 @@ internal static class xType
         if (baseType.IsGenericTypeDefinition)
         {
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
+            {
                 type = type.GetGenericTypeDefinition();
-
+                if (type == baseType) return true;
+            }
             if (baseType.IsInterface)
             {
                 var itypes = type.GetInterfaces();
@@ -38,7 +40,7 @@ internal static class xType
                 return false;
             }
 
-            Type? typeBaseType = type;
+            Type? typeBaseType = type.BaseType;
             while (typeBaseType != null)
             {
                 if (typeBaseType.IsGenericType)
@@ -108,7 +110,7 @@ internal static class xType
             !IDictionaryFactoryType.IsAssignableFrom(factoryType) &&
             !factoryType.IsAssignableToDefinition(IEnumerableFactoryGenericType))
         {
-            error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IDictionaryFactoryType.FullName}'";
+            error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IDictionaryFactoryType.FullName}', '{IEnumerableFactoryGenericType.FullName}'";
             return null;
         }
         var emptyMethodName = nameof(IEnumerableFactory.Empty);

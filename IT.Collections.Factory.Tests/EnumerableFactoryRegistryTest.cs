@@ -17,7 +17,10 @@ public class EnumerableFactoryRegistryTest
     public EnumerableFactoryRegistryTest(IEnumerableFactoryRegistry registry)
     {
         registry.RegisterFactoriesDefaultAndInterfaces();
-        registry.RegisterFactory(new HashSetStringFactory(StringComparer.OrdinalIgnoreCase));
+        var hssFactory = new HashSetStringFactory(StringComparer.OrdinalIgnoreCase);
+        registry.RegisterFactory(hssFactory);
+        //registry.RegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hssFactory, RegistrationBehavior.None);
+        registry.RegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hssFactory, RegistrationBehavior.None);
 
         var factories = registry.Values.Distinct().ToArray();
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
@@ -96,6 +99,9 @@ public class EnumerableFactoryRegistryTest
 
         var hhsFactory2 = _registry.GetFactory<HashSet<string>, string>();
         Assert.That(ReferenceEquals(hssFactory, hhsFactory2), Is.True);
+
+        var hhsFactory3 = _registry.GetFactory<ISet<string>, string>();
+        Assert.That(ReferenceEquals(hssFactory, hhsFactory3), Is.True);
     }
 
     private void SetStringTest(ISet<string?> ss, bool ignoreCase)
