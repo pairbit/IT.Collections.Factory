@@ -167,7 +167,11 @@ internal static class xType
             error = $"Type '{factoryType.FullName}' must contain the same return types of methods '{emptyMethodName}' and '{newMethodName}'";
             return null;
         }
-
+        if (!returnType.IsAssignableToEnumerable())
+        {
+            error = $"Return type '{returnType.FullName}' of methods '{emptyMethodName}' and '{newMethodName}' of type '{factoryType.FullName}' must implement type '{IEnumerableGenericType.FullName}'";
+            return null;
+        }
         error = null;
         if (returnType.FullName == null)
         {

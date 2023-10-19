@@ -6,7 +6,7 @@ internal static class Ex
         => new($"Property '{nameof(IEnumerableFactoryRegistrable.EnumerableType)}' of type '{factoryType.FullName}' must not be null", paramName);
 
     public static ArgumentException EnumerableTypeNotEnumerable(Type factoryType, Type enumerableType, string? paramName = null)
-        => new($"EnumerableType '{enumerableType.FullName}' must inherit type '{xType.IEnumerableGenericType.FullName}'", paramName);
+        => new($"EnumerableType '{enumerableType.FullName}' must implement type '{xType.IEnumerableGenericType.FullName}'", paramName);
 
     public static ArgumentException EnumerableTypeNotInheritedFromReturnType(Type factoryType, Type enumerableType, Type returnType, string? paramName = null)
         => new($"EnumerableType '{enumerableType.FullName}' must inherit return type '{returnType.FullName}'", paramName);
