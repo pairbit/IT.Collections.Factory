@@ -86,13 +86,16 @@ public class EnumerableFactoryRegistryTest
     }
 
     [Test]
-    public void GenericStringTest()
+    public void GenericStringFactoryTest()
     {
         var hssFactory = _registry.GetFactory<HashSetStringFactory>();
         Assert.That(hssFactory.Kind.IsProxy(), Is.False);
 
         var ignoreCase = hssFactory.Comparer == StringComparer.OrdinalIgnoreCase;
         SetStringTest(hssFactory.New(10), ignoreCase);
+
+        var hhsFactory2 = _registry.GetFactory<HashSet<string>, string>();
+        Assert.That(ReferenceEquals(hssFactory, hhsFactory2), Is.True);
     }
 
     private void SetStringTest(ISet<string?> ss, bool ignoreCase)

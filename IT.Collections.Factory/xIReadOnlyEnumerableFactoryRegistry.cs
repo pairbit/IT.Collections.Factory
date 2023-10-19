@@ -34,23 +34,27 @@ public static class xIReadOnlyEnumerableFactoryRegistry
             if (factoryTypeDefinition == typeof(IEnumerableFactory<,>))
             {
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
-                var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
+                var enumerableType = factoryTypeGenericArguments[0];
 
-                if (dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
+                if (dictionary.TryGetValue(enumerableType, out var factory)) return factory;
+                if (dictionary.TryGetValue(enumerableType.GetGenericTypeDefinition(), out factory) &&
+                    factory is IEnumerableFactory enumerableFactory)
                 {
                     var proxy = typeof(EnumerableFactoryProxy<,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableFactory)factory);
+                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, enumerableFactory);
                 }
             }
             else if (factoryTypeDefinition == typeof(IDictionaryFactory<,,>))
             {
                 var factoryTypeGenericArguments = factoryType.GetGenericArguments();
-                var enumerableTypeDefinition = factoryTypeGenericArguments[0].GetGenericTypeDefinition();
+                var enumerableType = factoryTypeGenericArguments[0];
 
-                if (dictionary.TryGetValue(enumerableTypeDefinition, out var factory))
+                if (dictionary.TryGetValue(enumerableType, out var factory)) return factory;
+                if (dictionary.TryGetValue(enumerableType.GetGenericTypeDefinition(), out factory) &&
+                    factory is IEnumerableKeyValueFactory enumerableKeyValueFactory)
                 {
                     var proxy = typeof(DictionaryFactoryProxy<,,>).MakeGenericType(factoryTypeGenericArguments);
-                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, (IEnumerableKeyValueFactory)factory);
+                    return (IEnumerableFactoryRegistrable?)Activator.CreateInstance(proxy, enumerableKeyValueFactory);
                 }
             }
         }

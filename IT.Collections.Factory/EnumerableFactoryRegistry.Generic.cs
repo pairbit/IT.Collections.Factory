@@ -37,18 +37,18 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
     public virtual TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable
     {
         var factoryType = typeof(TFactory);
-        if (_dictionary.TryGetValue(factoryType, out var factory)) return (TFactory?)factory;
+        if (_dictionary.TryGetValue(factoryType, out var factoryRegistrable)) return (TFactory?)factoryRegistrable;
 
-        factory = this.TryGetFactoryProxy(factoryType);
+        var factory = (TFactory?)this.TryGetFactoryProxy(factoryType);
         if (factory != null)
         {
             //Пробуем зарегистрировать прокси фабрику
             if (!TryRegisterFactory(factoryType, factory, RegistrationBehavior.None))
             {
                 //Кто-то успел зарегистрировать фабрику, получаем ее
-                factory = _dictionary[factoryType];
+                factory = (TFactory?)_dictionary[factoryType];
             }
-            return (TFactory?)factory;
+            return factory;
         }
         return default;
     }
