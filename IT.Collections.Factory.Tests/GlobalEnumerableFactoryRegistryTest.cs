@@ -3,7 +3,7 @@
 public class GlobalEnumerableFactoryRegistryTest : EnumerableFactoryRegistryTest
 {
     private static readonly IEnumerableFactoryRegistry Registry = 
-        EnumerableFactoryRegistry.Global.RegisterFactoriesDefaultAndInterfaces();
+        EnumerableFactoryRegistry.Global;
 
     public GlobalEnumerableFactoryRegistryTest() : base(Registry)
     {

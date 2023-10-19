@@ -73,6 +73,13 @@ public static class xIEnumerableFactoryRegistry
         => registry.TryRegisterFactoriesDefault(behavior) &
            registry.TryRegisterFactoriesDefaultInterfaces(behavior);
 
+    public static IEnumerableFactoryRegistry RegisterFactory<TFactory>(this IEnumerableFactoryRegistry registry, TFactory factory,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting) where TFactory : IEnumerableFactoryRegistrable
+    {
+        registry.TryRegisterFactory(factory, behavior);
+        return registry;
+    }
+
     public static IEnumerableFactoryRegistry RegisterFactoriesDefault(this IEnumerableFactoryRegistry registry,
         RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
     {

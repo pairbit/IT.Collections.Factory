@@ -6,7 +6,7 @@ using Internal;
 public class EnumerableFactoryRegistryTest
 {
     private readonly static IEnumerableFactoryRegistry Registry = 
-        new EnumerableFactoryRegistry().RegisterFactoriesDefaultAndInterfaces();
+        new EnumerableFactoryRegistry();
 
     private readonly IEnumerableFactoryRegistry _registry;
     private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;
@@ -16,13 +16,16 @@ public class EnumerableFactoryRegistryTest
 
     public EnumerableFactoryRegistryTest(IEnumerableFactoryRegistry registry)
     {
-        _registry = registry;
+        registry.RegisterFactoriesDefaultAndInterfaces();
+        registry.RegisterFactory(new HashSetStringFactory(StringComparer.OrdinalIgnoreCase));
+
         var factories = registry.Values.Distinct().ToArray();
         var enumerableFactories = factories.OfType<IEnumerableFactory>().ToArray();
 
         var listStrings = new [] { "abc", "cc", "ABC", "34", "d", "", "g", "tt", "sdfsdf", "9089" };
         var comparers = StringComparer.OrdinalIgnoreCase.ToComparers();
-
+        
+        _registry = registry;
         _enumerableFactoryTester = new(enumerableFactories, listStrings, comparers);
         _dictionaryFactoryTester = new(factories.OfType<IEnumerableKeyValueFactory>().ToArray());
     }
@@ -80,6 +83,37 @@ public class EnumerableFactoryRegistryTest
         GenericDictionaryFactoryTest<string, string>();
 
         Assert.That(registryCount + 6, Is.EqualTo(_registry.Count));
+    }
+
+    [Test]
+    public void GenericStringTest()
+    {
+        var hssFactory = _registry.GetFactory<HashSetStringFactory>();
+        Assert.That(hssFactory.Kind.IsProxy(), Is.False);
+
+        var ignoreCase = hssFactory.Comparer == StringComparer.OrdinalIgnoreCase;
+        SetStringTest(hssFactory.New(10), ignoreCase);
+    }
+
+    private void SetStringTest(ISet<string?> ss, bool ignoreCase)
+    {
+        Assert.That(ss.Add(null), Is.True);
+        Assert.That(ss.Add(null), Is.False);
+
+        if (ignoreCase)
+        {
+            Assert.That(ss.Add("Test"), Is.True);
+            Assert.That(ss.Add("test"), Is.False);
+            Assert.That(ss.Add("tEsT"), Is.False);
+            Assert.That(ss.Count, Is.EqualTo(2));
+        }
+        else
+        {
+            Assert.That(ss.Add("Test"), Is.True);
+            Assert.That(ss.Add("test"), Is.True);
+            Assert.That(ss.Add("tEsT"), Is.True);
+            Assert.That(ss.Count, Is.EqualTo(4));
+        }
     }
 
     private void GenericEnumerableFactoryTest<T>(int capacity = 20)

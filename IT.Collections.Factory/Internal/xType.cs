@@ -6,6 +6,7 @@ internal static class xType
 {
     private static readonly BindingFlags Bindings = BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
     internal static readonly Type IEnumerableGenericType = typeof(IEnumerable<>);
+    private static readonly Type IEnumerableFactoryGenericType = typeof(Generic.IEnumerableFactory<,>);
     private static readonly Type IEnumerableFactoryType = typeof(IEnumerableFactory);
     private static readonly Type IDictionaryFactoryType = typeof(IEnumerableKeyValueFactory);
     private static readonly Type ArrayType = typeof(Array);
@@ -14,8 +15,11 @@ internal static class xType
 
     public static bool IsAssignableToDefinition(this Type type, Type baseType)
     {
-        if (type.IsGenericTypeDefinition && baseType.IsGenericTypeDefinition)
+        if (baseType.IsGenericTypeDefinition)
         {
+            if (type.IsGenericType && !type.IsGenericTypeDefinition)
+                type = type.GetGenericTypeDefinition();
+
             if (baseType.IsInterface)
             {
                 var itypes = type.GetInterfaces();
@@ -24,7 +28,9 @@ internal static class xType
                     var itype = itypes[i];
                     if (itype.IsGenericType)
                     {
-                        if (!itype.IsGenericTypeDefinition) itype = itype.GetGenericTypeDefinition();
+                        if (!itype.IsGenericTypeDefinition)
+                            itype = itype.GetGenericTypeDefinition();
+
                         if (itype == baseType) return true;
                     }
                 }
@@ -32,12 +38,14 @@ internal static class xType
                 return false;
             }
 
-            Type? typeBaseType = type.BaseType;
+            Type? typeBaseType = type;
             while (typeBaseType != null)
             {
                 if (typeBaseType.IsGenericType)
                 {
-                    if (!typeBaseType.IsGenericTypeDefinition) typeBaseType = typeBaseType.GetGenericTypeDefinition();
+                    if (!typeBaseType.IsGenericTypeDefinition)
+                        typeBaseType = typeBaseType.GetGenericTypeDefinition();
+
                     if (typeBaseType == baseType) return true;
                 }
 
@@ -97,7 +105,8 @@ internal static class xType
     public static Type? TryGetReturnType(this Type factoryType, out string? error)
     {
         if (!IEnumerableFactoryType.IsAssignableFrom(factoryType) &&
-            !IDictionaryFactoryType.IsAssignableFrom(factoryType))
+            !IDictionaryFactoryType.IsAssignableFrom(factoryType) &&
+            !factoryType.IsAssignableToDefinition(IEnumerableFactoryGenericType))
         {
             error = $"Type '{factoryType.FullName}' must implement one of interfaces '{IEnumerableFactoryType.FullName}', '{IDictionaryFactoryType.FullName}'";
             return null;
@@ -140,9 +149,11 @@ internal static class xType
         }
 
         error = null;
-
-        if (returnType.IsArray) return ArrayType;
-        if (returnType.IsGenericType) return returnType.GetGenericTypeDefinition();
+        if (returnType.FullName == null)
+        {
+            if (returnType.IsArray) return returnType.BaseType;
+            if (returnType.IsGenericType) return returnType.GetGenericTypeDefinition();
+        }
         return returnType;
     }
 }
