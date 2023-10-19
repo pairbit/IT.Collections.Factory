@@ -102,30 +102,30 @@ public class EnumerableFactoryRegistryTest
     [Test]
     public void GenericStringFactoryTest()
     {
-        var hssFactory = _registry.GetFactory<HashSetStringFactory>();
-        Assert.That(hssFactory.Kind.IsProxy(), Is.False);
-        SetStringTest(hssFactory.New(10), hssFactory.Comparer == StringComparer.OrdinalIgnoreCase);
-        Assert.That(ReferenceEquals(hssFactory, _registry.GetFactory<HashSet<string>, string>()), Is.True);
-        Assert.That(ReferenceEquals(hssFactory, _registry.GetFactory<ISet<string>, string>()), Is.True);
+        var hss = _registry.GetFactory<HashSetStringFactory>();
+        Assert.That(hss.Kind.IsProxy(), Is.False);
+        SetStringTest(hss.New(10), hss.Comparer == StringComparer.OrdinalIgnoreCase);
+        Assert.That(hss.Equals(_registry.GetFactory<HashSet<string>, string>()), Is.True);
+        Assert.That(hss.Equals(_registry.GetFactory<ISet<string>, string>()), Is.True);
 
-        var dksFactory = _registry.GetFactory<DictionaryKeyStringFactory<int>>();
-        Assert.That(dksFactory.Kind.IsProxy(), Is.False);
-        DictionaryKeyStringTest(dksFactory.New(3), dksFactory.Comparer == StringComparer.OrdinalIgnoreCase, 5);
-        Assert.That(ReferenceEquals(dksFactory, _registry.GetFactory<Dictionary<string, int>, string, int>()), Is.True);
-        Assert.That(ReferenceEquals(dksFactory, _registry.GetFactory<IDictionary<string, int>, string, int>()), Is.True);
+        var dks = _registry.GetFactory<DictionaryKeyStringFactory<int>>();
+        Assert.That(dks.Kind.IsProxy(), Is.False);
+        DictionaryKeyStringTest(dks.New(3), dks.Comparer == StringComparer.OrdinalIgnoreCase, 5);
+        Assert.That(dks.Equals(_registry.GetFactory<Dictionary<string, int>, string, int>()), Is.True);
+        Assert.That(dks.Equals(_registry.GetFactory<IDictionary<string, int>, string, int>()), Is.True);
     }
 
     private static bool TryRegisterFactories(IEnumerableFactoryRegistry registry,
         RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
     {
         var comparer = StringComparer.Ordinal;
-        var hssFactory = new HashSetStringFactory(comparer);
+        var hss = new HashSetStringFactory(comparer);
         var dks = new DictionaryKeyStringFactory<int>(comparer);
 
         return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
-               registry.TryRegisterFactory(hssFactory, behavior) &
-               registry.TryRegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hssFactory, behavior) &
-               registry.TryRegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hssFactory, behavior) &
+               registry.TryRegisterFactory(hss, behavior) &
+               registry.TryRegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hss, behavior) &
+               registry.TryRegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hss, behavior) &
                registry.TryRegisterFactory(dks, behavior) &
                registry.TryRegisterFactory<Generic.IDictionaryFactory<Dictionary<string, int>, string, int>>(dks, behavior) &
                registry.TryRegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks, behavior);
