@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public sealed class ImmutableHashSetFactory : IImmutableSetFactory
+public sealed class ImmutableHashSetFactory : IImmutableSetFactory, IEquatable<ImmutableHashSetFactory>
 {
     public static readonly ImmutableHashSetFactory Default = new();
 
@@ -45,6 +45,12 @@ public sealed class ImmutableHashSetFactory : IImmutableSetFactory
 
         return hashSetBuilder.ToImmutable();
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ImmutableHashSetFactory);
+
+    public bool Equals(ImmutableHashSetFactory? other) => this == other || (other != null && other.GetType() == GetType());
 
     IImmutableSet<T> IImmutableSetFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IImmutableSet<T> IImmutableSetFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

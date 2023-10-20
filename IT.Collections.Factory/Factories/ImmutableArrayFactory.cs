@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public sealed class ImmutableArrayFactory : IImmutableListFactory
+public sealed class ImmutableArrayFactory : IImmutableListFactory, IEquatable<ImmutableArrayFactory>
 {
     public static readonly ImmutableArrayFactory Default = new();
 
@@ -46,6 +46,12 @@ public sealed class ImmutableArrayFactory : IImmutableListFactory
 
         return ImmutableArray.Create(array);
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ImmutableArrayFactory);
+
+    public bool Equals(ImmutableArrayFactory? other) => this == other || (other != null && other.GetType() == GetType());
 
     IImmutableList<T> IImmutableListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IImmutableList<T> IImmutableListFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

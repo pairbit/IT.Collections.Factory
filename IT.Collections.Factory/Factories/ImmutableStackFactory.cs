@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public sealed class ImmutableStackFactory : IImmutableStackFactory
+public sealed class ImmutableStackFactory : IImmutableStackFactory, IEquatable<ImmutableStackFactory>
 {
     public static readonly ImmutableStackFactory Default = new();
 
@@ -39,6 +39,12 @@ public sealed class ImmutableStackFactory : IImmutableStackFactory
 
         return stack;
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ImmutableStackFactory);
+
+    public bool Equals(ImmutableStackFactory? other) => this == other || (other != null && other.GetType() == GetType());
 
     IImmutableStack<T> IImmutableStackFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IImmutableStack<T> IImmutableStackFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

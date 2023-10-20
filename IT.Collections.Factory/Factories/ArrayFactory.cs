@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public sealed class ArrayFactory : IEnumerableFactory
+public sealed class ArrayFactory : IEnumerableFactory, IEquatable<ArrayFactory>
 {
     public static readonly ArrayFactory Default = new();
 
@@ -37,6 +37,13 @@ public sealed class ArrayFactory : IEnumerableFactory
 
         return array;
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ArrayFactory);
+
+    public bool Equals(ArrayFactory? other) => this == other || (other != null && other.GetType() == GetType());
+
     IEnumerable<T> IEnumerableFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
     IEnumerable<T> IEnumerableFactory.New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers) => New(capacity, builder, in comparers);

@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace IT.Collections.Factory.Factories;
 
-public sealed class ImmutableDictionaryFactory : IImmutableDictionaryFactory
+public sealed class ImmutableDictionaryFactory : IImmutableDictionaryFactory, IEquatable<ImmutableDictionaryFactory>
 {
     public static readonly ImmutableDictionaryFactory Default = new();
 
@@ -49,6 +49,13 @@ public sealed class ImmutableDictionaryFactory : IImmutableDictionaryFactory
 
         return dictionaryBuilder.ToImmutable();
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ImmutableDictionaryFactory);
+
+    public bool Equals(ImmutableDictionaryFactory? other) => this == other || (other != null && other.GetType() == GetType());
+
     IImmutableDictionary<TKey, TValue> IImmutableDictionaryFactory.Empty<TKey, TValue>(in Comparers<TKey, TValue> comparers) => Empty(in comparers);
     IImmutableDictionary<TKey, TValue> IImmutableDictionaryFactory.New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers) => New(capacity, in comparers);
     IImmutableDictionary<TKey, TValue> IImmutableDictionaryFactory.New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers) => New(capacity, builder, in comparers);
