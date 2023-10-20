@@ -2,7 +2,7 @@
 
 public class CollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<CollectionFactory>
 {
-    public static readonly CollectionFactory Default = new(ListFactory.Default);
+    public static readonly CollectionFactory Default = new();
 
     protected readonly IListFactory _factory;
 
@@ -10,14 +10,11 @@ public class CollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<
 
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
+    public CollectionFactory() : this(ListFactory.Default) { }
+
     public CollectionFactory(IListFactory factory)
     {
         _factory = factory ?? throw new ArgumentNullException(nameof(factory));
-    }
-
-    protected CollectionFactory()
-    {
-        _factory = null!;
     }
 
     public virtual Collection<T> Empty<T>(in Comparers<T> comparers = default) =>

@@ -64,12 +64,7 @@ public class FactoryTest
         Assert.That(new ListFactory().Equals(new EquatableListFactory()), Is.False);
         Assert.That(new CollectionFactory(new ListFactory()).Equals(CollectionFactory.Default), Is.True);
         Assert.That(new CollectionFactory(new EquatableListFactory()).Equals(CollectionFactory.Default), Is.False);
-#if NET5_0_OR_GREATER
         Assert.That(new ObservableCollectionFactory().Equals(ObservableCollectionFactory.Default), Is.True);
-#else
-        Assert.That(new ObservableCollectionFactory(new ListFactory()).Equals(ObservableCollectionFactory.Default), Is.True);
-        Assert.That(new ObservableCollectionFactory(new EquatableListFactory()).Equals(ObservableCollectionFactory.Default), Is.False);
-#endif
     }
 
     private void EquatableListTest(List<string?> list, int count = 0, int capacity = 0)

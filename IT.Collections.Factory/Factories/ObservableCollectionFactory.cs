@@ -2,21 +2,11 @@
 
 public class ObservableCollectionFactory : CollectionFactory
 {
-    public static new readonly ObservableCollectionFactory Default = new(
-#if !NET5_0_OR_GREATER
-        ListFactory.Default
-#endif
-        );
+    public static new readonly ObservableCollectionFactory Default = new();
 
     public override Type EnumerableType => typeof(ObservableCollection<>);
 
     public override EnumerableKind Kind => EnumerableKind.None;
-
-#if NET5_0_OR_GREATER
-    public ObservableCollectionFactory() { }
-#else
-    public ObservableCollectionFactory(IListFactory factory) : base(factory) { }
-#endif
 
     public
 #if NET5_0_OR_GREATER
