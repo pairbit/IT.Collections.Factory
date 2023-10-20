@@ -31,29 +31,38 @@ public class FactoryTest
     [Test]
     public void ObservableCollectionFactoryTest()
     {
+#if !NET5_0_OR_GREATER
+        ObservableCollectionFactoryTest(new MyObservableCollectionFactory());
+#endif
+        ObservableCollectionFactoryTest(ObservableCollectionFactory.Default);
+    }
+
+    public void ObservableCollectionFactoryTest(ObservableCollectionFactory factory)
+    {
         Assert.That(CollectionFactory.Default, Is.Not.EqualTo(ObservableCollectionFactory.Default));
 
-        var factory = ObservableCollectionFactory.Default;
+        var type = factory.EnumerableType;
 
-        CollectionTest(factory.Empty<string?>());
-        CollectionTest(factory.New<string?>(0));
-        CollectionTest(factory.New<string?>(0, null!));
-        CollectionTest(factory.New<string?, int>(0, null!, in _count));
+        CollectionTest(type, factory.Empty<string?>());
+        CollectionTest(type, factory.New<string?>(0));
+        CollectionTest(type, factory.New<string?>(0, null!));
+        CollectionTest(type, factory.New<string?, int>(0, null!, in _count));
 
-        CollectionTest(factory.New<string?>(10), count: 0);
-        CollectionTest(factory.New<string?>(11, Builder), count: 1);
-        CollectionTest(factory.New<string?, int>(12, BuilderState, in _count), count: _count);
+        CollectionTest(type, factory.New<string?>(10), count: 0);
+        CollectionTest(type, factory.New<string?>(11, Builder), count: 1);
+        CollectionTest(type, factory.New<string?, int>(12, BuilderState, in _count), count: _count);
 
         CollectionFactory baseFactory = factory;
 
-        CollectionTest(baseFactory.Empty<string?>());
-        CollectionTest(baseFactory.New<string?>(0));
-        CollectionTest(baseFactory.New<string?>(0, null!));
-        CollectionTest(baseFactory.New<string?, int>(0, null!, in _count));
+        type = baseFactory.EnumerableType;
+        CollectionTest(type, baseFactory.Empty<string?>());
+        CollectionTest(type, baseFactory.New<string?>(0));
+        CollectionTest(type, baseFactory.New<string?>(0, null!));
+        CollectionTest(type, baseFactory.New<string?, int>(0, null!, in _count));
 
-        CollectionTest(baseFactory.New<string?>(10), count: 0);
-        CollectionTest(baseFactory.New<string?>(11, Builder), count: 1);
-        CollectionTest(baseFactory.New<string?, int>(12, BuilderState, in _count), count: _count);
+        CollectionTest(type, baseFactory.New<string?>(10), count: 0);
+        CollectionTest(type, baseFactory.New<string?>(11, Builder), count: 1);
+        CollectionTest(type, baseFactory.New<string?, int>(12, BuilderState, in _count), count: _count);
     }
 
     [Test]
@@ -75,10 +84,11 @@ public class FactoryTest
         Assert.That(eqList.Capacity, Is.EqualTo(capacity));
     }
 
-    private void CollectionTest(Collection<string?> collection, int count = 0)
+    private void CollectionTest(Type typeDefinition, Collection<string?> collection, int count = 0)
     {
         var ocollection = (ObservableCollection<string?>)collection;
-
+        
+        Assert.That(ocollection.GetType().GetGenericTypeDefinition(), Is.EqualTo(typeDefinition));
         Assert.That(ocollection.Count, Is.EqualTo(count));
     }
 
