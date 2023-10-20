@@ -75,6 +75,7 @@ internal class DictionaryFactoryTester
     {
         var factoryType = factory.GetType();
         var newFactory = Activator.CreateInstance(factoryType);
+        Assert.That(newFactory, Is.Not.Null);
         Assert.That(newFactory == factory, Is.False);
         Assert.That(newFactory.Equals(factory), Is.True);
 

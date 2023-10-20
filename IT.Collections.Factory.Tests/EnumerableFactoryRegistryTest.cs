@@ -140,6 +140,9 @@ public class EnumerableFactoryRegistryTest
         DictionaryKeyStringTest(dks.New(3), dks.Comparer == StringComparer.OrdinalIgnoreCase, 5);
         Assert.That(dks.Equals(_registry.GetFactory<Dictionary<string, int>, string, int>()), Is.True);
         Assert.That(dks.Equals(_registry.GetFactory<IDictionary<string, int>, string, int>()), Is.True);
+        Assert.That(dks.Equals(_registry.GetFactory<ICollection<KeyValuePair<string, int>>, KeyValuePair<string, int>>()), Is.True);
+
+        Assert.That(_registry.GetFactory<ICollection<KeyValuePair<string, long>>, KeyValuePair<string, long>>().Kind.IsProxy(), Is.True);
     }
 
     private static bool TryRegisterFactories(IEnumerableFactoryRegistry registry,
@@ -158,7 +161,8 @@ public class EnumerableFactoryRegistryTest
                registry.TryRegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hss, behavior) &
                registry.TryRegisterFactory(dks, behavior) &
                registry.TryRegisterFactory<Generic.IDictionaryFactory<Dictionary<string, int>, string, int>>(dks, behavior) &
-               registry.TryRegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks, behavior);
+               registry.TryRegisterFactory<Generic.IDictionaryFactory<IDictionary<string, int>, string, int>>(dks, behavior) &
+               registry.TryRegisterFactory<Generic.IEnumerableFactory<ICollection<KeyValuePair<string, int>>, KeyValuePair<string, int>>>(dks, behavior);
     }
 
     private void SetStringTest(ISet<string?> ss, bool ignoreCase)
