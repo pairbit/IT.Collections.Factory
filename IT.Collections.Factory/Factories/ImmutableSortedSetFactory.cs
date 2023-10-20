@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableSortedSetFactory : IImmutableSetFactory, IEquatable<ImmutableSortedSetFactory>
 {
-    public static readonly ImmutableSortedSetFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableSortedSet<>);
 
     public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;

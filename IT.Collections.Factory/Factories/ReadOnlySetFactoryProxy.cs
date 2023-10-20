@@ -6,15 +6,13 @@ using Internal;
 
 public sealed class ReadOnlySetFactoryProxy : IReadOnlySetFactory, IEquatable<ReadOnlySetFactoryProxy>
 {
-    public static readonly ReadOnlySetFactoryProxy Default = new();
-
     private readonly IReadOnlySetFactory _factory;
 
     public Type EnumerableType => typeof(IReadOnlySet<>);
 
     public EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.Equatable;
 
-    public ReadOnlySetFactoryProxy() : this(HashSetFactory.Default) { }
+    public ReadOnlySetFactoryProxy() : this(EnumerableFactoryCache<HashSetFactory>.Default) { }
 
     public ReadOnlySetFactoryProxy(IReadOnlySetFactory factory)
     {

@@ -2,15 +2,13 @@
 
 public class CollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<CollectionFactory>
 {
-    public static readonly CollectionFactory Default = new();
-
     protected readonly IListFactory _factory;
 
     public virtual Type EnumerableType => typeof(Collection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
-    public CollectionFactory() : this(ListFactory.Default) { }
+    public CollectionFactory() : this(EnumerableFactoryCache<ListFactory>.Default) { }
 
     public CollectionFactory(IListFactory factory)
     {

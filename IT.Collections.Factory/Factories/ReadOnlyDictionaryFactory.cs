@@ -2,15 +2,13 @@
 
 public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory, IEquatable<ReadOnlyDictionaryFactory>
 {
-    public static readonly ReadOnlyDictionaryFactory Default = new();
-
     protected readonly IDictionaryFactory _factory;
 
     public virtual Type EnumerableType => typeof(ReadOnlyDictionary<,>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.EquatableKey;
 
-    public ReadOnlyDictionaryFactory() : this(DictionaryFactory.Default) { }
+    public ReadOnlyDictionaryFactory() : this(EnumerableFactoryCache<DictionaryFactory>.Default) { }
 
     public ReadOnlyDictionaryFactory(IDictionaryFactory factory)
     {

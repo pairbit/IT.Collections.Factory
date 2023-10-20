@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableSortedDictionaryFactory : IImmutableDictionaryFactory, IEquatable<ImmutableSortedDictionaryFactory>
 {
-    public static readonly ImmutableSortedDictionaryFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableSortedDictionary<,>);
 
     public EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.ComparableKey | EnumerableKind.EquatableValue;

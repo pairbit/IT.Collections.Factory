@@ -2,8 +2,6 @@
 
 public class DictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory, IEquatable<DictionaryFactory>
 {
-    public static readonly DictionaryFactory Default = new();
-
     public virtual Type EnumerableType => typeof(Dictionary<,>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.EquatableKey;

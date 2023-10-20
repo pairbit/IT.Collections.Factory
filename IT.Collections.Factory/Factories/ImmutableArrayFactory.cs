@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableArrayFactory : IImmutableListFactory, IEquatable<ImmutableArrayFactory>
 {
-    public static readonly ImmutableArrayFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableArray<>);
 
     public EnumerableKind Kind => EnumerableKind.Fixed;

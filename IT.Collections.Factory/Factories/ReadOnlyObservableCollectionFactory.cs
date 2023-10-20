@@ -2,15 +2,13 @@
 
 public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<ReadOnlyObservableCollectionFactory>
 {
-    public static readonly ReadOnlyObservableCollectionFactory Default = new();
-
     protected readonly ObservableCollectionFactory _factory;
 
     public virtual Type EnumerableType => typeof(ReadOnlyObservableCollection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
 
-    public ReadOnlyObservableCollectionFactory() : this(ObservableCollectionFactory.Default) { }
+    public ReadOnlyObservableCollectionFactory() : this(EnumerableFactoryCache<ObservableCollectionFactory>.Default) { }
 
     public ReadOnlyObservableCollectionFactory(ObservableCollectionFactory factory)
     {

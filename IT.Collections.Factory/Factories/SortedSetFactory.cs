@@ -5,8 +5,6 @@ public class SortedSetFactory : ISetFactory, IReadOnlyCollectionFactory, IEquata
     , IReadOnlySetFactory
 #endif
 {
-    public static readonly SortedSetFactory Default = new();
-
     public virtual Type EnumerableType => typeof(SortedSet<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;

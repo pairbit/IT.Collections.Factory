@@ -2,8 +2,6 @@
 
 public sealed class ArrayFactory : IEnumerableFactory, IEquatable<ArrayFactory>
 {
-    public static readonly ArrayFactory Default = new();
-
     public Type EnumerableType => typeof(Array);
 
     public EnumerableKind Kind => EnumerableKind.Fixed;

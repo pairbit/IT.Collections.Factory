@@ -2,8 +2,6 @@
 
 public class QueueFactory : IReadOnlyCollectionFactory, IEquatable<QueueFactory>
 {
-    public static readonly QueueFactory Default = new();
-
     public virtual Type EnumerableType => typeof(Queue<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.None;

@@ -4,8 +4,6 @@ namespace IT.Collections.Factory.Factories;
 
 internal class UnorderedPriorityQueueFactory : IEnumerableKeyValueTupleFactory
 {
-    public static readonly UnorderedPriorityQueueFactory Default = new();
-
     public Type EnumerableType => typeof(UnorderedPriorityQueue<,>);
 
     public EnumerableKind Kind => EnumerableKind.ComparableValue;

@@ -2,16 +2,13 @@
 
 public class BlockingCollectionFactory : IReadOnlyCollectionFactory, IEquatable<BlockingCollectionFactory>
 {
-    public static readonly BlockingCollectionFactory Default = new();
-
     private readonly IProducerConsumerCollectionFactory _factory;
 
     public virtual Type EnumerableType => typeof(BlockingCollection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe;
 
-    public BlockingCollectionFactory() 
-        : this(ConcurrentQueueFactory.Default) { }
+    public BlockingCollectionFactory() : this(EnumerableFactoryCache<ConcurrentQueueFactory>.Default) { }
 
     public BlockingCollectionFactory(IProducerConsumerCollectionFactory factory)
     {

@@ -2,8 +2,6 @@
 
 public class ConcurrentDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory, IEquatable<ConcurrentDictionaryFactory>
 {
-    public static readonly ConcurrentDictionaryFactory Default = new();
-
     private readonly int _concurrencyLevel;
 
     public virtual Type EnumerableType => typeof(ConcurrentDictionary<,>);

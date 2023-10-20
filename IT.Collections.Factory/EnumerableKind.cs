@@ -23,5 +23,6 @@ public enum EnumerableKind
     //Queue
     //Generic
     //KeyValue
+    //KeyNotNull
     //NoCapacity
 }

@@ -2,8 +2,6 @@
 
 public class ListFactory : IListFactory, IReadOnlyListFactory, IEquatable<ListFactory>
 {
-    public static readonly ListFactory Default = new();
-
     public virtual Type EnumerableType => typeof(List<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.None;

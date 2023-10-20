@@ -2,8 +2,6 @@
 
 public class ConcurrentQueueFactory : IProducerConsumerCollectionFactory, IReadOnlyCollectionFactory, IEquatable<ConcurrentQueueFactory>
 {
-    public static readonly ConcurrentQueueFactory Default = new();
-
     public virtual Type EnumerableType => typeof(ConcurrentQueue<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe;

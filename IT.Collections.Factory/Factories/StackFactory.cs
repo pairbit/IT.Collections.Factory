@@ -2,8 +2,6 @@
 
 public class StackFactory : IReadOnlyCollectionFactory, IEquatable<StackFactory>
 {
-    public static readonly StackFactory Default = new();
-
     public virtual Type EnumerableType => typeof(Stack<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Reverse;

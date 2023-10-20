@@ -4,15 +4,13 @@ using Internal;
 
 public sealed class ReadOnlyCollectionFactoryProxy : IReadOnlyCollectionFactory, IEquatable<ReadOnlyCollectionFactoryProxy>
 {
-    public static readonly ReadOnlyCollectionFactoryProxy Default = new();
-
     private readonly IReadOnlyCollectionFactory _factory;
 
     public Type EnumerableType => typeof(IReadOnlyCollection<>);
 
     public EnumerableKind Kind => EnumerableKind.ReadOnly;
 
-    public ReadOnlyCollectionFactoryProxy() : this(LinkedListFactory.Default) { }
+    public ReadOnlyCollectionFactoryProxy() : this(EnumerableFactoryCache<LinkedListFactory>.Default) { }
 
     public ReadOnlyCollectionFactoryProxy(IReadOnlyCollectionFactory factory)
     {

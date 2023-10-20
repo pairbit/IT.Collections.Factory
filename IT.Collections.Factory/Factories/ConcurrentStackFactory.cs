@@ -2,8 +2,6 @@
 
 public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadOnlyCollectionFactory, IEquatable<ConcurrentStackFactory>
 {
-    public static readonly ConcurrentStackFactory Default = new();
-
     public virtual Type EnumerableType => typeof(ConcurrentStack<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.ThreadSafe;

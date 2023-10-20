@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableHashSetFactory : IImmutableSetFactory, IEquatable<ImmutableHashSetFactory>
 {
-    public static readonly ImmutableHashSetFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableHashSet<>);
 
     public EnumerableKind Kind => EnumerableKind.Unordered | EnumerableKind.Unique | EnumerableKind.Equatable;

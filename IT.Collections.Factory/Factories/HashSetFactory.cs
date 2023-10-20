@@ -5,8 +5,6 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory, IEquatabl
     , IReadOnlySetFactory
 #endif
 {
-    public static readonly HashSetFactory Default = new();
-
     public virtual Type EnumerableType => typeof(HashSet<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.Equatable;

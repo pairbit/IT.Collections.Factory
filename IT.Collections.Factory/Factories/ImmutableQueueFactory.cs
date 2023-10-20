@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableQueueFactory : IImmutableQueueFactory, IEquatable<ImmutableQueueFactory>
 {
-    public static readonly ImmutableQueueFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableQueue<>);
 
     public EnumerableKind Kind => EnumerableKind.None;

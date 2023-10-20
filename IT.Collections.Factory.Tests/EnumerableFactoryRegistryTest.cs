@@ -7,8 +7,8 @@ public class EnumerableFactoryRegistryTest
 {
     private readonly static IEnumerableFactoryRegistry Registry = new EnumerableFactoryRegistry();
 
-    private readonly static HashSetStringFactory _hssFactory = new(StringComparer.Ordinal);
-    private readonly static DictionaryKeyStringFactory<int> _dks = new(StringComparer.Ordinal);
+    //private readonly static HashSetStringFactory _hss = new(StringComparer.Ordinal);
+    //private readonly static DictionaryKeyStringFactory<int> _dks = new(StringComparer.Ordinal);
 
     private readonly IEnumerableFactoryRegistry _registry;
     private readonly EnumerableFactoryTester<string?> _enumerableFactoryTester;
@@ -154,7 +154,7 @@ public class EnumerableFactoryRegistryTest
 
         return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
 #if NET6_0_OR_GREATER
-               registry.TryRegisterFactory(UnorderedPriorityQueueFactory.Default, behavior) &
+               registry.TryRegisterFactory<UnorderedPriorityQueueFactory>(behavior) &
 #endif
                registry.TryRegisterFactory(hss, behavior) &
                registry.TryRegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hss, behavior) &

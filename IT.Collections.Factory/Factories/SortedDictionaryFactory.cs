@@ -2,8 +2,6 @@
 
 public class SortedDictionaryFactory : IDictionaryFactory, IReadOnlyDictionaryFactory, IEquatable<SortedDictionaryFactory>
 {
-    public static readonly SortedDictionaryFactory Default = new();
-
     public virtual Type EnumerableType => typeof(SortedDictionary<,>);
 
     public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.ComparableKey;

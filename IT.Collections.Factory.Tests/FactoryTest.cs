@@ -12,7 +12,9 @@ public class FactoryTest
     [Test]
     public void EquatableListFactoryTest()
     {
-        Assert.That(ListFactory.Default, Is.Not.EqualTo(EquatableListFactory.Default));
+        Assert.That(
+            EnumerableFactoryCache<ListFactory>.Default,
+            Is.Not.EqualTo(EnumerableFactoryCache<EquatableListFactory>.Default));
 
         ListFactory factory = new EquatableListFactory();
 
@@ -34,12 +36,12 @@ public class FactoryTest
 #if !NET5_0_OR_GREATER
         ObservableCollectionFactoryTest(new MyObservableCollectionFactory());
 #endif
-        ObservableCollectionFactoryTest(ObservableCollectionFactory.Default);
+        ObservableCollectionFactoryTest(EnumerableFactoryCache<ObservableCollectionFactory>.Default);
     }
 
     public void ObservableCollectionFactoryTest(ObservableCollectionFactory factory)
     {
-        Assert.That(CollectionFactory.Default, Is.Not.EqualTo(ObservableCollectionFactory.Default));
+        Assert.That(EnumerableFactoryCache<CollectionFactory>.Default, Is.Not.EqualTo(EnumerableFactoryCache<ObservableCollectionFactory>.Default));
 
         var type = factory.EnumerableType;
 
@@ -71,9 +73,9 @@ public class FactoryTest
         Assert.That(new ListFactory().Equals(new ListFactory()), Is.True);
         Assert.That(new EquatableListFactory().Equals(new ListFactory()), Is.False);
         Assert.That(new ListFactory().Equals(new EquatableListFactory()), Is.False);
-        Assert.That(new CollectionFactory(new ListFactory()).Equals(CollectionFactory.Default), Is.True);
-        Assert.That(new CollectionFactory(new EquatableListFactory()).Equals(CollectionFactory.Default), Is.False);
-        Assert.That(new ObservableCollectionFactory().Equals(ObservableCollectionFactory.Default), Is.True);
+        Assert.That(new CollectionFactory(new ListFactory()).Equals(EnumerableFactoryCache<CollectionFactory>.Default), Is.True);
+        Assert.That(new CollectionFactory(new EquatableListFactory()).Equals(EnumerableFactoryCache<CollectionFactory>.Default), Is.False);
+        Assert.That(new ObservableCollectionFactory().Equals(EnumerableFactoryCache<ObservableCollectionFactory>.Default), Is.True);
     }
 
     private void EquatableListTest(List<string?> list, int count = 0, int capacity = 0)
@@ -87,7 +89,7 @@ public class FactoryTest
     private void CollectionTest(Type typeDefinition, Collection<string?> collection, int count = 0)
     {
         var ocollection = (ObservableCollection<string?>)collection;
-        
+
         Assert.That(ocollection.GetType().GetGenericTypeDefinition(), Is.EqualTo(typeDefinition));
         Assert.That(ocollection.Count, Is.EqualTo(count));
     }

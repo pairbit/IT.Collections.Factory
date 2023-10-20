@@ -6,8 +6,6 @@ namespace IT.Collections.Factory.Factories;
 
 public sealed class ImmutableStackFactory : IImmutableStackFactory, IEquatable<ImmutableStackFactory>
 {
-    public static readonly ImmutableStackFactory Default = new();
-
     public Type EnumerableType => typeof(ImmutableStack<>);
 
     public EnumerableKind Kind => EnumerableKind.Reverse;
