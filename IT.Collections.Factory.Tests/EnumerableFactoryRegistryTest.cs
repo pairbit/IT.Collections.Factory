@@ -69,12 +69,14 @@ public class EnumerableFactoryRegistryTest
             var empty = factory.Empty<string,int>();
             Assert.That(empty.Any(), Is.False);
             if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
-            //if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+            if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+
+            Console.Write($"Type '{empty.GetType().GetGenericTypeDefinitionOrArray().FullName}' is {factory.Kind}");
 
             var withBuilder = factory.New<string, int>(10, tryAdd => tryAdd(("data", 10)));
             Assert.That(withBuilder.Any(), Is.True);
             if (withBuilder.TryGetCount(out count)) Assert.That(count, Is.EqualTo(1));
-            //if (withBuilder.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(10));
+            if (withBuilder.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(10));
         }
 
         //var factory1 = _registry.GetFactory<IEnumerable<(string, int)>, (string, int)>();
@@ -148,6 +150,9 @@ public class EnumerableFactoryRegistryTest
         var dks = new DictionaryKeyStringFactory<int>(comparer);
 
         return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
+#if NET6_0_OR_GREATER
+               registry.TryRegisterFactory(UnorderedPriorityQueueFactory.Default, behavior) &
+#endif
                registry.TryRegisterFactory(hss, behavior) &
                registry.TryRegisterFactory<Generic.IEnumerableFactory<HashSet<string?>, string?>>(hss, behavior) &
                registry.TryRegisterFactory<Generic.IEnumerableFactory<ISet<string?>, string?>>(hss, behavior) &

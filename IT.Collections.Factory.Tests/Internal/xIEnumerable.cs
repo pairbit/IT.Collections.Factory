@@ -78,4 +78,18 @@ internal static class xIEnumerable
 #endif
         return false;
     }
+
+    public static bool TryGetCapacity<TKey, TValue>(this IEnumerable<(TKey, TValue)> enumerable, out int capacity)
+        where TKey : notnull
+    {
+        if (enumerable.TryGetCapacity<(TKey, TValue)>(out capacity)) return true;
+#if NET6_0_OR_GREATER
+        if (enumerable is PriorityQueue<TKey, TValue> priorityQueue)
+        {
+            capacity = priorityQueue.EnsureCapacity(0);
+            return true;
+        }
+#endif
+        return false;
+    }
 }
