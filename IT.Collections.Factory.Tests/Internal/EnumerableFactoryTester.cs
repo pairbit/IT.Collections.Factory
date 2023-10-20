@@ -230,22 +230,12 @@ internal class EnumerableFactoryTester<T>
         if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, T)>[span.Length];
-            if (kind.IsReverse())
+            for (int i = 0; i < span.Length; i++)
             {
-                for (int i = span.Length - 1; i >= 0; i--)
-                {
-                    var item = span[i];
-                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
-                }
+                var item = span[i];
+                tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
             }
-            else
-            {
-                for (int i = 0; i < span.Length; i++)
-                {
-                    var item = span[i];
-                    tasks[i] = Task.Run<(bool, T)>(() => tryAdd(item) ? (true, item) : (false, item));
-                }
-            }
+
             Task.WaitAll(tasks);
 
             for (int i = 0; i < tasks.Length; i++)

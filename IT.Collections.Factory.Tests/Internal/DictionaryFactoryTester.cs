@@ -182,22 +182,13 @@ internal class DictionaryFactoryTester
         if (kind.IsThreadSafe())
         {
             var tasks = new Task<(bool, int)>[array.Length];
-            if (kind.IsReverse())
+
+            for (int i = 0; i < array.Length; i++)
             {
-                for (int i = array.Length - 1; i >= 0; i--)
-                {
-                    var item = array[i];
-                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
-                }
+                var item = array[i];
+                tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
             }
-            else
-            {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    var item = array[i];
-                    tasks[i] = Task.Run<(bool, int)>(() => tryAdd(item) ? (true, item.Key) : (false, item.Key));
-                }
-            }
+
             Task.WaitAll(tasks);
 
             for (int i = 0; i < tasks.Length; i++)
