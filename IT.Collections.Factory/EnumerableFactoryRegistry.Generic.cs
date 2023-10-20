@@ -14,23 +14,30 @@ public abstract class EnumerableFactoryRegistry<TDictionary> : IEnumerableFactor
 
     public abstract void Clear();
 
-    public abstract bool TryRegisterFactory(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior);
+    protected abstract bool TryRegisterFactoryInternal(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior);
+
+    public virtual bool TryRegisterFactory(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
+    {
+        if (type == null) throw new ArgumentNullException(nameof(type));
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+        return TryRegisterFactoryInternal(type, factory, behavior);
+    }
 
     public virtual bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
+        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
         var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(typeof(TFactory), nameof(factory));
         if (!enumerableType.IsAssignableToEnumerable()) throw Ex.EnumerableTypeNotEnumerable(typeof(TFactory), enumerableType, nameof(factory));
-        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
 
-        //TODO: EnumerableType как быть? Регистрировать отдельно? как проверять?
         var returnType = CacheFactory<TFactory>.ReturnType!;
         if (enumerableType != returnType && !enumerableType.IsAssignableToDefinition(returnType))
             throw Ex.EnumerableTypeNotInheritedFromReturnType(typeof(TFactory), enumerableType, returnType, nameof(factory));
 
-        return TryRegisterFactory(returnType, factory, behavior) &
-               TryRegisterFactory(typeof(TFactory), factory, behavior);
+        return TryRegisterFactoryInternal(returnType, factory, behavior) &
+               TryRegisterFactoryInternal(typeof(TFactory), factory, behavior);
     }
 
     public virtual TFactory? TryGetFactory<TFactory>() where TFactory : IEnumerableFactoryRegistrable

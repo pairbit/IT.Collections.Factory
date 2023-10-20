@@ -6,7 +6,7 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
 {
     public static readonly int CapacityDefault = 100;
 
-    public static IEnumerableFactoryRegistry Global => GlobalEnumerableFactoryRegistry.Default;
+    internal static IEnumerableFactoryRegistry Global => GlobalEnumerableFactoryRegistry.Default;
 
     public EnumerableFactoryRegistry() : this(-1) { }
 
@@ -15,11 +15,8 @@ public class EnumerableFactoryRegistry : EnumerableFactoryRegistry<Dictionary<Ty
 
     public override void Clear() => _dictionary.Clear();
 
-    public override bool TryRegisterFactory(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
+    protected override bool TryRegisterFactoryInternal(Type type, IEnumerableFactoryRegistrable factory, RegistrationBehavior behavior)
     {
-        if (type == null) throw new ArgumentNullException(nameof(type));
-        if (factory == null) throw new ArgumentNullException(nameof(factory));
-
         if (behavior == RegistrationBehavior.None)
         {
 #if NETSTANDARD2_0 || NET461_OR_GREATER

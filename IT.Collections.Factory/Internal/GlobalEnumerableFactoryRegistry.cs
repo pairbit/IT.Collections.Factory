@@ -4,7 +4,7 @@ using Internal;
 
 internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegistry
 {
-    private static readonly ConcurrentDictionary<Type, IEnumerableFactoryRegistrable> _dictionary 
+    private static readonly ConcurrentDictionary<Type, IEnumerableFactoryRegistrable> _dictionary
         = new(Environment.ProcessorCount, EnumerableFactoryRegistry.CapacityDefault);
 
     public static readonly GlobalEnumerableFactoryRegistry Default = new();
@@ -42,20 +42,19 @@ internal sealed class GlobalEnumerableFactoryRegistry : IEnumerableFactoryRegist
 
     private GlobalEnumerableFactoryRegistry() { }
 
-    public bool IsRegistered<TFactory>() where TFactory : IEnumerableFactoryRegistrable 
+    public bool IsRegistered<TFactory>() where TFactory : IEnumerableFactoryRegistrable
         => Check<TFactory>._registered;
 
     public void Clear() => _dictionary.Clear();
 
     public bool TryRegisterFactory<TFactory>(TFactory factory, RegistrationBehavior behavior) where TFactory : IEnumerableFactoryRegistrable
     {
+        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
         if (factory == null) throw new ArgumentNullException(nameof(factory));
 
         var enumerableType = factory.EnumerableType ?? throw Ex.EnumerableTypeIsNull(typeof(TFactory), nameof(factory));
         if (!enumerableType.IsAssignableToEnumerable()) throw Ex.EnumerableTypeNotEnumerable(typeof(TFactory), enumerableType, nameof(factory));
-        if (!CacheFactory<TFactory>.IsValid) throw new ArgumentException(CacheFactory<TFactory>.Error);
 
-        //TODO: EnumerableType как быть? Регистрировать отдельно? как проверять?
         var returnType = CacheFactory<TFactory>.ReturnType!;
         if (enumerableType != returnType && !enumerableType.IsAssignableToDefinition(returnType))
             throw Ex.EnumerableTypeNotInheritedFromReturnType(typeof(TFactory), enumerableType, returnType, nameof(factory));
