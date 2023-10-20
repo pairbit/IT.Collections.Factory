@@ -73,6 +73,11 @@ internal class DictionaryFactoryTester
 
     public void Test(IEnumerableKeyValueFactory factory)
     {
+        var factoryType = factory.GetType();
+        var newFactory = Activator.CreateInstance(factoryType);
+        Assert.That(newFactory == factory, Is.False);
+        Assert.That(newFactory.Equals(factory), Is.True);
+
         var empty = factory.Empty<int, int>();
         Assert.That(empty.Any(), Is.False);
         if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
