@@ -21,7 +21,7 @@ var list = listFactory.New<int>(10);
 Assert.That(list.Capacity, Is.EqualTo(10));
 ```
 
-## Get IReadOnlySetFactory from registry and create empty List with 10 capacity
+## Get IReadOnlySetFactory and create hash set with ignore case comparer and add strings
 
 ```csharp
 #if NET6_0_OR_GREATER
