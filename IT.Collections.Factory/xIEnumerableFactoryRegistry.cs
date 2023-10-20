@@ -25,7 +25,7 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory(CollectionFactory.Default, behavior) &
            registry.TryRegisterFactory(ObservableCollectionFactory.Default, behavior) &
            registry.TryRegisterFactory(ReadOnlyObservableCollectionFactory.Default, behavior) &
-           registry.TryRegisterFactory(ReadOnlyListFactory.Default, behavior) &
+           registry.TryRegisterFactory(ReadOnlyCollectionFactory.Default, behavior) &
 #if NETCOREAPP3_1_OR_GREATER
            registry.TryRegisterFactory(ImmutableArrayFactory.Default, behavior) &
            registry.TryRegisterFactory(ImmutableListFactory.Default, behavior) &
@@ -51,10 +51,10 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<ICollectionFactory>(LinkedListFactory.Default, behavior) &
            registry.TryRegisterFactory<IListFactory>(ListFactory.Default, behavior) &
            registry.TryRegisterFactory<ISetFactory>(HashSetFactory.Default, behavior) &
-           registry.TryRegisterFactory<IReadOnlyCollectionFactory>(ReadOnlyLinkedListFactory.Default, behavior) &
-           registry.TryRegisterFactory<IReadOnlyListFactory>(ReadOnlyListFactory.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlyCollectionFactory>(ReadOnlyCollectionFactoryProxy.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlyListFactory>(ReadOnlyCollectionFactory.Default, behavior) &
 #if NET6_0_OR_GREATER
-           registry.TryRegisterFactory<IReadOnlySetFactory>(ReadOnlyHashSetFactory.Default, behavior) &
+           registry.TryRegisterFactory<IReadOnlySetFactory>(ReadOnlySetFactoryProxy.Default, behavior) &
 #endif
 #if NETCOREAPP3_1_OR_GREATER
            registry.TryRegisterFactory<IImmutableListFactory>(ImmutableListFactory.Default, behavior) &

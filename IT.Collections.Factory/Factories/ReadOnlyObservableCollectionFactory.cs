@@ -1,43 +1,78 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFactory
+public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<ReadOnlyObservableCollectionFactory>
 {
     public static readonly ReadOnlyObservableCollectionFactory Default = new();
+
+    protected readonly ObservableCollectionFactory _factory;
 
     public virtual Type EnumerableType => typeof(ReadOnlyObservableCollection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
 
-    public virtual ReadOnlyObservableCollection<T> Empty<T>(in Comparers<T> comparers = default) => Cache<T>.Empty;
+    public ReadOnlyObservableCollectionFactory() : this(ObservableCollectionFactory.Default) { }
+
+    public ReadOnlyObservableCollectionFactory(ObservableCollectionFactory factory)
+    {
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+    }
+
+    public virtual ReadOnlyObservableCollection<T> Empty<T>(in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        Cache<T>.Empty;
+#else
+        NewCollection(null, in comparers);
+#endif
 
     public virtual ReadOnlyObservableCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
-    {
-        throw new NotSupportedException();
-    }
+        => throw new NotSupportedException();
 
     public virtual ReadOnlyObservableCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return Cache<T>.Empty;
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        Cache<T>.Empty;
+#else
+        NewCollection(null, in comparers);
+#endif
 
-        var collection = new ObservableCollection<T>();
-
-        builder(item => { collection.Add(item); return true; });
-
-        return new(collection);
+        return
+#if NET5_0_OR_GREATER
+        new(_factory.New(capacity, builder, in comparers));
+#else
+        NewCollection(_factory.New(capacity, builder, in comparers), in comparers);
+#endif
     }
 
     public virtual ReadOnlyObservableCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return Cache<T>.Empty;
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        Cache<T>.Empty;
+#else
+        NewCollection(null, in comparers);
+#endif
 
-        var collection = new ObservableCollection<T>();
-
-        builder(item => { collection.Add(item); return true; }, in state);
-
-        return new(collection);
+        return
+#if NET5_0_OR_GREATER
+        new(_factory.New(capacity, builder, in state, in comparers));
+#else
+        NewCollection(_factory.New(capacity, builder, in state, in comparers), in comparers);
+#endif
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType(), _factory);
+
+    public override bool Equals(object? obj) => Equals(obj as ReadOnlyObservableCollectionFactory);
+
+    public bool Equals(ReadOnlyObservableCollectionFactory? other)
+        => this == other || (other != null && other.GetType() == GetType() &&
+        (_factory == other._factory || (_factory != null && _factory.Equals(other._factory))));
+
+#if !NET5_0_OR_GREATER
+    protected virtual ReadOnlyObservableCollection<T> NewCollection<T>(ObservableCollection<T>? collection, in Comparers<T> comparers)
+        => collection == null ? Cache<T>.Empty : new(collection);
+#endif
 
     static class Cache<T>
     {
