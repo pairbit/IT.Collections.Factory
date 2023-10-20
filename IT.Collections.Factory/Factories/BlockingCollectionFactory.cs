@@ -1,45 +1,60 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class BlockingCollectionFactory : IReadOnlyCollectionFactory
+public class BlockingCollectionFactory : IReadOnlyCollectionFactory, IEquatable<BlockingCollectionFactory>
 {
-    public static readonly BlockingCollectionFactory Default = new();
+    public static readonly BlockingCollectionFactory Default
+        = new(ConcurrentQueueFactory.Default);
+
+    private readonly IProducerConsumerCollectionFactory _factory;
 
     public virtual Type EnumerableType => typeof(BlockingCollection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe;
 
-    public virtual BlockingCollection<T> Empty<T>(in Comparers<T> comparers = default) => new();
-
-    public virtual BlockingCollection<T> New<T>(int capacity, in Comparers<T> comparers = default)
+    public BlockingCollectionFactory(IProducerConsumerCollectionFactory factory)
     {
-        if (capacity == 0) return new();
-
-        return new(new ConcurrentQueue<T>(), capacity);
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
     }
 
-    public virtual BlockingCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return new();
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+    public virtual BlockingCollection<T> Empty<T>(in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(_factory.Empty(in comparers));
+#else
+        NewCollection(_factory.Empty(in comparers), in comparers);
+#endif
 
-        var queue = new ConcurrentQueue<T>();
+    public virtual BlockingCollection<T> New<T>(int capacity, in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(_factory.New(capacity, in comparers));
+#else
+        NewCollection(_factory.New(capacity, in comparers), in comparers);
+#endif
 
-        builder(((IProducerConsumerCollection<T>)queue).TryAdd);
+    public virtual BlockingCollection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(_factory.New(capacity, builder, in comparers));
+#else
+        NewCollection(_factory.New(capacity, builder, in comparers), in comparers);
+#endif
 
-        return new(queue, capacity);
-    }
+    public virtual BlockingCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(_factory.New(capacity, builder, in state, in comparers));
+#else
+        NewCollection(_factory.New(capacity, builder, in state, in comparers), in comparers);
+#endif
 
-    public virtual BlockingCollection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return new();
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
+    public override int GetHashCode() => HashCode.Combine(GetType(), _factory);
 
-        var queue = new ConcurrentQueue<T>();
+    public override bool Equals(object? obj) => Equals(obj as BlockingCollectionFactory);
 
-        builder(((IProducerConsumerCollection<T>)queue).TryAdd, in state);
+    public bool Equals(BlockingCollectionFactory? other)
+        => this == other || (other != null && other.GetType() == GetType() && _factory.Equals(other._factory));
 
-        return new(queue, capacity);
-    }
+#if !NET5_0_OR_GREATER
+    protected virtual BlockingCollection<T> NewCollection<T>(IProducerConsumerCollection<T> collection, in Comparers<T> comparers)
+        => new(collection);
+#endif
 
     IReadOnlyCollection<T> IReadOnlyCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);

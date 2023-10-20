@@ -1,80 +1,63 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class CollectionFactory : IListFactory, IReadOnlyListFactory
+public class CollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<CollectionFactory>
 {
-    public static readonly CollectionFactory Default = new();
+    public static readonly CollectionFactory Default = new(ListFactory.Default);
+
+    protected readonly IListFactory _factory;
 
     public virtual Type EnumerableType => typeof(Collection<>);
 
     public virtual EnumerableKind Kind => EnumerableKind.None;
 
+    public CollectionFactory(IListFactory factory)
+    {
+        _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+    }
+
+    protected CollectionFactory()
+    {
+        _factory = null!;
+    }
+
     public virtual Collection<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER
-        new();
+        new(_factory.Empty(in comparers));
 #else
-        NewCollection<T>();
+        NewCollection(_factory.Empty(in comparers), in comparers);
 #endif
 
-    public virtual Collection<T> New<T>(int capacity, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return
+    public virtual Collection<T> New<T>(int capacity, in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER
-        new();
+        new(_factory.New(capacity, in comparers));
 #else
-        NewCollection<T>();
+        NewCollection(_factory.New(capacity, in comparers), in comparers);
 #endif
 
+    public virtual Collection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER
-        return new(new List<T>(capacity));
+        new(_factory.New(capacity, builder, in comparers));
 #else
-        return NewCollection(new List<T>(capacity));
+        NewCollection(_factory.New(capacity, builder, in comparers), in comparers);
 #endif
-    }
 
-    public virtual Collection<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return
+    public virtual Collection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER
-        new();
+        new(_factory.New(capacity, builder, in state, in comparers));
 #else
-        NewCollection<T>();
+        NewCollection(_factory.New(capacity, builder, in state, in comparers), in comparers);
 #endif
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        var list = new List<T>(capacity);
+    public override int GetHashCode() => HashCode.Combine(GetType(), _factory);
 
-        builder(item => { list.Add(item); return true; });
+    public override bool Equals(object? obj) => Equals(obj as CollectionFactory);
 
-#if NET5_0_OR_GREATER
-        return new(list);
-#else
-        return NewCollection(list);
-#endif
-    }
-
-    public virtual Collection<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
-    {
-        if (capacity == 0) return
-#if NET5_0_OR_GREATER
-        new();
-#else
-        NewCollection<T>();
-#endif
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-        var list = new List<T>(capacity);
-
-        builder(item => { list.Add(item); return true; }, in state);
-
-#if NET5_0_OR_GREATER
-        return new(list);
-#else
-        return NewCollection(list);
-#endif
-    }
+    public bool Equals(CollectionFactory? other)
+        => this == other || (other != null && other.GetType() == GetType() && 
+        (_factory == other._factory || (_factory != null && _factory.Equals(other._factory))));
 
 #if !NET5_0_OR_GREATER
-    protected virtual Collection<T> NewCollection<T>(List<T>? list = null) => list == null ? new() : new(list);
+    protected virtual Collection<T> NewCollection<T>(IList<T> list, in Comparers<T> comparers) => new(list);
 #endif
 
     IList<T> IListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);

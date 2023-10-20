@@ -33,7 +33,7 @@ public class FactoryTest
     {
         Assert.That(CollectionFactory.Default, Is.Not.EqualTo(ObservableCollectionFactory.Default));
 
-        CollectionFactory factory = new ObservableCollectionFactory();
+        var factory = ObservableCollectionFactory.Default;
 
         CollectionTest(factory.Empty<string?>());
         CollectionTest(factory.New<string?>(0));
@@ -43,6 +43,33 @@ public class FactoryTest
         CollectionTest(factory.New<string?>(10), count: 0);
         CollectionTest(factory.New<string?>(11, Builder), count: 1);
         CollectionTest(factory.New<string?, int>(12, BuilderState, in _count), count: _count);
+
+        CollectionFactory baseFactory = factory;
+
+        CollectionTest(baseFactory.Empty<string?>());
+        CollectionTest(baseFactory.New<string?>(0));
+        CollectionTest(baseFactory.New<string?>(0, null!));
+        CollectionTest(baseFactory.New<string?, int>(0, null!, in _count));
+
+        CollectionTest(baseFactory.New<string?>(10), count: 0);
+        CollectionTest(baseFactory.New<string?>(11, Builder), count: 1);
+        CollectionTest(baseFactory.New<string?, int>(12, BuilderState, in _count), count: _count);
+    }
+
+    [Test]
+    public void EqualsTest()
+    {
+        Assert.That(new ListFactory().Equals(new ListFactory()), Is.True);
+        Assert.That(new EquatableListFactory().Equals(new ListFactory()), Is.False);
+        Assert.That(new ListFactory().Equals(new EquatableListFactory()), Is.False);
+        Assert.That(new CollectionFactory(new ListFactory()).Equals(CollectionFactory.Default), Is.True);
+        Assert.That(new CollectionFactory(new EquatableListFactory()).Equals(CollectionFactory.Default), Is.False);
+#if NET5_0_OR_GREATER
+        Assert.That(new ObservableCollectionFactory().Equals(ObservableCollectionFactory.Default), Is.True);
+#else
+        Assert.That(new ObservableCollectionFactory(new ListFactory()).Equals(ObservableCollectionFactory.Default), Is.True);
+        Assert.That(new ObservableCollectionFactory(new EquatableListFactory()).Equals(ObservableCollectionFactory.Default), Is.False);
+#endif
     }
 
     private void EquatableListTest(List<string?> list, int count = 0, int capacity = 0)

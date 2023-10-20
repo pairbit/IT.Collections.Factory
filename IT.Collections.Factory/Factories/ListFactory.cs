@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class ListFactory : IListFactory, IReadOnlyListFactory
+public class ListFactory : IListFactory, IReadOnlyListFactory, IEquatable<ListFactory>
 {
     public static readonly ListFactory Default = new();
 
@@ -65,6 +65,12 @@ public class ListFactory : IListFactory, IReadOnlyListFactory
 
         return list;
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as ListFactory);
+
+    public bool Equals(ListFactory? other) => this == other || (other != null && other.GetType() == GetType());
 
 #if !NET5_0_OR_GREATER
     protected virtual List<T> NewList<T>(int capacity, in Comparers<T> comparers) => new(capacity);
