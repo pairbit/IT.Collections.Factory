@@ -152,7 +152,7 @@ public class EnumerableFactoryRegistryTest
         var hss = new HashSetStringFactory(comparer);
         var dks = new DictionaryKeyStringFactory<int>(comparer);
 
-        return registry.TryRegisterFactoriesDefaultAndInterfaces(behavior) &
+        return registry.TryRegisterFactoriesDefault(behavior) &
 #if NET6_0_OR_GREATER
                registry.TryRegisterFactory<UnorderedPriorityQueueFactory>(behavior) &
 #endif

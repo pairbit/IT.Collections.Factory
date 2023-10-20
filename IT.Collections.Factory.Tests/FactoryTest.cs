@@ -8,6 +8,29 @@ public class FactoryTest
 {
     private readonly StringComparer _comparer = StringComparer.OrdinalIgnoreCase;
     private readonly int _count = 4;
+    
+    [Test]
+    public void SimpleTest()
+    {
+        var registry = new EnumerableFactoryRegistry();
+        Assert.That(registry.Count, Is.EqualTo(0));
+        registry.RegisterFactoriesDefault();
+        Assert.That(registry.Count, Is.EqualTo(86));
+
+        var listFactory = registry.GetFactory<ListFactory>();
+        var list = listFactory.New<int>(10);
+        Assert.That(list.Capacity, Is.EqualTo(10));
+
+#if NET6_0_OR_GREATER
+        var roSetFactory = registry.GetFactory<IReadOnlySetFactory>();
+        var roSet = roSetFactory.New(2, tryAdd =>
+        {
+            Assert.That(tryAdd("Test"), Is.True);
+            Assert.That(tryAdd("tEsT"), Is.False);
+        }, StringComparer.OrdinalIgnoreCase.ToComparers());
+        Assert.That(roSet.Count, Is.EqualTo(1));
+#endif
+    }
 
     [Test]
     public void EquatableListFactoryTest()

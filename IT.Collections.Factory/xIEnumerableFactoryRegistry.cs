@@ -22,7 +22,7 @@ public static class xIEnumerableFactoryRegistry
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
         => registry.TryRegisterFactory(factory, behavior);
 
-    public static bool TryRegisterFactoriesDefault(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
+    public static bool TryRegisterFactoriesDefaultOnlyClasses(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
         => registry.TryRegisterFactory<ArrayFactory>(behavior) &
            registry.TryRegisterFactory<ListFactory>(behavior) &
            registry.TryRegisterFactory<LinkedListFactory>(behavior) &
@@ -54,7 +54,7 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<ConcurrentStackFactory>(behavior) &
            registry.TryRegisterFactory<BlockingCollectionFactory>(behavior);
 
-    public static bool TryRegisterFactoriesDefaultInterfaces(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
+    public static bool TryRegisterFactoriesDefaultOnlyInterfaces(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
         => registry.TryRegisterFactory<IEnumerableFactory, LinkedListFactory>(behavior) &
            registry.TryRegisterFactory<ICollectionFactory, LinkedListFactory>(behavior) &
            registry.TryRegisterFactory<IListFactory, ListFactory>(behavior) &
@@ -75,9 +75,9 @@ public static class xIEnumerableFactoryRegistry
            registry.TryRegisterFactory<IReadOnlyDictionaryFactory, ReadOnlyDictionaryFactory>(behavior) &
            registry.TryRegisterFactory<IProducerConsumerCollectionFactory, ConcurrentBagFactory>(behavior);
 
-    public static bool TryRegisterFactoriesDefaultAndInterfaces(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
-        => registry.TryRegisterFactoriesDefault(behavior) &
-           registry.TryRegisterFactoriesDefaultInterfaces(behavior);
+    public static bool TryRegisterFactoriesDefault(this IEnumerableFactoryRegistry registry, RegistrationBehavior behavior)
+        => registry.TryRegisterFactoriesDefaultOnlyClasses(behavior) &
+           registry.TryRegisterFactoriesDefaultOnlyInterfaces(behavior);
 
     public static IEnumerableFactoryRegistry RegisterFactory<TFactory>(this IEnumerableFactoryRegistry registry, TFactory factory,
         RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting) where TFactory : IEnumerableFactoryRegistrable
@@ -86,24 +86,40 @@ public static class xIEnumerableFactoryRegistry
         return registry;
     }
 
+    public static IEnumerableFactoryRegistry RegisterFactory<TFactory>(this IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting) where TFactory : IEnumerableFactoryRegistrable, new()
+    {
+        registry.TryRegisterFactory<TFactory>(behavior);
+        return registry;
+    }
+
+    public static IEnumerableFactoryRegistry RegisterFactory<TRegistrable, TFactory>(this IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
+        where TRegistrable : IEnumerableFactoryRegistrable
+        where TFactory : TRegistrable, new()
+    {
+        registry.TryRegisterFactory<TRegistrable, TFactory>(behavior);
+        return registry;
+    }
+
+    public static IEnumerableFactoryRegistry RegisterFactoriesDefaultOnlyClasses(this IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
+    {
+        registry.TryRegisterFactoriesDefaultOnlyClasses(behavior);
+        return registry;
+    }
+
+    public static IEnumerableFactoryRegistry RegisterFactoriesDefaultOnlyInterfaces(this IEnumerableFactoryRegistry registry,
+        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
+    {
+        registry.TryRegisterFactoriesDefaultOnlyInterfaces(behavior);
+        return registry;
+    }
+
     public static IEnumerableFactoryRegistry RegisterFactoriesDefault(this IEnumerableFactoryRegistry registry,
         RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
     {
         registry.TryRegisterFactoriesDefault(behavior);
-        return registry;
-    }
-
-    public static IEnumerableFactoryRegistry RegisterFactoriesDefaultInterfaces(this IEnumerableFactoryRegistry registry,
-        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
-    {
-        registry.TryRegisterFactoriesDefaultInterfaces(behavior);
-        return registry;
-    }
-
-    public static IEnumerableFactoryRegistry RegisterFactoriesDefaultAndInterfaces(this IEnumerableFactoryRegistry registry,
-        RegistrationBehavior behavior = RegistrationBehavior.ThrowOnExisting)
-    {
-        registry.TryRegisterFactoriesDefaultAndInterfaces(behavior);
         return registry;
     }
 }
