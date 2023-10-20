@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
-public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
+public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory, IEquatable<HashSetFactory>
 #if NET6_0_OR_GREATER
     , IReadOnlySetFactory
 #endif
@@ -11,24 +11,35 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
 
     public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.Equatable;
 
-    public virtual HashSet<T> Empty<T>(in Comparers<T> comparers = default) => new(comparers.EqualityComparer);
-
-    public virtual HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default)
-#if NETSTANDARD2_0 || NET461
-        => new(comparers.EqualityComparer);
+    public virtual HashSet<T> Empty<T>(in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(comparers.EqualityComparer);
 #else
-        => new(capacity, comparers.EqualityComparer);
+        NewSet(0, in comparers);
+#endif
+
+    public virtual HashSet<T> New<T>(int capacity, in Comparers<T> comparers = default) =>
+#if NET5_0_OR_GREATER
+        new(capacity, comparers.EqualityComparer);
+#else
+        NewSet(capacity, in comparers);
 #endif
 
     public virtual HashSet<T> New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new(comparers.EqualityComparer);
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new(comparers.EqualityComparer);
+#else
+        NewSet(0, in comparers);
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-#if NETSTANDARD2_0 || NET461
-        var hashSet = new HashSet<T>(comparers.EqualityComparer);
+        var hashSet =
+#if NET5_0_OR_GREATER
+        new HashSet<T>(capacity, comparers.EqualityComparer);
 #else
-        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
+        NewSet(capacity, in comparers);
 #endif
 
         builder(hashSet.Add);
@@ -38,19 +49,39 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory
 
     public virtual HashSet<T> New<T, TState>(int capacity, EnumerableBuilder<T, TState> builder, in TState state, in Comparers<T> comparers = default)
     {
-        if (capacity == 0) return new(comparers.EqualityComparer);
+        if (capacity == 0) return
+#if NET5_0_OR_GREATER
+        new(comparers.EqualityComparer);
+#else
+        NewSet(0, in comparers);
+#endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-#if NETSTANDARD2_0 || NET461
-        var hashSet = new HashSet<T>(comparers.EqualityComparer);
+        var hashSet =
+#if NET5_0_OR_GREATER
+        new HashSet<T>(capacity, comparers.EqualityComparer);
 #else
-        var hashSet = new HashSet<T>(capacity, comparers.EqualityComparer);
+        NewSet(capacity, in comparers);
 #endif
 
         builder(hashSet.Add, in state);
 
         return hashSet;
     }
+
+    public override int GetHashCode() => HashCode.Combine(GetType());
+
+    public override bool Equals(object? obj) => Equals(obj as HashSetFactory);
+
+    public bool Equals(HashSetFactory? other) => this == other || (other != null && other.GetType() == GetType());
+
+#if !NET5_0_OR_GREATER
+    protected virtual HashSet<T> NewSet<T>(int capacity, in Comparers<T> comparers) => new(
+#if !NET461 && !NETSTANDARD2_0
+            capacity,
+#endif
+            comparers.EqualityComparer);
+#endif
 
     ISet<T> ISetFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     ISet<T> ISetFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
