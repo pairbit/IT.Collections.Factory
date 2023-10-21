@@ -7,7 +7,7 @@ public enum EnumerableKind
     ReadOnly = 1,
     Ordered = 2,
     Unordered = 2 << 1,
-    Unique = 2 << 2,
+    Unique = 2 << 2,//TODO: KeyUnique???
     Reverse = 2 << 3,
     Fixed = 2 << 4,
     Proxy = 2 << 5,
@@ -18,6 +18,7 @@ public enum EnumerableKind
     ComparableValue = 2 << 9,
     Comparable = ComparableKey | ComparableValue,
     ThreadSafe = 2 << 10,
+    IgnoreCapacity = 2 << 11,
     //LinkedList
     //Stack
     //Queue

@@ -8,7 +8,7 @@ public sealed class ImmutableStackFactory : IImmutableStackFactory, IEquatable<I
 {
     public Type EnumerableType => typeof(ImmutableStack<>);
 
-    public EnumerableKind Kind => EnumerableKind.Reverse;
+    public EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.IgnoreCapacity;
 
     public ImmutableStack<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableStack<T>.Empty;
 

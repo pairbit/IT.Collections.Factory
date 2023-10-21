@@ -2,6 +2,8 @@
 
 internal static class Ex
 {
+    public static ArgumentOutOfRangeException ArgumentNegative(object? actualValue, string? paramName) => new(paramName, actualValue, $"{paramName} is negative");
+
     public static ArgumentException EnumerableTypeIsNull(Type factoryType, string? paramName = null)
         => new($"Property '{nameof(IEnumerableFactoryRegistrable.EnumerableType)}' of type '{factoryType.FullName}' must not be null", paramName);
 

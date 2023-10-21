@@ -6,7 +6,7 @@ public class CollectionFactory : IListFactory, IReadOnlyListFactory, IEquatable<
 
     public virtual Type EnumerableType => typeof(Collection<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.None;
+    public virtual EnumerableKind Kind => _factory.Kind;
 
     public CollectionFactory() : this(EnumerableFactoryCache<ListFactory>.Default) { }
 

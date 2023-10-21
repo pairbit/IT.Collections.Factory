@@ -7,7 +7,12 @@ public class HashSetFactory : ISetFactory, IReadOnlyCollectionFactory, IEquatabl
 {
     public virtual Type EnumerableType => typeof(HashSet<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.Unique | EnumerableKind.Equatable;
+    public virtual EnumerableKind Kind => 
+        EnumerableKind.Unique |
+#if NET461 || NETSTANDARD2_0
+        EnumerableKind.IgnoreCapacity |
+#endif
+        EnumerableKind.Equatable;
 
     public virtual HashSet<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

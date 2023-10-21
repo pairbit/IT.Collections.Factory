@@ -71,7 +71,7 @@ public class ListFactory : IListFactory, IReadOnlyListFactory, IEquatable<ListFa
     public bool Equals(ListFactory? other) => this == other || (other != null && other.GetType() == GetType());
 
 #if !NET5_0_OR_GREATER
-    protected virtual List<T> NewList<T>(int capacity, in Comparers<T> comparers) => new(capacity);
+    protected virtual List<T> NewList<T>(int capacity, in Comparers<T> comparers) => capacity == 0 ? new() : new(capacity);
 #endif
 
     IList<T> IListFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);

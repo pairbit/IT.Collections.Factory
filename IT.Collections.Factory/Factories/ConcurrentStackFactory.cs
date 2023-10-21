@@ -4,7 +4,7 @@ public class ConcurrentStackFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public virtual Type EnumerableType => typeof(ConcurrentStack<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.ThreadSafe;
+    public virtual EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.ThreadSafe | EnumerableKind.IgnoreCapacity;
 
     public virtual ConcurrentStack<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

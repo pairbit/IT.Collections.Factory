@@ -13,6 +13,7 @@ public class FactoryTest
     public void SimpleTest()
     {
         var registry = new EnumerableFactoryRegistry();
+        //var registry = new ConcurrentEnumerableFactoryRegistry();
         registry.RegisterFactoriesDefault();
 
         var listFactory = registry.GetFactory<ListFactory>();

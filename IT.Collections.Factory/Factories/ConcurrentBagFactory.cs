@@ -4,7 +4,7 @@ public class ConcurrentBagFactory : IProducerConsumerCollectionFactory, IReadOnl
 {
     public virtual Type EnumerableType => typeof(ConcurrentBag<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.Unordered | EnumerableKind.ThreadSafe;
+    public virtual EnumerableKind Kind => EnumerableKind.Reverse | EnumerableKind.Unordered | EnumerableKind.ThreadSafe | EnumerableKind.IgnoreCapacity;
 
     public virtual ConcurrentBag<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

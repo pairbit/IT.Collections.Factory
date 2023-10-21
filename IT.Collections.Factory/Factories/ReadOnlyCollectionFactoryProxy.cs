@@ -8,7 +8,7 @@ public sealed class ReadOnlyCollectionFactoryProxy : IReadOnlyCollectionFactory,
 
     public Type EnumerableType => typeof(IReadOnlyCollection<>);
 
-    public EnumerableKind Kind => EnumerableKind.ReadOnly;
+    public EnumerableKind Kind => EnumerableKind.ReadOnly | _factory.Kind;
 
     public ReadOnlyCollectionFactoryProxy() : this(EnumerableFactoryCache<LinkedListFactory>.Default) { }
 

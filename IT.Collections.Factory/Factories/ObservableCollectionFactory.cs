@@ -4,7 +4,12 @@ public class ObservableCollectionFactory : CollectionFactory
 {
     public override Type EnumerableType => typeof(ObservableCollection<>);
 
-    public override EnumerableKind Kind => EnumerableKind.None;
+    public override EnumerableKind Kind =>
+#if NET5_0_OR_GREATER
+        EnumerableKind.IgnoreCapacity;
+#else
+        base.Kind;
+#endif
 
     public
 #if NET5_0_OR_GREATER

@@ -4,7 +4,7 @@ public class LinkedListFactory : ICollectionFactory, IReadOnlyCollectionFactory,
 {
     public virtual Type EnumerableType => typeof(LinkedList<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.None;
+    public virtual EnumerableKind Kind => EnumerableKind.IgnoreCapacity;
 
     public virtual LinkedList<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

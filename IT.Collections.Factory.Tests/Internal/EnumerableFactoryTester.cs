@@ -35,7 +35,7 @@ internal class EnumerableFactoryTester<T>
     {
         var factoryList = _factoryList;
 
-        var factories = factoryList.Distinct().OrderBy(x => x.Empty<int>().GetType().FullName).ToArray();
+        var factories = factoryList.Distinct().OrderBy(x => x.EnumerableType.FullName).ToArray();
 
         Console.WriteLine($"{factories.Length} enumerable factories");
 
@@ -48,7 +48,7 @@ internal class EnumerableFactoryTester<T>
             catch (Exception)
             {
                 Console.WriteLine();
-                Console.WriteLine($"Type '{factory.Empty<int>().GetType().GetGenericTypeDefinitionOrArray().FullName}' is exception");
+                Console.WriteLine($"Type '{factory.EnumerableType.FullName}' is exception");
                 throw;
             }
             finally
@@ -66,94 +66,91 @@ internal class EnumerableFactoryTester<T>
         Assert.That(newFactory == factory, Is.False);
         Assert.That(newFactory.Equals(factory), Is.True);
 
+        var kind = factory.Kind;
+        var enumerableType = factory.EnumerableType;
+        Console.Write($"Type '{enumerableType.FullName}' is {kind}");
+
         var empty = factory.Empty(in _comparers);
-        Assert.That(empty.Any(), Is.False);
-        if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
-        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+        CheckEmpty(empty);
         var type = empty.GetType();
-        var enumerableKind = factory.Kind;
 
-        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableKind}");
+        NewWithCapacity(kind, type, capacity => factory.New(capacity, in _comparers), _capacity);
 
-        if (enumerableKind.IsReadOnly())
+        var data = GetData(kind);
+
+        var dataBuild = NewWithBuilder(kind, type,
+            (capacity, withBuilder) =>
+            factory.New(capacity, withBuilder ? add => Builder(add, kind) : null!, in _comparers),
+            _capacity);
+
+        Assert.That(dataBuild.SequenceEqual(data), Is.True);
+
+        Assert.That(NewWithBuilderState(factory, type).SequenceEqual(data), Is.True);
+    }
+
+    private static void NewWithCapacity(
+        EnumerableKind kind, Type type,
+        Func<int, IEnumerable<T>> funcNew, int capacity)
+    {
+        if (kind.IsReadOnly())
         {
-            Assert.Throws<NotSupportedException>(() => factory.New(0, in _comparers));
-            Assert.Throws<NotSupportedException>(() => factory.New(_capacity, in _comparers));
+            Assert.Throws<NotSupportedException>(() => funcNew(-100));
+            Assert.Throws<NotSupportedException>(() => funcNew(0));
+            Assert.Throws<NotSupportedException>(() => funcNew(capacity));
+
+            return;
+        }
+
+        if (kind.IsIgnoreCapacity())
+        {
+            CheckEmpty(funcNew(-100));
         }
         else
         {
-            var withZero = factory.New(0, in _comparers);
-            Assert.That(withZero.GetType(), Is.EqualTo(type));
-            Assert.That(withZero.Any(), Is.False);
-            if (withZero.TryGetCount(out count)) Assert.That(count, Is.EqualTo(0));
-            if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-100));
+        }
 
-            var withCapacity = factory.New(_capacity, in _comparers);
-            Assert.That(withCapacity.GetType(), Is.EqualTo(type));
-            if (enumerableKind.IsFixed())
+        var withZero = funcNew(0);
+        Assert.That(withZero.GetType(), Is.EqualTo(type));
+        CheckEmpty(withZero);
+
+        var withCapacity = funcNew(capacity);
+        Assert.That(withCapacity.GetType(), Is.EqualTo(type));
+
+        if (kind.IsFixed())
+        {
+            Assert.That(withCapacity.Any(), Is.True);
+            if (withCapacity.TryGetCount(out var count))
             {
-                Assert.That(withCapacity.Any(), Is.True);
-                if (withCapacity.TryGetCount(out count))
-                {
-                    Console.Write($", Count {count}");
-                    Assert.That(count, Is.EqualTo(_capacity));
-                }
-            }
-            else
-            {
-                Assert.That(withCapacity.Any(), Is.False);
-                if (withCapacity.TryGetCapacity(out capacity))
-                {
-                    Console.Write($", Capacity {capacity}");
-                    Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
-                }
+                Console.Write($", Count {count}");
+                Assert.That(count, Is.EqualTo(capacity));
             }
         }
-
-        Assert.That(factory.New(0, null!, in _comparers).Any(), Is.False);
-        Assert.That(factory.New(0, null!, 0, in _comparers).Any(), Is.False);
-        Assert.Throws<ArgumentNullException>(() => factory.New(1, null!, in _comparers));
-        Assert.Throws<ArgumentNullException>(() => factory.New(1, null!, 0, in _comparers));
-
-        var data = _data;
-
-        //TODO: Костыль IsThreadSafe
-        if (enumerableKind.HasOrdered() || enumerableKind.IsThreadSafe())
+        else
         {
-            data = enumerableKind.IsUnique() ? _dataSortedUnique : _dataSorted;
+            Assert.That(withCapacity.Any(), Is.False);
+            if (withCapacity.TryGetCapacity(out var c))
+            {
+                Console.Write($", Capacity {c}");
+                Assert.That(c, Is.GreaterThanOrEqualTo(capacity));
+            }
         }
-        else if (enumerableKind.IsUnique())
-        {
-            data = _dataUnique;
-        }
+    }
 
-        var withBuilder = factory.New(_capacity, add => Builder(add, enumerableKind), in _comparers);
-        Assert.That(withBuilder.GetType(), Is.EqualTo(type));
-
-        //TODO: Костыль IsThreadSafe! Как проверить правильность порядка в многопоточном приложении?
-        if (enumerableKind.IsUnordered() || enumerableKind.IsThreadSafe())
-        {
-            withBuilder = withBuilder.OrderBy(x => x).ToArray();
-        }
-
-        Assert.That(withBuilder.SequenceEqual(data), Is.True);
+    private IEnumerable<T> NewWithBuilderState(IEnumerableFactory factory, Type type)
+    {
+        var kind = factory.Kind;
 
         var memory = new ReadOnlyMemory<T>(_data);
         var duplicates = new List<T>();
-        var state = (memory, enumerableKind, duplicates, _comparers);
-        var withBuilderState = factory.New<T, (ReadOnlyMemory<T>, EnumerableKind, List<T>, Comparers<T>)>
-            (_capacity, BuilderState, in state, in _comparers);
-        Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
-        
-        //TODO: Костыль IsThreadSafe
-        if (enumerableKind.IsUnordered() || enumerableKind.IsThreadSafe())
-        {
-            withBuilderState = withBuilderState.OrderBy(x => x).ToArray();
-        }
+        var state = (memory, kind, duplicates, _comparers);
 
-        Assert.That(withBuilderState.SequenceEqual(data), Is.True);
+        var data = NewWithBuilder(kind, type,
+            (capacity, withBuilder) =>
+            factory.New(capacity, withBuilder ? BuilderState : null!, in state, in _comparers),
+            _capacity);
 
-        if (enumerableKind.IsUnique())
+        if (kind.IsUnique())
         {
             Assert.That(duplicates.SequenceEqual(_dataDuplicates, _comparers.EqualityComparer), Is.True);
         }
@@ -161,6 +158,40 @@ internal class EnumerableFactoryTester<T>
         {
             Assert.That(duplicates.Count == 0, Is.True);
         }
+
+        return data;
+    }
+
+    private static IEnumerable<T> NewWithBuilder(EnumerableKind kind, Type type,
+        Func<int, bool, IEnumerable<T>> funcNew, int capacity)
+    {
+        CheckEmpty(funcNew(0, false));
+        CheckEmpty(funcNew(0, true));
+
+        //builder is null
+        Assert.Throws<ArgumentNullException>(() => funcNew(-100, false));
+        Assert.Throws<ArgumentNullException>(() => funcNew(100, false));
+
+        IEnumerable<T> data;
+        if (kind.IsIgnoreCapacity())
+        {
+            data = funcNew(-100, true);
+        }
+        else
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-100, true));
+            data = funcNew(capacity, true);
+        }
+
+        Assert.That(data.GetType(), Is.EqualTo(type));
+
+        //TODO: Костыль IsThreadSafe! Как проверить правильность порядка в многопоточном приложении?
+        if (kind.IsUnordered() || kind.IsThreadSafe())
+        {
+            data = data.OrderBy(x => x).ToArray();
+        }
+
+        return data;
     }
 
     private void Builder(TryAdd<T> tryAdd, EnumerableKind kind)
@@ -264,5 +295,27 @@ internal class EnumerableFactoryTester<T>
                 }
             }
         }
+    }
+
+    private static void CheckEmpty(IEnumerable<T> empty)
+    {
+        Assert.That(empty.Any(), Is.False);
+        if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
+        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+    }
+
+    private T[] GetData(EnumerableKind kind)
+    {
+        //TODO: Костыль IsThreadSafe
+        if (kind.HasOrdered() || kind.IsThreadSafe())
+        {
+            return kind.IsUnique() ? _dataSortedUnique : _dataSorted;
+        }
+        else if (kind.IsUnique())
+        {
+            return _dataUnique;
+        }
+
+        return _data;
     }
 }

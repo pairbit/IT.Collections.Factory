@@ -34,4 +34,6 @@ public static class xEnumerableKind
     public static bool IsComparable(this EnumerableKind kind) => (kind & EnumerableKind.Comparable) == EnumerableKind.Comparable;
 
     public static bool IsThreadSafe(this EnumerableKind kind) => (kind & EnumerableKind.ThreadSafe) == EnumerableKind.ThreadSafe;
+
+    public static bool IsIgnoreCapacity(this EnumerableKind kind) => (kind & EnumerableKind.IgnoreCapacity) == EnumerableKind.IgnoreCapacity;
 }

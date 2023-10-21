@@ -7,7 +7,7 @@ public class SortedSetFactory : ISetFactory, IReadOnlyCollectionFactory, IEquata
 {
     public virtual Type EnumerableType => typeof(SortedSet<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable;
+    public virtual EnumerableKind Kind => EnumerableKind.Ordered | EnumerableKind.Unique | EnumerableKind.Comparable | EnumerableKind.IgnoreCapacity;
 
     public virtual SortedSet<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

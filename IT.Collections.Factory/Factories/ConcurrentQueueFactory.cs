@@ -4,7 +4,7 @@ public class ConcurrentQueueFactory : IProducerConsumerCollectionFactory, IReadO
 {
     public virtual Type EnumerableType => typeof(ConcurrentQueue<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe;
+    public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe | EnumerableKind.IgnoreCapacity;
 
     public virtual ConcurrentQueue<T> Empty<T>(in Comparers<T> comparers = default) =>
 #if NET5_0_OR_GREATER

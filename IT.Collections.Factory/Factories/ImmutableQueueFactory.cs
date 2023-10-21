@@ -8,7 +8,7 @@ public sealed class ImmutableQueueFactory : IImmutableQueueFactory, IEquatable<I
 {
     public Type EnumerableType => typeof(ImmutableQueue<>);
 
-    public EnumerableKind Kind => EnumerableKind.None;
+    public EnumerableKind Kind => EnumerableKind.IgnoreCapacity;
 
     public ImmutableQueue<T> Empty<T>(in Comparers<T> comparers = default) => ImmutableQueue<T>.Empty;
 

@@ -1,5 +1,7 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
+using Internal;
+
 public sealed class ArrayFactory : IEnumerableFactory, IEquatable<ArrayFactory>
 {
     public Type EnumerableType => typeof(Array);
@@ -8,12 +10,19 @@ public sealed class ArrayFactory : IEnumerableFactory, IEquatable<ArrayFactory>
 
     public T[] Empty<T>(in Comparers<T> comparers = default) => Array.Empty<T>();
 
-    public T[] New<T>(int capacity, in Comparers<T> comparers = default) => new T[capacity];
+    public T[] New<T>(int capacity, in Comparers<T> comparers = default)
+    {
+        if (capacity == 0) return Array.Empty<T>();
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
+
+        return new T[capacity];
+    }
 
     public T[] New<T>(int capacity, EnumerableBuilder<T> builder, in Comparers<T> comparers = default)
     {
         if (capacity == 0) return Array.Empty<T>();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
 
         var array = new T[capacity];
         var index = 0;
@@ -27,6 +36,7 @@ public sealed class ArrayFactory : IEnumerableFactory, IEquatable<ArrayFactory>
     {
         if (capacity == 0) return Array.Empty<T>();
         if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
 
         var array = new T[capacity];
         var index = 0;

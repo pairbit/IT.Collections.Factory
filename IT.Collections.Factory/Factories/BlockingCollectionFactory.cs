@@ -6,7 +6,7 @@ public class BlockingCollectionFactory : IReadOnlyCollectionFactory, IEquatable<
 
     public virtual Type EnumerableType => typeof(BlockingCollection<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.ThreadSafe;
+    public virtual EnumerableKind Kind => _factory.Kind;
 
     public BlockingCollectionFactory() : this(EnumerableFactoryCache<ConcurrentQueueFactory>.Default) { }
 

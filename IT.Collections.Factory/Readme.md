@@ -8,6 +8,7 @@ Implementation of collections factory
 
 ```csharp
 var registry = new EnumerableFactoryRegistry();
+//var registry = new ConcurrentEnumerableFactoryRegistry();
 registry.RegisterFactoriesDefault();
 ```
 

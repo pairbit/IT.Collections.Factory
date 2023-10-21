@@ -5,8 +5,8 @@ public class ReadOnlyObservableCollectionFactory : IListFactory, IReadOnlyListFa
     protected readonly ObservableCollectionFactory _factory;
 
     public virtual Type EnumerableType => typeof(ReadOnlyObservableCollection<>);
-
-    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
+    //TODO: костыль, так делать нельзя, по хорошему нужно указать _factory.Kind
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.IgnoreCapacity;
 
     public ReadOnlyObservableCollectionFactory() : this(EnumerableFactoryCache<ObservableCollectionFactory>.Default) { }
 
