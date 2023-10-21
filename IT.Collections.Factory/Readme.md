@@ -39,7 +39,7 @@ Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
 Assert.That(listFactory.Kind.IsFixed(), Is.False);
 ```
 
-## New IReadOnlySet with comparer
+## New IReadOnlySet<string> with comparer
 
 ```csharp
 #if NET6_0_OR_GREATER
@@ -51,4 +51,22 @@ Assert.That(listFactory.Kind.IsFixed(), Is.False);
     }, StringComparer.OrdinalIgnoreCase.ToComparers());
     Assert.That(roSet.Count, Is.EqualTo(1));
 #endif
+```
+
+## New stack
+
+```csharp
+
+```
+
+## Check IgnoreCapacity
+
+```csharp
+
+```
+
+## Check ThreadSafe
+
+```csharp
+
 ```

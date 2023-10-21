@@ -107,7 +107,7 @@ internal class EnumerableFactoryTester<T>
         }
         else
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-100));
+            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-99)).CheckCapacity();
         }
 
         var withZero = funcNew(0);
@@ -169,8 +169,8 @@ internal class EnumerableFactoryTester<T>
         CheckEmpty(funcNew(0, true));
 
         //builder is null
-        Assert.Throws<ArgumentNullException>(() => funcNew(-100, false));
-        Assert.Throws<ArgumentNullException>(() => funcNew(100, false));
+        Assert.Throws<ArgumentNullException>(() => funcNew(-100, false)).CheckBuilder();
+        Assert.Throws<ArgumentNullException>(() => funcNew(100, false)).CheckBuilder();
 
         IEnumerable<T> data;
         if (kind.IsIgnoreCapacity())
@@ -179,7 +179,7 @@ internal class EnumerableFactoryTester<T>
         }
         else
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-100, true));
+            Assert.Throws<ArgumentOutOfRangeException>(() => funcNew(-99, true)).CheckCapacity();
             data = funcNew(capacity, true);
         }
 

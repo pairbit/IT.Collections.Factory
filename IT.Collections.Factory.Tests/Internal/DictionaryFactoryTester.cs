@@ -101,7 +101,7 @@ internal class DictionaryFactoryTester
             }
             else
             {
-                Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-100));
+                Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-100)).CheckCapacity();
             }
 
             var withZero = factory.New<int, int>(0);
@@ -133,8 +133,8 @@ internal class DictionaryFactoryTester
         CheckEmpty(factory.New<int, int>(0, null!));
         CheckEmpty(factory.New<int, int>(0, tryAdd => tryAdd(default)));
         
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(-99, null!));
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!));
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(-99, null!)).CheckBuilder();
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!)).CheckBuilder();
 
         var keys = _keys;
         if (kind.HasOrdered()) keys = kind.IsUnique() ? _keysSortedUnique : _keysSorted;
@@ -148,7 +148,7 @@ internal class DictionaryFactoryTester
         }
         else
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-99, add => Builder(add, kind)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-99, add => Builder(add, kind))).CheckCapacity();
 
             withBuilder = factory.New<int, int>(_capacity, add => Builder(add, kind));
         }
@@ -167,8 +167,8 @@ internal class DictionaryFactoryTester
         CheckEmpty(factory.New<int, int, int>(0, null!, 0));
         CheckEmpty(factory.New<int, int, int>(0, BuilderStateTest, 0));
         
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(-99, null!, 0));
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0));
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(-99, null!, 0)).CheckBuilder();
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0)).CheckBuilder();
 
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
         var duplicates = new List<int>();
@@ -181,7 +181,7 @@ internal class DictionaryFactoryTester
         }
         else
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New(-99, BuilderState, in state, in _comparers));
+            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New(-99, BuilderState, in state, in _comparers)).CheckCapacity();
             withBuilderState = factory.New(_capacity, BuilderState, in state, in _comparers);
         }
 

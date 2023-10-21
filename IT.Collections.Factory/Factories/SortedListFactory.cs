@@ -1,5 +1,7 @@
 ﻿namespace IT.Collections.Factory.Factories;
 
+using Internal;
+
 public class SortedListFactory : IDictionaryFactory, IReadOnlyDictionaryFactory, IEquatable<SortedListFactory>
 {
     public virtual Type EnumerableType => typeof(SortedList<,>);
@@ -13,12 +15,16 @@ public class SortedListFactory : IDictionaryFactory, IReadOnlyDictionaryFactory,
         NewSortedList(0, in comparers);
 #endif
 
-    public virtual SortedList<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull =>
+    public virtual SortedList<TKey, TValue> New<TKey, TValue>(int capacity, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
+    {
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
+        return
 #if NET5_0_OR_GREATER
-        new(capacity, comparers.KeyComparer);
+            new(capacity, comparers.KeyComparer);
 #else
-        NewSortedList(capacity, in comparers);
+            NewSortedList(capacity, in comparers);
 #endif
+    }
 
     public virtual SortedList<TKey, TValue> New<TKey, TValue>(int capacity, EnumerableBuilder<KeyValuePair<TKey, TValue>> builder, in Comparers<TKey, TValue> comparers = default) where TKey : notnull
     {
@@ -29,6 +35,7 @@ public class SortedListFactory : IDictionaryFactory, IReadOnlyDictionaryFactory,
         NewSortedList(0, in comparers);
 #endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
 
         var dictionary =
 #if NET5_0_OR_GREATER
@@ -51,6 +58,7 @@ public class SortedListFactory : IDictionaryFactory, IReadOnlyDictionaryFactory,
         NewSortedList(0, in comparers);
 #endif
         if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (capacity < 0) throw Ex.ArgumentNegative(capacity, nameof(capacity));
 
         var dictionary =
 #if NET5_0_OR_GREATER
