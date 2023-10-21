@@ -66,12 +66,12 @@ public class EnumerableFactoryRegistryTest
 
         foreach (var factory in factories)
         {
+            Console.Write($"Type '{factory.EnumerableType.FullName}' is {factory.Kind}");
+
             var empty = factory.Empty<string,int>();
             Assert.That(empty.Any(), Is.False);
             if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
             if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
-
-            Console.Write($"Type '{empty.GetType().GetGenericTypeDefinitionOrArray().FullName}' is {factory.Kind}");
 
             var withBuilder = factory.New<string, int>(10, tryAdd => tryAdd(("data", 10)));
             Assert.That(withBuilder.Any(), Is.True);

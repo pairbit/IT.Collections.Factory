@@ -4,6 +4,8 @@ internal class DictionaryFactoryTester
 {
     private readonly static Random _random = new();
     private readonly IReadOnlyList<IEnumerableKeyValueFactory> _factoryList;
+    private readonly Comparers<int, int> _comparers;
+
     private int _capacity;
     private KeyValuePair<int, int>[] _array;
     private int[] _keys;
@@ -79,34 +81,39 @@ internal class DictionaryFactoryTester
         Assert.That(newFactory == factory, Is.False);
         Assert.That(newFactory.Equals(factory), Is.True);
 
+        var kind = factory.Kind;
+        Console.Write($"Type '{factory.EnumerableType.FullName}' is {kind}");
+
         var empty = factory.Empty<int, int>();
-        Assert.That(empty.Any(), Is.False);
-        if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
-        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
+        CheckEmpty(empty);
         var type = empty.GetType();
-        var enumerableKind = factory.Kind;
-
-        Console.Write($"Type '{type.GetGenericTypeDefinitionOrArray().FullName}' is {enumerableKind}");
-
-        if (enumerableKind.IsReadOnly())
+        
+        if (kind.IsReadOnly())
         {
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(0));
             Assert.Throws<NotSupportedException>(() => factory.New<int, int>(_capacity));
         }
         else
         {
+            if (kind.IsIgnoreCapacity())
+            {
+                CheckEmpty(factory.New<int, int>(-100));
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-100));
+            }
+
             var withZero = factory.New<int, int>(0);
             Assert.That(withZero.GetType(), Is.EqualTo(type));
-            Assert.That(withZero.Any(), Is.False);
-            if (withZero.TryGetCount(out count)) Assert.That(count, Is.EqualTo(0));
-            if (withZero.TryGetCapacity(out capacity)) Assert.That(capacity, Is.EqualTo(0));
+            CheckEmpty(withZero);
 
             var withCapacity = factory.New<int, int>(_capacity);
             Assert.That(withCapacity.GetType(), Is.EqualTo(type));
-            if (enumerableKind.IsFixed())
+            if (kind.IsFixed())
             {
                 Assert.That(withCapacity.Any(), Is.True);
-                if (withCapacity.TryGetCount(out count))
+                if (withCapacity.TryGetCount(out var count))
                 {
                     Console.Write($", Count {count}");
                     Assert.That(count, Is.EqualTo(_capacity));
@@ -115,7 +122,7 @@ internal class DictionaryFactoryTester
             else
             {
                 Assert.That(withCapacity.Any(), Is.False);
-                if (withCapacity.TryGetCapacity(out capacity))
+                if (withCapacity.TryGetCapacity(out var capacity))
                 {
                     Console.Write($", Capacity {capacity}");
                     Assert.That(capacity, Is.GreaterThanOrEqualTo(_capacity));
@@ -123,50 +130,72 @@ internal class DictionaryFactoryTester
             }
         }
 
-        Assert.That(factory.New<int, int>(0, null!).Any(), Is.False);
-        Assert.That(factory.New<int, int, int>(0, null!, 0).Any(), Is.False);
+        CheckEmpty(factory.New<int, int>(0, null!));
+        CheckEmpty(factory.New<int, int>(0, tryAdd => tryAdd(default)));
+        
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(-99, null!));
         Assert.Throws<ArgumentNullException>(() => factory.New<int, int>(1, null!));
-        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0));
 
         var keys = _keys;
+        if (kind.HasOrdered()) keys = kind.IsUnique() ? _keysSortedUnique : _keysSorted;
+        else if (kind.IsUnique()) keys = _keysUnique;
 
-        if (enumerableKind.HasOrdered())
+        IEnumerable<KeyValuePair<int, int>> withBuilder;
+
+        if (kind.IsIgnoreCapacity())
         {
-            keys = enumerableKind.IsUnique() ? _keysSortedUnique : _keysSorted;
+            withBuilder = factory.New<int, int>(-99, add => Builder(add, kind));
         }
-        else if (enumerableKind.IsUnique())
+        else
         {
-            keys = _keysUnique;
+            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New<int, int>(-99, add => Builder(add, kind)));
+
+            withBuilder = factory.New<int, int>(_capacity, add => Builder(add, kind));
         }
 
-        IEnumerable<KeyValuePair<int, int>> withBuilder = factory.New<int, int>(_capacity, add => Builder(add, factory.Kind));
         Assert.That(withBuilder.GetType(), Is.EqualTo(type));
 
         var newKeys = withBuilder.Select(x => x.Key).ToArray();
 
-        if (enumerableKind.IsUnordered())
+        if (kind.IsUnordered())
         {
             newKeys = newKeys.OrderBy(x => x).ToArray();
         }
 
         Assert.That(newKeys.SequenceEqual(keys), Is.True);
 
+        CheckEmpty(factory.New<int, int, int>(0, null!, 0));
+        CheckEmpty(factory.New<int, int, int>(0, BuilderStateTest, 0));
+        
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(-99, null!, 0));
+        Assert.Throws<ArgumentNullException>(() => factory.New<int, int, int>(1, null!, 0));
+
         var memory = new ReadOnlyMemory<KeyValuePair<int, int>>(_array);
         var duplicates = new List<int>();
-        var state = (memory, enumerableKind, duplicates);
-        IEnumerable<KeyValuePair<int, int>> withBuilderState =
-            factory.New<int, int, (ReadOnlyMemory<KeyValuePair<int, int>>, EnumerableKind, List<int>)>(_capacity, BuilderState, in state);
+        var state = (memory, kind, duplicates);
+        IEnumerable<KeyValuePair<int, int>> withBuilderState;
+
+        if (kind.IsIgnoreCapacity())
+        {
+            withBuilderState = factory.New(-99, BuilderState, in state, in _comparers);
+        }
+        else
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => factory.New(-99, BuilderState, in state, in _comparers));
+            withBuilderState = factory.New(_capacity, BuilderState, in state, in _comparers);
+        }
+
         Assert.That(withBuilderState.GetType(), Is.EqualTo(type));
 
         newKeys = withBuilderState.Select(x => x.Key).ToArray();
 
-        if (enumerableKind.IsUnordered())
+        if (kind.IsUnordered())
         {
             newKeys = newKeys.OrderBy(x => x).ToArray();
         }
         Assert.That(newKeys.SequenceEqual(keys), Is.True);
 
-        if (enumerableKind.IsUnique())
+        if (kind.IsUnique())
         {
             Assert.That(duplicates.SequenceEqual(_keysDuplicates), Is.True);
         }
@@ -278,5 +307,17 @@ internal class DictionaryFactoryTester
                 }
             }
         }
+    }
+
+    private static void BuilderStateTest(TryAdd<KeyValuePair<int, int>> tryAdd, in int data)
+    {
+        tryAdd(default);
+    }
+
+    private static void CheckEmpty(IEnumerable<KeyValuePair<int, int>> empty)
+    {
+        Assert.That(empty.Any(), Is.False);
+        if (empty.TryGetCount(out var count)) Assert.That(count, Is.EqualTo(0));
+        if (empty.TryGetCapacity(out var capacity)) Assert.That(capacity, Is.EqualTo(0));
     }
 }
