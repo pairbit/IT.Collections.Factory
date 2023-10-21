@@ -6,7 +6,7 @@ public class ReadOnlyDictionaryFactory : IDictionaryFactory, IReadOnlyDictionary
 
     public virtual Type EnumerableType => typeof(ReadOnlyDictionary<,>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.EquatableKey;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | _factory.Kind;
 
     public ReadOnlyDictionaryFactory() : this(EnumerableFactoryCache<DictionaryFactory>.Default) { }
 

@@ -1,4 +1,4 @@
-﻿#if NET6_0_OR_GREATER
+﻿#if NET5_0_OR_GREATER
 
 namespace IT.Collections.Factory.Factories;
 
@@ -10,7 +10,7 @@ public sealed class ReadOnlySetFactoryProxy : IReadOnlySetFactory, IEquatable<Re
 
     public Type EnumerableType => typeof(IReadOnlySet<>);
 
-    public EnumerableKind Kind => EnumerableKind.ReadOnly | EnumerableKind.Unique | EnumerableKind.Equatable;
+    public EnumerableKind Kind => EnumerableKind.ReadOnly | _factory.Kind;
 
     public ReadOnlySetFactoryProxy() : this(EnumerableFactoryCache<HashSetFactory>.Default) { }
 

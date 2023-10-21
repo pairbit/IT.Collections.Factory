@@ -6,7 +6,7 @@ public class ReadOnlyCollectionFactory : IListFactory, IReadOnlyListFactory, IEq
 
     public virtual Type EnumerableType => typeof(ReadOnlyCollection<>);
 
-    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly;
+    public virtual EnumerableKind Kind => EnumerableKind.ReadOnly | _factory.Kind;
 
     public ReadOnlyCollectionFactory() : this(EnumerableFactoryCache<ListFactory>.Default) { }
 
