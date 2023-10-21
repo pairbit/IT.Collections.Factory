@@ -4,24 +4,41 @@
 
 Implementation of collections factory
 
-## Create registry
+## Register factories
 
 ```csharp
 var registry = new EnumerableFactoryRegistry();
-Assert.That(registry.Count, Is.EqualTo(0));
 registry.RegisterFactoriesDefault();
-Assert.That(registry.Count, Is.EqualTo(86));
 ```
 
-## Get ListFactory from registry and create empty list with 10 capacity
+## New empty list
 
 ```csharp
 var listFactory = registry.GetFactory<ListFactory>();
-var list = listFactory.New<int>(10);
-Assert.That(list.Capacity, Is.EqualTo(10));
+var list = listFactory.Empty<int>();
+Assert.That(list.Capacity, Is.EqualTo(0));
 ```
 
-## Get IReadOnlySetFactory and create hash set with ignore case comparer and add strings
+## New array and new list with capacity
+
+```csharp
+var arrayFactory = registry.GetFactory<ArrayFactory>();
+var array = arrayFactory.New<int>(3);
+Assert.That(array.Length, Is.EqualTo(3));
+
+list = listFactory.New<int>(4);
+Assert.That(list.Capacity, Is.EqualTo(4));
+Assert.That(list.Count, Is.EqualTo(0));
+```
+
+## Check EnumerableKind
+
+```csharp
+Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
+Assert.That(listFactory.Kind.IsFixed(), Is.False);
+```
+
+## New IReadOnlySet with comparer
 
 ```csharp
 #if NET6_0_OR_GREATER

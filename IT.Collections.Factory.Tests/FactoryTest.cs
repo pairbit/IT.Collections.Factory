@@ -13,13 +13,22 @@ public class FactoryTest
     public void SimpleTest()
     {
         var registry = new EnumerableFactoryRegistry();
-        Assert.That(registry.Count, Is.EqualTo(0));
         registry.RegisterFactoriesDefault();
-        Assert.That(registry.Count, Is.EqualTo(86));
 
         var listFactory = registry.GetFactory<ListFactory>();
-        var list = listFactory.New<int>(10);
-        Assert.That(list.Capacity, Is.EqualTo(10));
+        var list = listFactory.Empty<int>();
+        Assert.That(list.Capacity, Is.EqualTo(0));
+
+        var arrayFactory = registry.GetFactory<ArrayFactory>();
+        var array = arrayFactory.New<int>(3);
+        Assert.That(array.Length, Is.EqualTo(3));
+
+        list = listFactory.New<int>(4);
+        Assert.That(list.Capacity, Is.EqualTo(4));
+        Assert.That(list.Count, Is.EqualTo(0));
+
+        Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
+        Assert.That(listFactory.Kind.IsFixed(), Is.False);
 
 #if NET6_0_OR_GREATER
         var roSetFactory = registry.GetFactory<IReadOnlySetFactory>();
