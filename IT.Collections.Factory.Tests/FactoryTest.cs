@@ -31,6 +31,19 @@ public class FactoryTest
         Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
         Assert.That(listFactory.Kind.IsFixed(), Is.False);
 
+        var linkedListFactory = registry.GetFactory<LinkedListFactory>();
+
+        Assert.That(linkedListFactory.Kind.IsIgnoreCapacity(), Is.True);
+
+        var linkedList = linkedListFactory.New<int>(-1, tryAdd =>
+        {
+            tryAdd(1);
+            tryAdd(2);
+            tryAdd(3);
+        });
+
+        Assert.That(linkedList.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
+
 #if NET6_0_OR_GREATER
         var roSetFactory = registry.GetFactory<IReadOnlySetFactory>();
         var roSet = roSetFactory.New(2, tryAdd =>
@@ -40,6 +53,21 @@ public class FactoryTest
         }, StringComparer.OrdinalIgnoreCase.ToComparers());
         Assert.That(roSet.Count, Is.EqualTo(1));
 #endif
+
+        var intStackFactory = registry.GetFactory<Stack<int>, int>();
+
+        Assert.That(intStackFactory.Kind.IsProxy(), Is.True);
+        Assert.That(intStackFactory.Kind.IsReverse(), Is.True);
+
+        var stack = intStackFactory.New(3, tryAdd =>
+        {
+            tryAdd(3);
+            tryAdd(2);
+            tryAdd(1);
+        });
+
+        Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
+
         IEnumerable<int> data = Enumerable.Range(5, 10);
 
         CheckFactory(data, registry.GetFactory<ListFactory>());//None
@@ -85,9 +113,7 @@ public class FactoryTest
             //allocation, need use ArrayPool
             var dataArray = data.ToArray();
 
-            newEnumerable = factory.New<T, T[]>(dataArray.Length,
-                kind.IsReverse() ? BuildReverse : Build,
-                in dataArray);
+            newEnumerable = factory.New<T, T[]>(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
         }
 
         Assert.That(newEnumerable.SequenceEqual(data), Is.True);

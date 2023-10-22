@@ -24,6 +24,9 @@ Assert.That(list.Capacity, Is.EqualTo(0));
 
 ```csharp
 var arrayFactory = registry.GetFactory<ArrayFactory>();
+Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
+Assert.That(listFactory.Kind.IsFixed(), Is.False);
+
 var array = arrayFactory.New<int>(3);
 Assert.That(array.Length, Is.EqualTo(3));
 
@@ -32,11 +35,21 @@ Assert.That(list.Capacity, Is.EqualTo(4));
 Assert.That(list.Count, Is.EqualTo(0));
 ```
 
-## Check EnumerableKind
+## New LinkedList with IgnoreCapacity
 
 ```csharp
-Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
-Assert.That(listFactory.Kind.IsFixed(), Is.False);
+var linkedListFactory = registry.GetFactory<LinkedListFactory>();
+
+Assert.That(linkedListFactory.Kind.IsIgnoreCapacity(), Is.True);
+
+var linkedList = linkedListFactory.New<int>(-1, tryAdd =>
+{
+    tryAdd(1);
+    tryAdd(2);
+    tryAdd(3);
+});
+
+Assert.That(linkedList.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 ```
 
 ## New IReadOnlySet with comparer
@@ -51,6 +64,24 @@ Assert.That(listFactory.Kind.IsFixed(), Is.False);
     }, StringComparer.OrdinalIgnoreCase.ToComparers());
     Assert.That(roSet.Count, Is.EqualTo(1));
 #endif
+```
+
+## New Stack from generic factory 
+
+```csharp
+var intStackFactory = registry.GetFactory<Stack<int>, int>();
+
+Assert.That(intStackFactory.Kind.IsProxy(), Is.True);
+Assert.That(intStackFactory.Kind.IsReverse(), Is.True);
+
+var stack = intStackFactory.New(3, tryAdd =>
+{
+    tryAdd(3);
+    tryAdd(2);
+    tryAdd(1);
+});
+
+Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 ```
 
 ## New collections with builder
