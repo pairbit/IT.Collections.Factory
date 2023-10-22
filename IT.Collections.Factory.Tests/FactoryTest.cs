@@ -1,5 +1,7 @@
 ﻿using IT.Collections.Equatable;
 using IT.Collections.Factory.Factories;
+using IT.Collections.Factory.Generic;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
 namespace IT.Collections.Factory.Tests;
@@ -46,6 +48,9 @@ public class FactoryTest
 
 #if NET6_0_OR_GREATER
         var roSetFactory = registry.GetFactory<IReadOnlySetFactory>();
+        Assert.That(roSetFactory.Kind.IsUnique(), Is.True);
+        Assert.That(roSetFactory.Kind.IsEquatable(), Is.True);
+
         var roSet = roSetFactory.New(2, tryAdd =>
         {
             Assert.That(tryAdd("Test"), Is.True);
@@ -68,15 +73,20 @@ public class FactoryTest
 
         Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 
-        IEnumerable<int> data = Enumerable.Range(5, 10);
+        IEnumerable<KeyValuePair<int, string>> data =
+            Enumerable.Range(5, 100).Select(x => new KeyValuePair<int, string>(x, new string('x', x)));
 
-        CheckFactory(data, registry.GetFactory<ListFactory>());//None
-        CheckFactory(data, registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
-        CheckFactory(data, registry.GetFactory<StackFactory>());//Reverse
-        CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse, ThreadSafe
+        var orderBy = (IEnumerable<KeyValuePair<int, string>> kvp) => kvp.OrderBy(x => x.Key);
+
+        CheckFactory(data, registry.GetFactory<List<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy);//None
+        CheckFactory(data, registry.GetFactory<LinkedList<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy);//IgnoreCapacity
+        CheckFactory(data, registry.GetFactory<Stack<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy);//Reverse
+        CheckFactory(data, registry.GetFactory<ConcurrentBag<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy);//IgnoreCapacity, Reverse, ThreadSafe
+        CheckFactory(data, registry.GetFactory<ConcurrentDictionary<int, string>, int, string>(), orderBy);//ThreadSafe
     }
 
-    static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
+    static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory<IEnumerable<T>, T> factory,
+        Func<IEnumerable<T>, IOrderedEnumerable<T>> orderBy)
     {
         IEnumerable<T> newEnumerable;
 
@@ -96,9 +106,9 @@ public class FactoryTest
                 data = dataArray;
             }
 
-            newEnumerable = factory.New<T, IEnumerable<T>>(capacity, BuildParallel, in data);
+            newEnumerable = factory.New(capacity, BuildParallel, in data);
 
-            Assert.That(newEnumerable.OrderBy(x => x).SequenceEqual(data), Is.True);
+            Assert.That(orderBy(newEnumerable).SequenceEqual(data), Is.True);
         }
 
         if (kind.IsIgnoreCapacity() && !kind.IsReverse())
@@ -113,7 +123,7 @@ public class FactoryTest
             //allocation, need use ArrayPool
             var dataArray = data.ToArray();
 
-            newEnumerable = factory.New<T, T[]>(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
+            newEnumerable = factory.New(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
         }
 
         Assert.That(newEnumerable.SequenceEqual(data), Is.True);

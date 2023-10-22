@@ -57,6 +57,9 @@ Assert.That(linkedList.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 ```csharp
 #if NET6_0_OR_GREATER
     var roSetFactory = registry.GetFactory<IReadOnlySetFactory>();
+    Assert.That(roSetFactory.Kind.IsUnique(), Is.True);
+    Assert.That(roSetFactory.Kind.IsEquatable(), Is.True);
+
     var roSet = roSetFactory.New(2, tryAdd =>
     {
         Assert.That(tryAdd("Test"), Is.True);
