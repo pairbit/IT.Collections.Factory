@@ -56,21 +56,41 @@ Assert.That(listFactory.Kind.IsFixed(), Is.False);
 ## New collections with builder
 
 ```csharp
-CheckFactory(registry.GetFactory<ListFactory>());//None
-CheckFactory(registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
-CheckFactory(registry.GetFactory<StackFactory>());//Reverse
-CheckFactory(registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse
+IEnumerable<int> data = Enumerable.Range(5, 10);
 
-static void CheckFactory(IEnumerableFactory factory)
+CheckFactory(data, registry.GetFactory<ListFactory>());//None
+CheckFactory(data, registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
+CheckFactory(data, registry.GetFactory<StackFactory>());//Reverse
+CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse, ThreadSafe
+
+static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
 {
-    IEnumerable<int> data = Enumerable.Range(5, 15);
-    IEnumerable<int> newEnumerable;
+    IEnumerable<T> newEnumerable;
 
     var kind = factory.Kind;
 
+    if (kind.IsThreadSafe())
+    {
+        var capacity = -1;
+
+        if (!kind.IsIgnoreCapacity())
+        {
+            //allocation, need use ArrayPool
+            var dataArray = data.ToArray();
+
+            capacity = dataArray.Length;
+
+            data = dataArray;
+        }
+
+        newEnumerable = factory.New<T, IEnumerable<T>>(capacity, BuildParallel, in data);
+
+        Assert.That(newEnumerable.OrderBy(x => x).SequenceEqual(data), Is.True);
+    }
+
     if (kind.IsIgnoreCapacity() && !kind.IsReverse())
     {
-        newEnumerable = factory.New(-1, static (TryAdd<int> tryAdd, in IEnumerable<int> data) =>
+        newEnumerable = factory.New(-1, static (TryAdd<T> tryAdd, in IEnumerable<T> data) =>
         {
             foreach (var i in data) tryAdd(i);
         }, in data);
@@ -80,22 +100,26 @@ static void CheckFactory(IEnumerableFactory factory)
         //allocation, need use ArrayPool
         var dataArray = data.ToArray();
 
-        newEnumerable = factory.New<int, int[]>(dataArray.Length,
-            kind.IsReverse() ? BuildReverse : Build, 
+        newEnumerable = factory.New<T, T[]>(dataArray.Length,
+            kind.IsReverse() ? BuildReverse : Build,
             in dataArray);
     }
 
-    //test
-    if (!newEnumerable.SequenceEqual(data)) throw new InvalidOperationException();
+    Assert.That(newEnumerable.SequenceEqual(data), Is.True);
 }
 
-static void Build(TryAdd<int> tryAdd, in int[] data)
+static void Build<T>(TryAdd<T> tryAdd, in T[] data)
 {
     for (int i = 0; i < data.Length; i++) tryAdd(data[i]);
 }
 
-static void BuildReverse(TryAdd<int> tryAdd, in int[] data)
+static void BuildReverse<T>(TryAdd<T> tryAdd, in T[] data)
 {
     for (int i = data.Length - 1; i >= 0; i--) tryAdd(data[i]);
+}
+
+static void BuildParallel<T>(TryAdd<T> tryAdd, in IEnumerable<T> data)
+{
+    Parallel.ForEach(data, i => tryAdd(i));
 }
 ```

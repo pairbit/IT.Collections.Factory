@@ -40,22 +40,42 @@ public class FactoryTest
         }, StringComparer.OrdinalIgnoreCase.ToComparers());
         Assert.That(roSet.Count, Is.EqualTo(1));
 #endif
-        CheckFactory(registry.GetFactory<ListFactory>());//None
-        CheckFactory(registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
-        CheckFactory(registry.GetFactory<StackFactory>());//Reverse
-        CheckFactory(registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse
+        IEnumerable<int> data = Enumerable.Range(5, 10);
+
+        CheckFactory(data, registry.GetFactory<ListFactory>());//None
+        CheckFactory(data, registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
+        CheckFactory(data, registry.GetFactory<StackFactory>());//Reverse
+        CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse, ThreadSafe
     }
 
-    static void CheckFactory(IEnumerableFactory factory)
+    static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
     {
-        IEnumerable<int> data = Enumerable.Range(5, 15);
-        IEnumerable<int> newEnumerable;
+        IEnumerable<T> newEnumerable;
 
         var kind = factory.Kind;
 
+        if (kind.IsThreadSafe())
+        {
+            var capacity = -1;
+
+            if (!kind.IsIgnoreCapacity())
+            {
+                //allocation, need use ArrayPool
+                var dataArray = data.ToArray();
+
+                capacity = dataArray.Length;
+
+                data = dataArray;
+            }
+
+            newEnumerable = factory.New<T, IEnumerable<T>>(capacity, BuildParallel, in data);
+
+            Assert.That(newEnumerable.OrderBy(x => x).SequenceEqual(data), Is.True);
+        }
+
         if (kind.IsIgnoreCapacity() && !kind.IsReverse())
         {
-            newEnumerable = factory.New(-1, static (TryAdd<int> tryAdd, in IEnumerable<int> data) =>
+            newEnumerable = factory.New(-1, static (TryAdd<T> tryAdd, in IEnumerable<T> data) =>
             {
                 foreach (var i in data) tryAdd(i);
             }, in data);
@@ -65,79 +85,28 @@ public class FactoryTest
             //allocation, need use ArrayPool
             var dataArray = data.ToArray();
 
-            newEnumerable = factory.New<int, int[]>(dataArray.Length,
-                kind.IsReverse() ? BuildReverse : Build, 
+            newEnumerable = factory.New<T, T[]>(dataArray.Length,
+                kind.IsReverse() ? BuildReverse : Build,
                 in dataArray);
         }
 
-        if (!newEnumerable.SequenceEqual(data)) throw new InvalidOperationException();
+        Assert.That(newEnumerable.SequenceEqual(data), Is.True);
     }
 
-    static void Build(TryAdd<int> tryAdd, in int[] data)
+    static void Build<T>(TryAdd<T> tryAdd, in T[] data)
     {
         for (int i = 0; i < data.Length; i++) tryAdd(data[i]);
     }
 
-    static void BuildReverse(TryAdd<int> tryAdd, in int[] data)
+    static void BuildReverse<T>(TryAdd<T> tryAdd, in T[] data)
     {
         for (int i = data.Length - 1; i >= 0; i--) tryAdd(data[i]);
     }
 
-    //static void Check(IEnumerable<int> enumerable, int length)
-    //{
-    //    foreach (var item in enumerable)
-    //    {
-    //        if (item != length--) throw new InvalidOperationException("");
-    //    }
-    //    if (length != 0) throw new InvalidOperationException("length invalid");
-    //}
-
-    //static void BuildArray(TryAdd<int> tryAdd, in (EnumerableKind kind, int[] data) state)
-    //{
-    //    (EnumerableKind kind, int[] data) = state;
-    //    if (kind.IsThreadSafe())
-    //    {
-    //        Parallel.ForEach(data, i => tryAdd(i));
-    //    }
-    //    else if (kind.IsReverse())
-    //    {
-    //        for (int i = length - 1; i >= 0; i--) tryAdd(i);
-    //    }
-    //    else
-    //    {
-    //        foreach (var i in data) tryAdd(i);
-    //    }
-    //}
-
-    //static void BuildEnumerable(TryAdd<int> tryAdd, IEnumerable<int> data)
-    //{
-    //    (EnumerableKind kind, IEnumerable<int> data) = state;
-    //    if (kind.IsThreadSafe())
-    //    {
-    //        Parallel.ForEach(data, i => tryAdd(i));
-    //    }
-    //    else
-    //    {
-    //        foreach (var i in data) tryAdd(i);
-    //    }
-    //}
-
-    //static void Build(TryAdd<int> tryAdd, in (EnumerableKind kind, IEnumerable<int> data) state)
-    //{
-    //    (EnumerableKind kind, IEnumerable<int> data) = state;
-    //    if (kind.IsThreadSafe())
-    //    {
-    //        Parallel.ForEach(data, i => tryAdd(i));
-    //    }
-    //    else if (kind.IsReverse())
-    //    {
-    //        for (int i = length - 1; i >= 0; i--) tryAdd(i);
-    //    }
-    //    else
-    //    {
-    //        for (int i = 0; i < length; i++) tryAdd(i);
-    //    }
-    //}
+    static void BuildParallel<T>(TryAdd<T> tryAdd, in IEnumerable<T> data)
+    {
+        Parallel.ForEach(data, i => tryAdd(i));
+    }
 
     [Test]
     public void EquatableListFactoryTest()
