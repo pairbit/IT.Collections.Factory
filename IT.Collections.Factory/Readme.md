@@ -134,9 +134,7 @@ static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
         //allocation, need use ArrayPool
         var dataArray = data.ToArray();
 
-        newEnumerable = factory.New<T, T[]>(dataArray.Length,
-            kind.IsReverse() ? BuildReverse : Build,
-            in dataArray);
+        newEnumerable = factory.New<T, T[]>(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
     }
 
     Assert.That(newEnumerable.SequenceEqual(data), Is.True);

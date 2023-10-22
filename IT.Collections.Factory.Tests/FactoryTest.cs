@@ -1,7 +1,5 @@
 ﻿using IT.Collections.Equatable;
 using IT.Collections.Factory.Factories;
-using IT.Collections.Factory.Generic;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
 namespace IT.Collections.Factory.Tests;
@@ -73,31 +71,15 @@ public class FactoryTest
 
         Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 
-        IEnumerable<KeyValuePair<int, string>> data =
-            Enumerable.Range(5, 10).Select(x => new KeyValuePair<int, string>(x, new string('x', x)));
+        IEnumerable<int> data = Enumerable.Range(5, 10);
 
-        var orderBy = (IEnumerable<KeyValuePair<int, string>> kvp) => kvp.OrderBy(x => x.Key);
-        var comparer = new EqComparer();
-        CheckFactory(data, registry.GetFactory<List<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy, comparer);//None
-        CheckFactory(data, registry.GetFactory<LinkedList<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy, comparer);//IgnoreCapacity
-        CheckFactory(data, registry.GetFactory<Stack<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy, comparer);//Reverse
-        CheckFactory(data, registry.GetFactory<ConcurrentBag<KeyValuePair<int, string>>, KeyValuePair<int, string>>(), orderBy, comparer);//IgnoreCapacity, Reverse, ThreadSafe
-        CheckFactory(data, registry.GetFactory<ConcurrentDictionary<int, string>, int, string>(), orderBy, comparer);//ThreadSafe
+        CheckFactory(data, registry.GetFactory<ListFactory>());//None
+        CheckFactory(data, registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
+        CheckFactory(data, registry.GetFactory<StackFactory>());//Reverse
+        CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse, ThreadSafe
     }
 
-    class EqComparer : IEqualityComparer<KeyValuePair<int, string>>
-    {
-        public bool Equals(KeyValuePair<int, string> x, KeyValuePair<int, string> y)
-            => x.Key == y.Key && (x.Value == y.Value || x.Value.Equals(y.Value));
-
-        public int GetHashCode(KeyValuePair<int, string> obj)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory<IEnumerable<T>, T> factory,
-        Func<IEnumerable<T>, IOrderedEnumerable<T>> orderBy, IEqualityComparer<T> equalityComparer)
+    static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
     {
         IEnumerable<T> newEnumerable;
 
@@ -117,9 +99,9 @@ public class FactoryTest
                 data = dataArray;
             }
 
-            newEnumerable = factory.New(capacity, BuildParallel, in data);
+            newEnumerable = factory.New<T, IEnumerable<T>>(capacity, BuildParallel, in data);
 
-            Assert.That(orderBy(newEnumerable).SequenceEqual(data), Is.True);
+            Assert.That(newEnumerable.OrderBy(x => x).SequenceEqual(data), Is.True);
         }
 
         if (kind.IsIgnoreCapacity() && !kind.IsReverse())
@@ -134,10 +116,10 @@ public class FactoryTest
             //allocation, need use ArrayPool
             var dataArray = data.ToArray();
 
-            newEnumerable = factory.New(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
+            newEnumerable = factory.New<T, T[]>(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
         }
 
-        Assert.That(newEnumerable.SequenceEqual(data, equalityComparer), Is.True);
+        Assert.That(newEnumerable.SequenceEqual(data), Is.True);
     }
 
     static void Build<T>(TryAdd<T> tryAdd, in T[] data)
