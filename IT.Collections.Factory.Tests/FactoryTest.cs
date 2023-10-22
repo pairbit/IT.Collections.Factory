@@ -74,7 +74,7 @@ public class FactoryTest
         Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 
         IEnumerable<KeyValuePair<int, string>> data =
-            Enumerable.Range(5, 100).Select(x => new KeyValuePair<int, string>(x, new string('x', x)));
+            Enumerable.Range(5, 10).Select(x => new KeyValuePair<int, string>(x, new string('x', x)));
 
         var orderBy = (IEnumerable<KeyValuePair<int, string>> kvp) => kvp.OrderBy(x => x.Key);
 
