@@ -92,10 +92,17 @@ Assert.That(stack.SequenceEqual(new[] { 1, 2, 3 }), Is.True);
 ```csharp
 IEnumerable<int> data = Enumerable.Range(5, 10);
 
-CheckFactory(data, registry.GetFactory<ListFactory>());//None
-CheckFactory(data, registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
-CheckFactory(data, registry.GetFactory<StackFactory>());//Reverse
-CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse, ThreadSafe
+//EnumerableKind: None
+CheckFactory(data, registry.GetFactory<ListFactory>());
+
+//EnumerableKind: IgnoreCapacity
+CheckFactory(data, registry.GetFactory<LinkedListFactory>());
+
+//EnumerableKind: Reverse
+CheckFactory(data, registry.GetFactory<StackFactory>());
+
+//EnumerableKind: IgnoreCapacity, Reverse, ThreadSafe
+CheckFactory(data, registry.GetFactory<ConcurrentBagFactory>());
 
 static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
 {
@@ -134,7 +141,8 @@ static void CheckFactory<T>(IEnumerable<T> data, IEnumerableFactory factory)
         //allocation, need use ArrayPool
         var dataArray = data.ToArray();
 
-        newEnumerable = factory.New<T, T[]>(dataArray.Length, kind.IsReverse() ? BuildReverse : Build, in dataArray);
+        newEnumerable = factory.New<T, T[]>(dataArray.Length, 
+            kind.IsReverse() ? BuildReverse : Build, in dataArray);
     }
 
     Assert.That(newEnumerable.SequenceEqual(data), Is.True);
