@@ -39,7 +39,7 @@ Assert.That(arrayFactory.Kind.IsFixed(), Is.True);
 Assert.That(listFactory.Kind.IsFixed(), Is.False);
 ```
 
-## New IReadOnlySet<string> with comparer
+## New IReadOnlySet with comparer
 
 ```csharp
 #if NET6_0_OR_GREATER
@@ -53,20 +53,49 @@ Assert.That(listFactory.Kind.IsFixed(), Is.False);
 #endif
 ```
 
-## New stack
+## New collections with builder
 
 ```csharp
+CheckFactory(registry.GetFactory<ListFactory>());//None
+CheckFactory(registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
+CheckFactory(registry.GetFactory<StackFactory>());//Reverse
+CheckFactory(registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse
 
-```
+static void CheckFactory(IEnumerableFactory factory)
+{
+    IEnumerable<int> data = Enumerable.Range(5, 15);
+    IEnumerable<int> newEnumerable;
 
-## Check IgnoreCapacity
+    var kind = factory.Kind;
 
-```csharp
+    if (kind.IsIgnoreCapacity() && !kind.IsReverse())
+    {
+        newEnumerable = factory.New(-1, static (TryAdd<int> tryAdd, in IEnumerable<int> data) =>
+        {
+            foreach (var i in data) tryAdd(i);
+        }, in data);
+    }
+    else
+    {
+        //allocation, need use ArrayPool
+        var dataArray = data.ToArray();
 
-```
+        newEnumerable = factory.New<int, int[]>(dataArray.Length,
+            kind.IsReverse() ? BuildReverse : Build, 
+            in dataArray);
+    }
 
-## Check ThreadSafe
+    //test
+    if (!newEnumerable.SequenceEqual(data)) throw new InvalidOperationException();
+}
 
-```csharp
+static void Build(TryAdd<int> tryAdd, in int[] data)
+{
+    for (int i = 0; i < data.Length; i++) tryAdd(data[i]);
+}
 
+static void BuildReverse(TryAdd<int> tryAdd, in int[] data)
+{
+    for (int i = data.Length - 1; i >= 0; i--) tryAdd(data[i]);
+}
 ```

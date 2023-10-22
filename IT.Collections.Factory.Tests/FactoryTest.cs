@@ -8,7 +8,7 @@ public class FactoryTest
 {
     private readonly StringComparer _comparer = StringComparer.OrdinalIgnoreCase;
     private readonly int _count = 4;
-    
+
     [Test]
     public void SimpleTest()
     {
@@ -40,7 +40,104 @@ public class FactoryTest
         }, StringComparer.OrdinalIgnoreCase.ToComparers());
         Assert.That(roSet.Count, Is.EqualTo(1));
 #endif
+        CheckFactory(registry.GetFactory<ListFactory>());//None
+        CheckFactory(registry.GetFactory<LinkedListFactory>());//IgnoreCapacity
+        CheckFactory(registry.GetFactory<StackFactory>());//Reverse
+        CheckFactory(registry.GetFactory<ConcurrentBagFactory>());//IgnoreCapacity, Reverse
     }
+
+    static void CheckFactory(IEnumerableFactory factory)
+    {
+        IEnumerable<int> data = Enumerable.Range(5, 15);
+        IEnumerable<int> newEnumerable;
+
+        var kind = factory.Kind;
+
+        if (kind.IsIgnoreCapacity() && !kind.IsReverse())
+        {
+            newEnumerable = factory.New(-1, static (TryAdd<int> tryAdd, in IEnumerable<int> data) =>
+            {
+                foreach (var i in data) tryAdd(i);
+            }, in data);
+        }
+        else
+        {
+            //allocation, need use ArrayPool
+            var dataArray = data.ToArray();
+
+            newEnumerable = factory.New<int, int[]>(dataArray.Length,
+                kind.IsReverse() ? BuildReverse : Build, 
+                in dataArray);
+        }
+
+        if (!newEnumerable.SequenceEqual(data)) throw new InvalidOperationException();
+    }
+
+    static void Build(TryAdd<int> tryAdd, in int[] data)
+    {
+        for (int i = 0; i < data.Length; i++) tryAdd(data[i]);
+    }
+
+    static void BuildReverse(TryAdd<int> tryAdd, in int[] data)
+    {
+        for (int i = data.Length - 1; i >= 0; i--) tryAdd(data[i]);
+    }
+
+    //static void Check(IEnumerable<int> enumerable, int length)
+    //{
+    //    foreach (var item in enumerable)
+    //    {
+    //        if (item != length--) throw new InvalidOperationException("");
+    //    }
+    //    if (length != 0) throw new InvalidOperationException("length invalid");
+    //}
+
+    //static void BuildArray(TryAdd<int> tryAdd, in (EnumerableKind kind, int[] data) state)
+    //{
+    //    (EnumerableKind kind, int[] data) = state;
+    //    if (kind.IsThreadSafe())
+    //    {
+    //        Parallel.ForEach(data, i => tryAdd(i));
+    //    }
+    //    else if (kind.IsReverse())
+    //    {
+    //        for (int i = length - 1; i >= 0; i--) tryAdd(i);
+    //    }
+    //    else
+    //    {
+    //        foreach (var i in data) tryAdd(i);
+    //    }
+    //}
+
+    //static void BuildEnumerable(TryAdd<int> tryAdd, IEnumerable<int> data)
+    //{
+    //    (EnumerableKind kind, IEnumerable<int> data) = state;
+    //    if (kind.IsThreadSafe())
+    //    {
+    //        Parallel.ForEach(data, i => tryAdd(i));
+    //    }
+    //    else
+    //    {
+    //        foreach (var i in data) tryAdd(i);
+    //    }
+    //}
+
+    //static void Build(TryAdd<int> tryAdd, in (EnumerableKind kind, IEnumerable<int> data) state)
+    //{
+    //    (EnumerableKind kind, IEnumerable<int> data) = state;
+    //    if (kind.IsThreadSafe())
+    //    {
+    //        Parallel.ForEach(data, i => tryAdd(i));
+    //    }
+    //    else if (kind.IsReverse())
+    //    {
+    //        for (int i = length - 1; i >= 0; i--) tryAdd(i);
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < length; i++) tryAdd(i);
+    //    }
+    //}
 
     [Test]
     public void EquatableListFactoryTest()
