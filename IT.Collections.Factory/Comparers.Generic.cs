@@ -1,4 +1,6 @@
-﻿namespace IT.Collections.Factory;
+﻿using System.Runtime.CompilerServices;
+
+namespace IT.Collections.Factory;
 
 public readonly struct Comparers<T> : IEquatable<Comparers<T>>
 {
@@ -25,26 +27,29 @@ public readonly struct Comparers<T> : IEquatable<Comparers<T>>
         _comparer = comparer;
     }
 
+    public static bool operator ==(Comparers<T> left, Comparers<T> right) => EqualsCore(in left, in right);
+
+    public static bool operator !=(Comparers<T> left, Comparers<T> right) => !EqualsCore(in left, in right);
+
     public override int GetHashCode() => HashCode.Combine(_equalityComparer, _comparer);
 
     public override bool Equals(
 #if NETSTANDARD2_1 || NETCOREAPP3_1_OR_GREATER
         [System.Diagnostics.CodeAnalysis.NotNullWhen(true)]
 #endif
-        object? other) => other is Comparers<T> comparers && Equals(comparers);
+        object? other) => other is Comparers<T> comparers && EqualsCore(in this, in comparers);
 
-    public bool Equals(Comparers<T> other)
+    public bool Equals(Comparers<T> other) => EqualsCore(in this, in other);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool EqualsCore(in Comparers<T> left, in Comparers<T> right)
     {
-        var equalityComparer = _equalityComparer;
-        var otherEqualityComparer = other._equalityComparer;
+        var lec = left._equalityComparer;
+        var rec = right._equalityComparer;
+        if (lec != rec && (lec == null || !lec.Equals(rec))) return false;
 
-        if (equalityComparer != otherEqualityComparer &&
-           (equalityComparer == null || !equalityComparer.Equals(otherEqualityComparer))) return false;
-
-        var comparer = _comparer;
-        var otherComparer = other._comparer;
-
-        return comparer == otherComparer || 
-              (comparer != null && comparer.Equals(otherComparer));
+        var lc = left._comparer;
+        var rc = right._comparer;
+        return lc == rc || (lc != null && lc.Equals(rc));
     }
 }

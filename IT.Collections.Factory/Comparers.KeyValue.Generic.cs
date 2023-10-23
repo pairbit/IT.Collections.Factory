@@ -1,4 +1,6 @@
-﻿namespace IT.Collections.Factory;
+﻿using System.Runtime.CompilerServices;
+
+namespace IT.Collections.Factory;
 
 public readonly struct Comparers<TKey, TValue> : IEquatable<Comparers<TKey, TValue>>
 {
@@ -26,6 +28,10 @@ public readonly struct Comparers<TKey, TValue> : IEquatable<Comparers<TKey, TVal
         _valueComparer = valueComparer;
     }
 
+    public static bool operator ==(Comparers<TKey, TValue> left, Comparers<TKey, TValue> right) => EqualsCore(in left, in right);
+
+    public static bool operator !=(Comparers<TKey, TValue> left, Comparers<TKey, TValue> right) => !EqualsCore(in left, in right);
+
     public override int GetHashCode()
         => HashCode.Combine(_keyEqualityComparer, _keyComparer, _valueEqualityComparer, _valueComparer);
 
@@ -33,32 +39,27 @@ public readonly struct Comparers<TKey, TValue> : IEquatable<Comparers<TKey, TVal
 #if NETSTANDARD2_1 || NETCOREAPP3_1_OR_GREATER
         [System.Diagnostics.CodeAnalysis.NotNullWhen(true)]
 #endif
-        object? other) => other is Comparers<TKey, TValue> comparers && Equals(comparers);
+        object? other) => other is Comparers<TKey, TValue> comparers && EqualsCore(in this, in comparers);
 
-    public bool Equals(Comparers<TKey, TValue> other)
+    public bool Equals(Comparers<TKey, TValue> other) => EqualsCore(in this, in other);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool EqualsCore(in Comparers<TKey, TValue> left, in Comparers<TKey, TValue> right)
     {
-        var keyEqualityComparer = _keyEqualityComparer;
-        var otherKeyEqualityComparer = other._keyEqualityComparer;
+        var lkeq = left._keyEqualityComparer;
+        var rkeq = right._keyEqualityComparer;
+        if (lkeq != rkeq && (lkeq == null || !lkeq.Equals(rkeq))) return false;
 
-        if (keyEqualityComparer != otherKeyEqualityComparer &&
-           (keyEqualityComparer == null || !keyEqualityComparer.Equals(otherKeyEqualityComparer))) return false;
+        var lkc = left._keyComparer;
+        var rkc = right._keyComparer;
+        if (lkc != rkc && (lkc == null || !lkc.Equals(rkc))) return false;
 
-        var keyComparer = _keyComparer;
-        var otherKeyComparer = other._keyComparer;
+        var lvec = left._valueEqualityComparer;
+        var rvec = right._valueEqualityComparer;
+        if (lvec != rvec && (lvec == null || !lvec.Equals(rvec))) return false;
 
-        if (keyComparer != otherKeyComparer &&
-           (keyComparer == null || !keyComparer.Equals(otherKeyComparer))) return false;
-
-        var valueEqualityComparer = _valueEqualityComparer;
-        var otherValueEqualityComparer = other._valueEqualityComparer;
-
-        if (valueEqualityComparer != otherValueEqualityComparer &&
-           (valueEqualityComparer == null || !valueEqualityComparer.Equals(otherValueEqualityComparer))) return false;
-
-        var valueComparer = _valueComparer;
-        var otherValueComparer = other._valueComparer;
-
-        return valueComparer == otherValueComparer || 
-              (valueComparer != null && valueComparer.Equals(otherValueComparer));
+        var lvc = left._valueComparer;
+        var rvc = right._valueComparer;
+        return lvc == rvc || (lvc != null && lvc.Equals(rvc));
     }
 }

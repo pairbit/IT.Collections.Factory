@@ -223,12 +223,16 @@ public class FactoryTest
         var comparers4 = Comparers.New(new EQ(), null);
         var comparers5 = Comparers.New(StringComparer.Ordinal, null);
 
+        Assert.That(comparers3 == comparers4, Is.True);
+        Assert.That(comparers3 != comparers4, Is.False);
         Assert.That(comparers3.Equals(comparers4), Is.True);
         Assert.That(comparers3.Equals(comparers5), Is.True);
 
         var ckv = Comparers.NewKeyValue(StringComparer.Ordinal);
         var ckv2 = StringComparer.Ordinal.ToComparersKeyValue();
 
+        Assert.That(ckv == ckv2, Is.True);
+        Assert.That(ckv != ckv2, Is.False);
         Assert.That(ckv.Equals(ckv2), Is.True);
     }
 
