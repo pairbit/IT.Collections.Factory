@@ -48,7 +48,15 @@ public class BlockingCollectionFactory : IReadOnlyCollectionFactory, IEquatable<
     public override bool Equals(object? obj) => Equals(obj as BlockingCollectionFactory);
 
     public bool Equals(BlockingCollectionFactory? other)
-        => this == other || (other != null && other.GetType() == GetType() && _factory.Equals(other._factory));
+    {
+        if (other == this) return true;
+        if (other == null || other.GetType() != GetType()) return false;
+
+        var factory = _factory;
+        var otherFactory = other._factory;
+
+        return factory == otherFactory || (factory != null && factory.Equals(otherFactory));
+    }
 
 #if !NET5_0_OR_GREATER
     protected virtual BlockingCollection<T> NewCollection<T>(IProducerConsumerCollection<T> collection, in Comparers<T> comparers)

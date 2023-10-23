@@ -1,6 +1,6 @@
 ﻿namespace IT.Collections.Factory;
 
-public readonly struct Comparers<TKey, TValue>
+public readonly struct Comparers<TKey, TValue> : IEquatable<Comparers<TKey, TValue>>
 {
     private readonly IEqualityComparer<TKey>? _keyEqualityComparer;
     private readonly IComparer<TKey>? _keyComparer;
@@ -24,5 +24,41 @@ public readonly struct Comparers<TKey, TValue>
         _keyComparer = keyComparer;
         _valueEqualityComparer = valueEqualityComparer;
         _valueComparer = valueComparer;
+    }
+
+    public override int GetHashCode()
+        => HashCode.Combine(_keyEqualityComparer, _keyComparer, _valueEqualityComparer, _valueComparer);
+
+    public override bool Equals(
+#if NETSTANDARD2_1 || NETCOREAPP3_1_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)]
+#endif
+        object? other) => other is Comparers<TKey, TValue> comparers && Equals(comparers);
+
+    public bool Equals(Comparers<TKey, TValue> other)
+    {
+        var keyEqualityComparer = _keyEqualityComparer;
+        var otherKeyEqualityComparer = other._keyEqualityComparer;
+
+        if (keyEqualityComparer != otherKeyEqualityComparer &&
+           (keyEqualityComparer == null || !keyEqualityComparer.Equals(otherKeyEqualityComparer))) return false;
+
+        var keyComparer = _keyComparer;
+        var otherKeyComparer = other._keyComparer;
+
+        if (keyComparer != otherKeyComparer &&
+           (keyComparer == null || !keyComparer.Equals(otherKeyComparer))) return false;
+
+        var valueEqualityComparer = _valueEqualityComparer;
+        var otherValueEqualityComparer = other._valueEqualityComparer;
+
+        if (valueEqualityComparer != otherValueEqualityComparer &&
+           (valueEqualityComparer == null || !valueEqualityComparer.Equals(otherValueEqualityComparer))) return false;
+
+        var valueComparer = _valueComparer;
+        var otherValueComparer = other._valueComparer;
+
+        return valueComparer == otherValueComparer || 
+              (valueComparer != null && valueComparer.Equals(otherValueComparer));
     }
 }

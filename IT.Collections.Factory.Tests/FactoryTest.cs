@@ -123,7 +123,7 @@ public class FactoryTest
             //allocation, need use ArrayPool
             var dataArray = data.ToArray();
 
-            newEnumerable = factory.New<T, T[]>(dataArray.Length, 
+            newEnumerable = factory.New<T, T[]>(dataArray.Length,
                 kind.IsReverse() ? BuildReverse : Build, in dataArray);
         }
 
@@ -201,6 +201,61 @@ public class FactoryTest
         CollectionTest(type, baseFactory.New<string?>(10), count: 0);
         CollectionTest(type, baseFactory.New<string?>(11, Builder), count: 1);
         CollectionTest(type, baseFactory.New<string?, int>(12, BuilderState, in _count), count: _count);
+    }
+
+    [Test]
+    public void ComparersTest()
+    {
+        var ordinalIgnoreCase = StringComparer.OrdinalIgnoreCase.ToComparers();
+        var ordinal = StringComparer.Ordinal.ToComparers();
+
+        Assert.That(ordinalIgnoreCase.Equals(ordinalIgnoreCase), Is.True);
+        Assert.That(ordinalIgnoreCase.Equals(ordinal), Is.False);
+        Assert.That(ordinal.Equals(ordinalIgnoreCase), Is.False);
+
+        var comparers1 = Comparers.New(StringComparer.OrdinalIgnoreCase, StringComparer.Ordinal);
+        var comparers2 = Comparers.New(StringComparer.Ordinal, StringComparer.OrdinalIgnoreCase);
+
+        Assert.That(comparers1.Equals(comparers2), Is.False);
+        Assert.That(comparers2.Equals(comparers1), Is.False);
+
+        var comparers3 = Comparers.New(new EQ(), null);
+        var comparers4 = Comparers.New(new EQ(), null);
+        var comparers5 = Comparers.New(StringComparer.Ordinal, null);
+
+        Assert.That(comparers3.Equals(comparers4), Is.True);
+        Assert.That(comparers3.Equals(comparers5), Is.True);
+
+        var ckv = Comparers.NewKeyValue(StringComparer.Ordinal);
+        var ckv2 = StringComparer.Ordinal.ToComparersKeyValue();
+
+        Assert.That(ckv.Equals(ckv2), Is.True);
+    }
+
+    public sealed class EQ : IEqualityComparer<string?>
+    {
+        public bool Equals(string? x, string? y)
+            => StringComparer.Ordinal.Equals(x, y);
+
+        public int GetHashCode(string? obj)
+            => StringComparer.Ordinal.GetHashCode(obj);
+
+        public override bool Equals(object? obj)
+        {
+            if (this == obj) return true;
+
+            if (obj is StringComparer stringComparer && stringComparer.Equals(StringComparer.Ordinal))
+            {
+                return true;
+            }
+
+            return obj is EQ;
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [Test]

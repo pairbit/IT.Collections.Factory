@@ -43,8 +43,15 @@ public sealed class ReadOnlySetFactoryProxy : IReadOnlySetFactory, IEquatable<Re
     public override bool Equals(object? obj) => Equals(obj as ReadOnlySetFactoryProxy);
 
     public bool Equals(ReadOnlySetFactoryProxy? other)
-        => this == other || (other != null && other.GetType() == GetType() &&
-        (_factory == other._factory || (_factory != null && _factory.Equals(other._factory))));
+    {
+        if (other == this) return true;
+        if (other == null || other.GetType() != GetType()) return false;
+
+        var factory = _factory;
+        var otherFactory = other._factory;
+
+        return factory == otherFactory || (factory != null && factory.Equals(otherFactory));
+    }
 
     IReadOnlyCollection<T> IReadOnlyCollectionFactory.Empty<T>(in Comparers<T> comparers) => Empty(in comparers);
     IReadOnlyCollection<T> IReadOnlyCollectionFactory.New<T>(int capacity, in Comparers<T> comparers) => New(capacity, in comparers);
