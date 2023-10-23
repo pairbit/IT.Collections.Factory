@@ -238,7 +238,7 @@ public class FactoryTest
             => StringComparer.Ordinal.Equals(x, y);
 
         public int GetHashCode(string? obj)
-            => StringComparer.Ordinal.GetHashCode(obj);
+            => obj == null ? 0 : StringComparer.Ordinal.GetHashCode(obj);
 
         public override bool Equals(object? obj)
         {
