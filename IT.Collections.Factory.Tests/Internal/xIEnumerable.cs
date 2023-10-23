@@ -39,6 +39,13 @@ internal static class xIEnumerable
             capacity = list.Capacity;
             return true;
         }
+#if NETCOREAPP3_1_OR_GREATER
+        if (enumerable is HashSet<T> hashSet)
+        {
+            capacity = hashSet.EnsureCapacity(0);
+            return true;
+        }
+#endif
 #if NET6_0_OR_GREATER
         if (enumerable is Queue<T> queue)
         {
@@ -48,11 +55,6 @@ internal static class xIEnumerable
         if (enumerable is Stack<T> stack)
         {
             capacity = stack.EnsureCapacity(0);
-            return true;
-        }
-        if (enumerable is HashSet<T> hashSet)
-        {
-            capacity = hashSet.EnsureCapacity(0);
             return true;
         }
 #endif
@@ -69,7 +71,7 @@ internal static class xIEnumerable
             capacity = sortedList.Capacity;
             return true;
         }
-#if NET6_0_OR_GREATER
+#if NETCOREAPP3_1_OR_GREATER
         if (enumerable is Dictionary<TKey, TValue> dictionary)
         {
             capacity = dictionary.EnsureCapacity(0);
